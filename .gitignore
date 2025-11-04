@@ -1,155 +1,24 @@
-# Gestionnaire de Planning Internes - .gitignore
+# Nuxt dev/build outputs
+.output
+.data
+.nuxt
+.nitro
+.cache
+dist
 
-# ============================================
-# Python
-# ============================================
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
+# Node dependencies
+node_modules
 
-# Virtual environments
-venv/
-env/
-ENV/
-env.bak/
-venv.bak/
-
-# PyCharm
-.idea/
-
-# VS Code
-.vscode/
-
-# ============================================
-# Node.js / JavaScript
-# ============================================
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-package-lock.json
-yarn.lock
-.pnpm-debug.log*
-
-# ============================================
-# Base de données
-# ============================================
-*.db
-*.sqlite
-*.sqlite3
-plannings.db
-backup/*.db
-
-# ============================================
-# Fichiers de logs
-# ============================================
-logs/
+# Logs
+logs
 *.log
-npm-debug.log*
-yarn-debug.log*
-lerna-debug.log*
 
-# ============================================
-# OS
-# ============================================
-# macOS
+# Misc
 .DS_Store
-.AppleDouble
-.LSOverride
-._*
+.fleet
+.idea
 
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-
-# Linux
-*~
-
-# ============================================
-# Environnement et secrets
-# ============================================
+# Local env files
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-secrets.json
-config.local.json
-
-# ============================================
-# Build / Dist
-# ============================================
-dist/
-build/
-out/
-.next/
-.nuxt/
-.cache/
-.parcel-cache/
-.output/
-
-# ============================================
-# Tests
-# ============================================
-coverage/
-.nyc_output/
-*.cover
-.hypothesis/
-.pytest_cache/
-htmlcov/
-
-# ============================================
-# Backup et exports temporaires
-# ============================================
-backup/
-exports/
-temp/
-tmp/
-*.tmp
-*.bak
-*.swp
-
-# ============================================
-# Documentation générée
-# ============================================
-docs/_build/
-site/
-
-# ============================================
-# Fichiers de données temporaires
-# ============================================
-*.csv.tmp
-*.xlsx.tmp
-*.json.tmp
-
-# ============================================
-# Fichiers spécifiques au projet
-# ============================================
-# Données de test
-test_data/
-sample_plannings/
-
-# Exports utilisateur (à ne pas commiter)
-user_exports/
-planning_exports/
-
+.env.*
+!.env.example

@@ -1,0 +1,133 @@
+# 📊 Progression du Développement
+
+**Dernière mise à jour :** 4 novembre 2025 - 21h55
+
+---
+
+## ✅ PHASE 1 : SETUP INITIAL (COMPLÉTÉ)
+
+### 1.1 Documentation ✅
+- ✅ README.md créé
+- ✅ .gitignore configuré
+- ✅ LICENSE (MIT) ajoutée
+- ✅ 7 modules documentés (MODULE-1 à MODULE-7)
+- ✅ Documentation technique (ARCHITECTURE.md, DATABASE.md, ALGORITHMS.md)
+- ✅ ROADMAP.md créé
+- ✅ QUESTIONS.md et ANSWERS.md complétés
+
+### 1.2 Configuration Git ✅
+- ✅ Repository initialisé
+- ✅ Premier commit effectué
+- ✅ Push sur GitHub réussi (https://github.com/louisgarnier/internes.git)
+
+### 1.3 Setup Technique ✅
+- ✅ **Nuxt.js 3** installé (compatible Node v18.20.6)
+- ✅ Configuration `nuxt.config.ts` créée
+- ✅ Structure de dossiers créée (`pages/`, `components/`, etc.)
+- ✅ Page d'accueil fonctionnelle (`pages/index.vue`)
+- ✅ Serveur de développement opérationnel
+- ✅ `package.json` configuré
+
+**Note :** Tailwind CSS sera ajouté plus tard pour éviter les problèmes de configuration.
+
+---
+
+## 🎯 PHASE 2 : MODULE 1 - DASHBOARD (EN COURS)
+
+### État : ⏳ Prêt à démarrer
+
+### Objectifs :
+- [ ] Créer le layout principal
+- [ ] Dashboard avec liste des plannings (vide au départ)
+- [ ] Bouton "Nouveau Planning"
+- [ ] Carte pour chaque planning existant
+- [ ] Actions : Ouvrir, Dupliquer, Supprimer
+
+### Prochaines étapes :
+1. Ajouter un système de style simple (CSS ou Tailwind)
+2. Créer le composant Dashboard
+3. Implémenter le store Pinia pour les plannings
+4. Tester l'affichage
+
+---
+
+## 📅 Planning Prévisionnel
+
+| Phase | Module | État | Semaine Prévue |
+|-------|--------|------|----------------|
+| ✅ Phase 1 | Setup & Documentation | **COMPLÉTÉ** | Semaine 1-2 |
+| ⏳ Phase 2 | MODULE 1 - Dashboard | Prêt | Semaine 3 |
+| 📝 Phase 3 | MODULE 2 - Configuration | À venir | Semaine 4-5 |
+| 📝 Phase 4 | MODULE 3 - Génération | À venir | Semaine 5-6 |
+| 📝 Phase 5 | MODULE 4 - Visualisation | À venir | Semaine 7 |
+| 📝 Phase 6 | MODULE 5 - Manipulation | À venir | Semaine 8 |
+| 📝 Phase 7 | MODULE 6 - Export | À venir | Semaine 8 |
+| 📝 Phase 8 | MODULE 7 - Stockage | À venir | Semaine 9 |
+| 📝 Phase 9 | Tests & Polish | À venir | Semaine 10 |
+
+---
+
+## 🛠️ Stack Technique Confirmé
+
+| Composant | Technologie | Version |
+|-----------|-------------|---------|
+| **Framework** | Nuxt.js | 3.13.0 |
+| **Runtime** | Node.js | 18.20.6 |
+| **Framework Vue** | Vue 3 | 3.4.0 |
+| **Router** | Vue Router | 4.3.0 |
+| **State Management** | Pinia | À installer |
+| **Styles** | CSS natif (temporaire) | - |
+| **Stockage** | LocalStorage | - |
+
+---
+
+## 📝 Notes de Développement
+
+### Décisions Prises
+1. **Nuxt 3 au lieu de Nuxt 4** : Compatibilité avec Node 18
+2. **Pas de Tailwind pour l'instant** : Problèmes de config PostCSS, on le rajoutera après
+3. **CSS inline/natif** : Pour avoir une interface fonctionnelle rapidement
+4. **Approche itérative** : Valider visuellement chaque étape avant de passer à la suivante
+
+### Problèmes Résolus
+- ✅ Erreur `EBADENGINE` (Node version) → Solution : Nuxt 3
+- ✅ Erreurs PostCSS avec Tailwind → Solution : CSS natif temporaire
+- ✅ Authentification GitHub → Utilisation d'osxkeychain
+
+---
+
+## 🎨 Workflow de Développement
+
+Pour chaque fonctionnalité :
+1. ✅ Lire le fichier MD du module
+2. ✅ Développer la fonctionnalité
+3. ✅ Tester visuellement dans le navigateur
+4. ✅ Valider avec l'utilisateur
+5. ✅ Mettre à jour le MD avec ✅
+6. ✅ Commit + Push sur GitHub
+
+**Note :** L'utilisateur veut être en contrôle et valider chaque étape visuellement.
+
+---
+
+## 🚀 Commandes Utiles
+
+```bash
+# Lancer le serveur de développement
+npm run dev
+
+# Build de production
+npm run build
+
+# Générer site statique
+npm run generate
+
+# Prévisualiser le build
+npm run preview
+```
+
+**URL de développement :** http://localhost:3001/
+
+---
+
+*Ce fichier sera mis à jour au fur et à mesure du développement.*

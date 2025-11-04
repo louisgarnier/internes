@@ -4,10 +4,11 @@
 
 Ce document décrit le plan de développement complet de l'application sur **10 semaines**.
 
-**Version actuelle :** 0.1.0 (Documentation)  
+**Version actuelle :** 0.2.0 (Setup technique complété)  
 **Version cible v1.0 :** Toutes les fonctionnalités principales implémentées  
 **Date de début :** 4 novembre 2025  
-**Date de fin prévue :** 13 janvier 2026
+**Date de fin prévue :** 13 janvier 2026  
+**Progression :** ✅ Phase 1 terminée - Phase 2 en cours
 
 ---
 
@@ -17,27 +18,28 @@ Ce document décrit le plan de développement complet de l'application sur **10 
 
 **Objectif :** Avoir une base solide pour le développement
 
-#### Semaine 1 : Documentation & Architecture
+#### Semaine 1 : Documentation & Architecture ✅
 - [x] Rédaction des spécifications complètes
 - [x] Création du README principal
-- [ ] Documentation de tous les modules (1-7)
-- [ ] Documentation technique (architecture, DB, algorithmes)
-- [ ] Création des maquettes UI/UX (Figma)
-- [ ] Setup du repository GitHub
+- [x] Documentation de tous les modules (1-7)
+- [x] Documentation technique (architecture, DB, algorithmes)
+- [x] Setup du repository GitHub
+- [x] Push initial sur GitHub
 
-#### Semaine 2 : Setup Technique
-- [ ] Choix de la stack technique finale
-- [ ] Setup de l'environnement de développement
-- [ ] Configuration des outils (linters, formatters)
-- [ ] Structure des dossiers du projet
-- [ ] Configuration CI/CD de base
-- [ ] Premiers tests de faisabilité algorithmique
+#### Semaine 2 : Setup Technique ✅
+- [x] Choix de la stack technique finale (Nuxt 3 + Pinia + LocalStorage)
+- [x] Setup de l'environnement de développement
+- [x] Structure des dossiers du projet
+- [x] Installation et configuration de Nuxt.js 3
+- [x] Page d'accueil fonctionnelle
+- [x] Serveur de développement opérationnel
 
-**Livrables Phase 1 :**
-- ✅ Documentation complète
-- ✅ Maquettes validées
-- ✅ Architecture définie
-- ✅ Environnement prêt
+**Livrables Phase 1 :** ✅ COMPLÉTÉS
+- ✅ Documentation complète (7 modules + 3 docs techniques)
+- ✅ Architecture définie (Nuxt 3 + Pinia + LocalStorage)
+- ✅ Environnement prêt et testé
+- ✅ Repository GitHub configuré
+- ✅ Application Nuxt fonctionnelle
 
 ---
 
