@@ -183,6 +183,88 @@
 
           </div>
 
+          <!-- ÉTAPE 3 : Gestion des Practices -->
+          <div v-if="currentStep === 3">
+            
+            <!-- Header avec bouton Ajouter -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+              <div>
+                <h3 style="font-size: 18px; font-weight: 600; color: #333; margin: 0;">
+                  Liste des Practices ({{ formData.practices.length }})
+                </h3>
+                <p style="font-size: 13px; color: #666; margin: 4px 0 0 0;">
+                  Minimum 1 practice requise
+                </p>
+              </div>
+              <button 
+                @click="openAddPractice"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+                @mouseover="$event.target.style.transform = 'translateY(-2px)'"
+                @mouseout="$event.target.style.transform = 'translateY(0)'"
+              >
+                ➕ Ajouter
+              </button>
+            </div>
+
+            <!-- Liste des practices -->
+            <div v-if="formData.practices.length === 0" style="text-align: center; padding: 60px 20px; background: #f9fafb; border-radius: 10px; border: 2px dashed #d1d5db;">
+              <div style="font-size: 48px; margin-bottom: 16px;">🏥</div>
+              <p style="color: #6b7280; font-size: 15px; margin: 0;">
+                Aucune practice ajoutée. Cliquez sur "➕ Ajouter" pour commencer.
+              </p>
+            </div>
+
+            <div v-else style="display: grid; gap: 12px; margin-bottom: 30px;">
+              <div 
+                v-for="(practice, index) in formData.practices"
+                :key="index"
+                style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; transition: all 0.2s;"
+                @mouseover="$event.currentTarget.style.background = '#f3f4f6'"
+                @mouseout="$event.currentTarget.style.background = '#f9fafb'"
+              >
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                  <div style="flex: 1;">
+                    <div style="font-size: 15px; color: #333; font-weight: 600; margin-bottom: 4px;">
+                      {{ index + 1 }}. {{ practice.name }}
+                    </div>
+                    <div style="font-size: 13px; color: #666; margin-bottom: 4px;">
+                      {{ practice.internsRequired }} {{ practice.internsRequired > 1 ? 'internes' : 'interne' }} requis
+                    </div>
+                    <div style="font-size: 13px; color: #666;">
+                      📅 {{ formatPracticeSchedule(practice) }}
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 8px;">
+                    <button 
+                      @click="editPractice(index)"
+                      style="background: #3b82f6; color: white; font-size: 13px; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s;"
+                      @mouseover="$event.target.style.background = '#2563eb'"
+                      @mouseout="$event.target.style.background = '#3b82f6'"
+                    >
+                      ✏️
+                    </button>
+                    <button 
+                      @click="deletePractice(index)"
+                      style="background: #ef4444; color: white; font-size: 13px; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s;"
+                      @mouseover="$event.target.style.background = '#dc2626'"
+                      @mouseout="$event.target.style.background = '#ef4444'"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message d'avertissement si < 1 practice -->
+            <div v-if="formData.practices.length < 1" style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px; padding: 16px; margin-bottom: 30px;">
+              <p style="margin: 0; color: #92400e; font-size: 14px; font-weight: 500;">
+                ⚠️ Vous devez ajouter au moins 1 practice pour continuer
+              </p>
+            </div>
+
+          </div>
+
           <!-- Buttons -->
           <div style="display: flex; gap: 12px; margin-top: 40px;">
             <button 
@@ -232,6 +314,134 @@
 
       </div>
 
+    </div>
+
+    <!-- Modal Ajouter/Modifier Practice -->
+    <div v-if="showPracticeModal" @click="closePracticeModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;">
+      <div @click.stop style="background: white; border-radius: 16px; padding: 30px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        <h2 style="font-size: 22px; font-weight: 600; color: #333; margin: 0 0 8px 0;">
+          {{ editingPracticeIndex !== null ? 'Modifier une Practice' : 'Ajouter une Practice' }}
+        </h2>
+        <p style="font-size: 13px; color: #666; margin: 0 0 24px 0;">
+          Définissez les services médicaux et leurs horaires
+        </p>
+        
+        <!-- Nom de la practice -->
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 6px;">
+            Nom de la Practice <span style="color: #ef4444;">*</span>
+          </label>
+          <input 
+            v-model="practiceForm.name"
+            type="text"
+            placeholder="Ex: Chirurgie"
+            style="width: 100%; padding: 10px 14px; font-size: 14px; border: 2px solid #e5e7eb; border-radius: 8px; outline: none; box-sizing: border-box;"
+            @focus="$event.target.style.borderColor = '#667eea'"
+            @blur="$event.target.style.borderColor = '#e5e7eb'"
+          />
+        </div>
+
+        <!-- Nombre d'internes requis -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 10px;">
+            Nombre d'internes requis <span style="color: #ef4444;">*</span>
+          </label>
+          <div style="display: flex; gap: 20px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input 
+                type="radio" 
+                v-model="practiceForm.internsRequired" 
+                :value="1"
+                style="width: 18px; height: 18px; cursor: pointer;"
+              />
+              <span style="font-size: 14px; color: #333;">1 interne</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input 
+                type="radio" 
+                v-model="practiceForm.internsRequired" 
+                :value="2"
+                style="width: 18px; height: 18px; cursor: pointer;"
+              />
+              <span style="font-size: 14px; color: #333;">2 internes</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Jours d'activité -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 10px;">
+            Jours d'activité <span style="color: #ef4444;">*</span>
+          </label>
+          <div style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden;">
+            <!-- Header -->
+            <div style="display: grid; grid-template-columns: 1fr 80px 100px; background: #e5e7eb; padding: 10px; font-size: 13px; font-weight: 600; color: #374151;">
+              <div>Jour</div>
+              <div style="text-align: center;">Matin</div>
+              <div style="text-align: center;">Après-midi</div>
+            </div>
+            <!-- Rows -->
+            <div 
+              v-for="(day, dayKey) in practiceForm.schedule"
+              :key="dayKey"
+              style="display: grid; grid-template-columns: 1fr 80px 100px; padding: 12px 10px; border-top: 1px solid #e5e7eb; align-items: center;"
+            >
+              <div style="font-size: 14px; color: #333; font-weight: 500;">
+                {{ getDayLabel(dayKey) }}
+              </div>
+              <div style="text-align: center;">
+                <input 
+                  type="checkbox" 
+                  v-model="day.morning"
+                  style="width: 18px; height: 18px; cursor: pointer;"
+                />
+              </div>
+              <div style="text-align: center;">
+                <input 
+                  type="checkbox" 
+                  v-model="day.afternoon"
+                  :disabled="dayKey === 'saturday'"
+                  style="width: 18px; height: 18px; cursor: pointer;"
+                  :style="{ opacity: dayKey === 'saturday' ? 0.3 : 1 }"
+                />
+              </div>
+            </div>
+          </div>
+          <p style="font-size: 12px; color: #666; margin: 8px 0 0 0;">
+            ℹ️ Samedi : uniquement le matin (astreinte)
+          </p>
+        </div>
+
+        <!-- Buttons -->
+        <div style="display: flex; gap: 10px;">
+          <button 
+            @click="closePracticeModal"
+            style="flex: 1; background: #e5e7eb; color: #374151; font-size: 15px; font-weight: 600; padding: 12px; border: none; border-radius: 8px; cursor: pointer;"
+            @mouseover="$event.target.style.background = '#d1d5db'"
+            @mouseout="$event.target.style.background = '#e5e7eb'"
+          >
+            Annuler
+          </button>
+          <button 
+            @click="savePractice"
+            :disabled="!practiceForm.name || !hasAtLeastOneSlot"
+            :style="{
+              flex: 1,
+              background: (practiceForm.name && hasAtLeastOneSlot) ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#d1d5db',
+              color: 'white',
+              fontSize: '15px',
+              fontWeight: '600',
+              padding: '12px',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: (practiceForm.name && hasAtLeastOneSlot) ? 'pointer' : 'not-allowed',
+              opacity: (practiceForm.name && hasAtLeastOneSlot) ? 1 : 0.6
+            }"
+          >
+            Enregistrer
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Modal Ajouter/Modifier Interne -->
@@ -373,7 +583,9 @@ const formData = ref({
   startDate: '',
   weeks: 3,
   // Étape 2
-  interns: []
+  interns: [],
+  // Étape 3
+  practices: []
 })
 
 // Errors
@@ -392,6 +604,22 @@ const internForm = ref({
   phone: ''
 })
 const editingInternIndex = ref(null)
+
+// Modal practice
+const showPracticeModal = ref(false)
+const practiceForm = ref({
+  name: '',
+  internsRequired: 2,
+  schedule: {
+    monday: { morning: false, afternoon: false },
+    tuesday: { morning: false, afternoon: false },
+    wednesday: { morning: false, afternoon: false },
+    thursday: { morning: false, afternoon: false },
+    friday: { morning: false, afternoon: false },
+    saturday: { morning: false, afternoon: false }
+  }
+})
+const editingPracticeIndex = ref(null)
 
 // Get step title
 const getStepTitle = () => {
@@ -448,6 +676,11 @@ const endDate = computed(() => {
   return end.toISOString().split('T')[0]
 })
 
+// Vérifier si au moins un slot est sélectionné
+const hasAtLeastOneSlot = computed(() => {
+  return Object.values(practiceForm.value.schedule).some(day => day.morning || day.afternoon)
+})
+
 // Validation de l'étape courante
 const isStepValid = computed(() => {
   if (currentStep.value === 1) {
@@ -458,6 +691,8 @@ const isStepValid = computed(() => {
            formData.value.weeks <= 10
   } else if (currentStep.value === 2) {
     return formData.value.interns.length >= 2
+  } else if (currentStep.value === 3) {
+    return formData.value.practices.length >= 1
   }
   return true
 })
@@ -530,6 +765,112 @@ const closeModal = () => {
   showInternModal.value = false
   internForm.value = { id: null, firstName: '', lastName: '', email: '', phone: '' }
   editingInternIndex.value = null
+}
+
+// Actions Modal Practice
+const openAddPractice = () => {
+  practiceForm.value = {
+    name: '',
+    internsRequired: 2,
+    schedule: {
+      monday: { morning: false, afternoon: false },
+      tuesday: { morning: false, afternoon: false },
+      wednesday: { morning: false, afternoon: false },
+      thursday: { morning: false, afternoon: false },
+      friday: { morning: false, afternoon: false },
+      saturday: { morning: false, afternoon: false }
+    }
+  }
+  editingPracticeIndex.value = null
+  showPracticeModal.value = true
+}
+
+const editPractice = (index) => {
+  practiceForm.value = JSON.parse(JSON.stringify(formData.value.practices[index]))
+  editingPracticeIndex.value = index
+  showPracticeModal.value = true
+}
+
+const deletePractice = (index) => {
+  if (confirm('Êtes-vous sûr de vouloir supprimer cette practice ?')) {
+    formData.value.practices.splice(index, 1)
+  }
+}
+
+const savePractice = () => {
+  if (!practiceForm.value.name || !hasAtLeastOneSlot.value) return
+  
+  if (editingPracticeIndex.value !== null) {
+    // Modifier
+    formData.value.practices[editingPracticeIndex.value] = JSON.parse(JSON.stringify(practiceForm.value))
+  } else {
+    // Ajouter
+    formData.value.practices.push(JSON.parse(JSON.stringify(practiceForm.value)))
+  }
+  
+  closePracticeModal()
+}
+
+const closePracticeModal = () => {
+  showPracticeModal.value = false
+  practiceForm.value = {
+    name: '',
+    internsRequired: 2,
+    schedule: {
+      monday: { morning: false, afternoon: false },
+      tuesday: { morning: false, afternoon: false },
+      wednesday: { morning: false, afternoon: false },
+      thursday: { morning: false, afternoon: false },
+      friday: { morning: false, afternoon: false },
+      saturday: { morning: false, afternoon: false }
+    }
+  }
+  editingPracticeIndex.value = null
+}
+
+// Helper functions for practices
+const getDayLabel = (dayKey) => {
+  const labels = {
+    monday: 'Lundi',
+    tuesday: 'Mardi',
+    wednesday: 'Mercredi',
+    thursday: 'Jeudi',
+    friday: 'Vendredi',
+    saturday: 'Samedi'
+  }
+  return labels[dayKey] || dayKey
+}
+
+const formatPracticeSchedule = (practice) => {
+  const days = []
+  const schedule = practice.schedule
+  
+  // Vérifier quels jours sont actifs
+  const activeDays = {
+    monday: schedule.monday.morning || schedule.monday.afternoon,
+    tuesday: schedule.tuesday.morning || schedule.tuesday.afternoon,
+    wednesday: schedule.wednesday.morning || schedule.wednesday.afternoon,
+    thursday: schedule.thursday.morning || schedule.thursday.afternoon,
+    friday: schedule.friday.morning || schedule.friday.afternoon,
+    saturday: schedule.saturday.morning || schedule.saturday.afternoon
+  }
+  
+  // Simplifier l'affichage
+  const allWeekdays = activeDays.monday && activeDays.tuesday && activeDays.wednesday && activeDays.thursday && activeDays.friday
+  
+  if (allWeekdays) {
+    days.push('Lun-Ven')
+  } else {
+    if (activeDays.monday) days.push('Lun')
+    if (activeDays.tuesday) days.push('Mar')
+    if (activeDays.wednesday) days.push('Mer')
+    if (activeDays.thursday) days.push('Jeu')
+    if (activeDays.friday) days.push('Ven')
+  }
+  
+  if (activeDays.saturday) days.push('Sam')
+  
+  return days.join(', ')
 }
 
 // Navigation

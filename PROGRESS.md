@@ -64,7 +64,7 @@
 
 ## 🎯 PHASE 3 : MODULE 2 - CONFIGURATION (EN COURS)
 
-### État : ⏳ En cours - Étapes 1-2/4 complétées (50%)
+### État : ⏳ En cours - Étapes 1-2-3/4 complétées (75%)
 
 ### Réalisations :
 
@@ -97,11 +97,28 @@
 - **Modal** : formulaire complet avec auto-remplissage
 - 2 internes de test pré-remplis
 
+#### ✅ Étape 3 : Gestion des Practices (COMPLÉTÉE)
+- **Liste des practices** avec compteur
+- **Formulaire complet** :
+  - Nom de la practice (obligatoire)
+  - Nombre d'internes requis (radio : 1 ou 2)
+  - Tableau des jours avec checkboxes (Lun-Sam)
+  - Matin et Après-midi sélectionnables
+  - Samedi : uniquement matin (après-midi désactivé)
+- **Affichage intelligent** :
+  - Formatage des jours (ex: "Lun-Ven" au lieu de liste)
+  - Nombre d'internes affiché
+  - Jours d'activité résumés
+- **Actions** : Ajouter, Modifier, Supprimer
+- **Validation** : minimum 1 practice requise
+- **Modal** avec tableau de sélection des jours
+- **Progress bar** à 75%
+
 ### À venir :
-- ⏳ Étape 3 : Gestion des practices (configuration + jours requis)
-- ⏳ Étape 4 : Empêchements (dates + périodes)
+- ⏳ Étape 4 : Empêchements (dates + périodes) - DERNIÈRE ÉTAPE !
 - ⏳ Sauvegarde du planning complet dans le store
 - 📝 **À PRÉVOIR** : Page dédiée de gestion des contacts (CRUD complet)
+- 📝 **v2.0** : Intégration Google Calendar (export/import)
 
 ### Fichiers créés/modifiés :
 - `stores/interns.js` - Store global des internes (nouveau)
@@ -116,7 +133,7 @@
 |-------|--------|------|----------------|
 | ✅ Phase 1 | Setup & Documentation | **COMPLÉTÉ** | Semaine 1-2 |
 | ✅ Phase 2 | MODULE 1 - Dashboard | **COMPLÉTÉ** | Semaine 3 |
-| ⏳ Phase 3 | MODULE 2 - Configuration | **EN COURS** (2/4 étapes - 50%) | Semaine 4-5 |
+| ⏳ Phase 3 | MODULE 2 - Configuration | **EN COURS** (3/4 étapes - 75%) | Semaine 4-5 |
 | 📝 Phase 4 | MODULE 3 - Génération | À venir | Semaine 5-6 |
 | 📝 Phase 5 | MODULE 4 - Visualisation | À venir | Semaine 7 |
 | 📝 Phase 6 | MODULE 5 - Manipulation | À venir | Semaine 8 |

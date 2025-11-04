@@ -6,7 +6,7 @@
 
 **Priorité :** 🔴 CRITIQUE (Fondation de l'application)
 
-**Statut :** ⏳ EN COURS (Étapes 1-2/4 complétées - 50%)
+**Statut :** ⏳ EN COURS (Étapes 1-2-3/4 complétées - 75%)
 
 **Dépendances :** MODULE 1 (Gestion des plannings)
 
@@ -60,24 +60,91 @@
 - ✅ Validation : minimum 2 internes requis pour passer à l'étape 3
 - ✅ Progress bar à 50%
 
+### Étape 3 : Gestion des Practices ✅ COMPLÉTÉE
+- ✅ Interface Étape 3 du wizard :
+  - Liste des practices avec compteur
+  - Bouton "➕ Ajouter" en haut à droite
+  - État vide avec icône 🏥
+  - Cartes practices avec infos détaillées :
+    - Numéro + Nom de la practice
+    - Nombre d'internes requis (1 ou 2)
+    - Jours d'activité (format simplifié)
+  - Actions par practice : Modifier ✏️ et Supprimer 🗑️
+  - Message d'avertissement si < 1 practice
+- ✅ Modal Ajouter/Modifier Practice :
+  - Formulaire avec 3 sections :
+    - Nom de la practice* (obligatoire)
+    - Nombre d'internes requis* (radio buttons : 1 ou 2)
+    - Tableau des jours d'activité* :
+      - 6 jours (Lundi à Samedi)
+      - Colonnes : Jour | Matin | Après-midi
+      - Checkboxes pour sélectionner les périodes
+      - Samedi après-midi désactivé (astreinte matin uniquement)
+  - Validation : nom + au moins 1 slot sélectionné
+  - Info contextuelle : "Samedi : uniquement le matin (astreinte)"
+- ✅ Formatage intelligent des jours :
+  - "Lun-Ven" si tous les jours de semaine actifs
+  - Liste courte sinon (ex: "Lun, Mer, Ven")
+  - Ajout de "Sam" si samedi actif
+- ✅ Validation : minimum 1 practice requise pour passer à l'étape 4
+- ✅ Progress bar à 75%
+- ✅ Deep copy pour éviter les références partagées
+- ✅ Navigation Retour/Suivant fonctionnelle
+
 ### Étapes à Venir
-- ⏳ Étape 3 : Gestion des practices (configuration + jours requis)
-- ⏳ Étape 4 : Empêchements (dates + périodes)
+- ⏳ Étape 4 : Empêchements (dates + périodes) - DERNIÈRE ÉTAPE
 - ⏳ Sauvegarde finale du planning complet dans le store
 - ⏳ Création et affichage du planning
 
-### Fonctionnalité Additionnelle à Prévoir
-- 📝 **Page dédiée de gestion des contacts** :
-  - Liste complète de tous les internes/contacts
-  - CRUD complet (Create, Read, Update, Delete)
-  - Recherche et filtres
-  - Import/Export (CSV)
-  - Accessible depuis le dashboard ou menu principal
-  - Permettra de gérer les contacts en dehors de la création de planning
+### Fonctionnalités Additionnelles à Prévoir
+
+#### 📝 v1.1 : Page de Gestion des Contacts
+- Liste complète de tous les internes/contacts
+- CRUD complet (Create, Read, Update, Delete)
+- Recherche et filtres
+- Import/Export (CSV)
+- Accessible depuis le dashboard ou menu principal
+- Permettra de gérer les contacts en dehors de la création de planning
+
+#### 📝 v2.0 : Intégration Google Calendar
+**Exigence importante** : Le calendrier doit être structuré de manière à faciliter l'intégration future avec Google Calendar
+
+**Fonctionnalités prévues** :
+- **Export vers Google Calendar** :
+  - Export d'un planning complet vers Google Calendar
+  - Création automatique d'événements pour :
+    - Gardes (avec type : semaine, samedi, dimanche)
+    - Assignations aux practices (avec lieu/service)
+    - Repos post-garde
+    - Demi-journées OFF
+  - Couleurs différentes par type d'événement
+  - Descriptions enrichies (interne, practice, horaires)
+
+- **Import depuis Google Calendar** :
+  - Synchronisation des empêchements depuis Google Calendar
+  - Détection automatique des indisponibilités
+  - Mise à jour bidirectionnelle
+
+- **Synchronisation continue** :
+  - Notifications de changements
+  - Mise à jour automatique des événements modifiés
+  - Gestion des conflits
+
+**Structure de données requise** :
+- Format de dates compatible ISO 8601
+- Identifiants uniques pour chaque événement
+- Métadonnées structurées (type, practice, interne)
+- Champs optionnels pour ID Google Calendar
+
+**À prévoir dans le développement** :
+- Structure des objets Planning/Shift compatible avec Google Calendar API
+- Champs `googleCalendarId` dans les models
+- Format de dates standardisé
+- API REST pour synchronisation
 
 ### Fichiers Créés
 - `stores/interns.js` - Store Pinia global pour les internes
-- `pages/planning/new.vue` - Wizard étapes 1-2 avec navigation
+- `pages/planning/new.vue` - Wizard étapes 1-2-3 avec navigation complète
 
 ---
 
