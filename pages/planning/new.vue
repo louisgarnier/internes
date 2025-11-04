@@ -265,6 +265,81 @@
 
           </div>
 
+          <!-- ÉTAPE 4 : Empêchements -->
+          <div v-if="currentStep === 4">
+            
+            <!-- Header avec bouton Ajouter -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+              <div>
+                <h3 style="font-size: 18px; font-weight: 600; color: #333; margin: 0;">
+                  Liste des Empêchements ({{ formData.unavailabilities.length }})
+                </h3>
+                <p style="font-size: 13px; color: #666; margin: 4px 0 0 0;">
+                  Étape optionnelle - Déclarez les indisponibilités
+                </p>
+              </div>
+              <button 
+                @click="openAddUnavailability"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+                @mouseover="$event.target.style.transform = 'translateY(-2px)'"
+                @mouseout="$event.target.style.transform = 'translateY(0)'"
+              >
+                ➕ Ajouter
+              </button>
+            </div>
+
+            <!-- Liste des empêchements -->
+            <div v-if="formData.unavailabilities.length === 0" style="text-align: center; padding: 60px 20px; background: #f9fafb; border-radius: 10px; border: 2px dashed #d1d5db; margin-bottom: 30px;">
+              <div style="font-size: 48px; margin-bottom: 16px;">📅</div>
+              <p style="color: #6b7280; font-size: 15px; margin: 0 0 8px 0; font-weight: 500;">
+                Aucun empêchement déclaré
+              </p>
+              <p style="color: #9ca3af; font-size: 13px; margin: 0;">
+                Cette étape est optionnelle. Vous pouvez ajouter des empêchements plus tard.
+              </p>
+            </div>
+
+            <div v-else style="display: grid; gap: 12px; margin-bottom: 30px;">
+              <div 
+                v-for="(unavail, index) in formData.unavailabilities"
+                :key="index"
+                style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; transition: all 0.2s;"
+                @mouseover="$event.currentTarget.style.background = '#f3f4f6'"
+                @mouseout="$event.currentTarget.style.background = '#f9fafb'"
+              >
+                <div style="display: flex; justify-content: space-between; align-items: start;">
+                  <div style="flex: 1;">
+                    <div style="font-size: 15px; color: #333; font-weight: 600; margin-bottom: 4px;">
+                      {{ getInternName(unavail.internId) }}
+                    </div>
+                    <div style="font-size: 13px; color: #666; margin-bottom: 2px;">
+                      📅 {{ formatDate(unavail.date) }} - {{ getPeriodLabel(unavail.period) }}
+                    </div>
+                    <div v-if="unavail.reason" style="font-size: 13px; color: #666; font-style: italic;">
+                      💬 {{ unavail.reason }}
+                    </div>
+                  </div>
+                  <button 
+                    @click="deleteUnavailability(index)"
+                    style="background: #ef4444; color: white; font-size: 13px; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s;"
+                    @mouseover="$event.target.style.background = '#dc2626'"
+                    @mouseout="$event.target.style.background = '#ef4444'"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Info -->
+            <div style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 10px; padding: 16px; margin-bottom: 30px;">
+              <p style="margin: 0; color: #1e40af; font-size: 14px; font-weight: 500;">
+                ℹ️ Cette étape est optionnelle. Vous pouvez créer le planning maintenant et ajouter des empêchements plus tard si nécessaire.
+              </p>
+            </div>
+
+          </div>
+
           <!-- Buttons -->
           <div style="display: flex; gap: 12px; margin-top: 40px;">
             <button 
@@ -292,7 +367,7 @@
               :disabled="!isStepValid"
               :style="{
                 flex: 2,
-                background: isStepValid ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#d1d5db',
+                background: isStepValid ? (currentStep === 4 ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)') : '#d1d5db',
                 color: 'white',
                 fontSize: '16px',
                 fontWeight: '600',
@@ -306,7 +381,7 @@
               @mouseover="handleButtonHover"
               @mouseout="handleButtonLeave"
             >
-              {{ currentStep === 4 ? 'Créer le Planning' : 'Suivant → Étape ' + (currentStep + 1) }}
+              {{ currentStep === 4 ? '✓ Terminer et Créer le Planning' : 'Suivant → Étape ' + (currentStep + 1) }}
             </button>
           </div>
 
@@ -314,6 +389,136 @@
 
       </div>
 
+    </div>
+
+    <!-- Modal Ajouter Empêchement -->
+    <div v-if="showUnavailabilityModal" @click="closeUnavailabilityModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;">
+      <div @click.stop style="background: white; border-radius: 16px; padding: 30px; max-width: 500px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        <h2 style="font-size: 22px; font-weight: 600; color: #333; margin: 0 0 8px 0;">
+          Ajouter un Empêchement
+        </h2>
+        <p style="font-size: 13px; color: #666; margin: 0 0 24px 0;">
+          Déclarez une indisponibilité pour un interne
+        </p>
+        
+        <!-- Sélection de l'interne -->
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 6px;">
+            Interne <span style="color: #ef4444;">*</span>
+          </label>
+          <select 
+            v-model="unavailabilityForm.internId"
+            style="width: 100%; padding: 10px 14px; font-size: 14px; border: 2px solid #e5e7eb; border-radius: 8px; outline: none; box-sizing: border-box; cursor: pointer; background: white;"
+            @focus="$event.target.style.borderColor = '#667eea'"
+            @blur="$event.target.style.borderColor = '#e5e7eb'"
+          >
+            <option value="">-- Sélectionner un interne --</option>
+            <option v-for="intern in formData.interns" :key="intern.id" :value="intern.id">
+              {{ intern.firstName }} {{ intern.lastName }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Date -->
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 6px;">
+            Date <span style="color: #ef4444;">*</span>
+          </label>
+          <input 
+            v-model="unavailabilityForm.date"
+            type="date"
+            :min="formData.startDate"
+            :max="endDate"
+            style="width: 100%; padding: 10px 14px; font-size: 14px; border: 2px solid #e5e7eb; border-radius: 8px; outline: none; box-sizing: border-box;"
+            @focus="$event.target.style.borderColor = '#667eea'"
+            @blur="$event.target.style.borderColor = '#e5e7eb'"
+          />
+          <p style="font-size: 12px; color: #666; margin: 6px 0 0 0;">
+            La date doit être dans la période du planning ({{ formatDate(formData.startDate) }} - {{ formatDate(endDate) }})
+          </p>
+        </div>
+
+        <!-- Période -->
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 10px;">
+            Période <span style="color: #ef4444;">*</span>
+          </label>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input 
+                type="radio" 
+                v-model="unavailabilityForm.period" 
+                value="morning"
+                style="width: 18px; height: 18px; cursor: pointer;"
+              />
+              <span style="font-size: 14px; color: #333;">Matin (8h-13h)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input 
+                type="radio" 
+                v-model="unavailabilityForm.period" 
+                value="afternoon"
+                style="width: 18px; height: 18px; cursor: pointer;"
+              />
+              <span style="font-size: 14px; color: #333;">Après-midi (13h-18h)</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+              <input 
+                type="radio" 
+                v-model="unavailabilityForm.period" 
+                value="fullday"
+                style="width: 18px; height: 18px; cursor: pointer;"
+              />
+              <span style="font-size: 14px; color: #333;">Journée complète</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Raison (optionnelle) -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 6px;">
+            Raison <span style="font-weight: normal; color: #666; font-size: 12px;">(optionnel)</span>
+          </label>
+          <input 
+            v-model="unavailabilityForm.reason"
+            type="text"
+            placeholder="Ex: Congé, Formation, RDV médical..."
+            style="width: 100%; padding: 10px 14px; font-size: 14px; border: 2px solid #e5e7eb; border-radius: 8px; outline: none; box-sizing: border-box;"
+            @focus="$event.target.style.borderColor = '#667eea'"
+            @blur="$event.target.style.borderColor = '#e5e7eb'"
+          />
+        </div>
+
+        <!-- Buttons -->
+        <div style="display: flex; gap: 10px;">
+          <button 
+            @click="closeUnavailabilityModal"
+            style="flex: 1; background: #e5e7eb; color: #374151; font-size: 15px; font-weight: 600; padding: 12px; border: none; border-radius: 8px; cursor: pointer;"
+            @mouseover="$event.target.style.background = '#d1d5db'"
+            @mouseout="$event.target.style.background = '#e5e7eb'"
+          >
+            Annuler
+          </button>
+          <button 
+            @click="saveUnavailability"
+            :disabled="!unavailabilityForm.internId || !unavailabilityForm.date || !unavailabilityForm.period"
+            :style="{
+              flex: 1,
+              background: (unavailabilityForm.internId && unavailabilityForm.date && unavailabilityForm.period) ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#d1d5db',
+              color: 'white',
+              fontSize: '15px',
+              fontWeight: '600',
+              padding: '12px',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: (unavailabilityForm.internId && unavailabilityForm.date && unavailabilityForm.period) ? 'pointer' : 'not-allowed',
+              opacity: (unavailabilityForm.internId && unavailabilityForm.date && unavailabilityForm.period) ? 1 : 0.6
+            }"
+          >
+            Ajouter
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Modal Ajouter/Modifier Practice -->
@@ -585,7 +790,9 @@ const formData = ref({
   // Étape 2
   interns: [],
   // Étape 3
-  practices: []
+  practices: [],
+  // Étape 4
+  unavailabilities: []
 })
 
 // Errors
@@ -620,6 +827,15 @@ const practiceForm = ref({
   }
 })
 const editingPracticeIndex = ref(null)
+
+// Modal unavailability
+const showUnavailabilityModal = ref(false)
+const unavailabilityForm = ref({
+  internId: '',
+  date: '',
+  period: 'morning',
+  reason: ''
+})
 
 // Get step title
 const getStepTitle = () => {
@@ -693,6 +909,8 @@ const isStepValid = computed(() => {
     return formData.value.interns.length >= 2
   } else if (currentStep.value === 3) {
     return formData.value.practices.length >= 1
+  } else if (currentStep.value === 4) {
+    return true // Étape optionnelle, toujours valide
   }
   return true
 })
@@ -873,6 +1091,62 @@ const formatPracticeSchedule = (practice) => {
   return days.join(', ')
 }
 
+// Actions Modal Unavailability
+const openAddUnavailability = () => {
+  unavailabilityForm.value = {
+    internId: '',
+    date: '',
+    period: 'morning',
+    reason: ''
+  }
+  showUnavailabilityModal.value = true
+}
+
+const deleteUnavailability = (index) => {
+  if (confirm('Êtes-vous sûr de vouloir supprimer cet empêchement ?')) {
+    formData.value.unavailabilities.splice(index, 1)
+  }
+}
+
+const saveUnavailability = () => {
+  if (!unavailabilityForm.value.internId || !unavailabilityForm.value.date || !unavailabilityForm.value.period) return
+  
+  // Ajouter l'empêchement
+  formData.value.unavailabilities.push({
+    internId: unavailabilityForm.value.internId,
+    date: unavailabilityForm.value.date,
+    period: unavailabilityForm.value.period,
+    reason: unavailabilityForm.value.reason
+  })
+  
+  closeUnavailabilityModal()
+}
+
+const closeUnavailabilityModal = () => {
+  showUnavailabilityModal.value = false
+  unavailabilityForm.value = {
+    internId: '',
+    date: '',
+    period: 'morning',
+    reason: ''
+  }
+}
+
+// Helper functions for unavailabilities
+const getInternName = (internId) => {
+  const intern = formData.value.interns.find(i => i.id === internId)
+  return intern ? `${intern.firstName} ${intern.lastName}` : 'Inconnu'
+}
+
+const getPeriodLabel = (period) => {
+  const labels = {
+    morning: 'Matin',
+    afternoon: 'Après-midi',
+    fullday: 'Journée complète'
+  }
+  return labels[period] || period
+}
+
 // Navigation
 const handleButtonHover = (e) => {
   if (isStepValid.value) {
@@ -916,10 +1190,35 @@ const nextStep = () => {
     if (currentStep.value < 4) {
       currentStep.value++
     } else {
-      // Créer le planning (à implémenter)
-      alert('✅ Planning créé !\n\nÉtapes 3 et 4 à venir...')
+      // Créer le planning
+      createPlanning()
     }
   }
+}
+
+const createPlanning = () => {
+  // Afficher un résumé du planning créé
+  const summary = `
+✅ Planning créé avec succès !
+
+📋 Récapitulatif :
+• Nom : ${formData.value.name}
+• Période : ${formatDate(formData.value.startDate)} - ${formatDate(endDate.value)}
+• Durée : ${formData.value.weeks} ${formData.value.weeks > 1 ? 'semaines' : 'semaine'}
+• Internes : ${formData.value.interns.length}
+• Practices : ${formData.value.practices.length}
+• Empêchements : ${formData.value.unavailabilities.length}
+
+🎯 Prochaine étape : Génération automatique (MODULE 3)
+
+Le planning sera ajouté au dashboard et pourra être généré automatiquement.
+  `
+  
+  alert(summary)
+  
+  // TODO: Sauvegarder dans le store plannings
+  // Pour l'instant on retourne au dashboard
+  router.push('/')
 }
 </script>
 

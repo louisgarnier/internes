@@ -6,7 +6,7 @@
 
 **Priorité :** 🔴 CRITIQUE (Fondation de l'application)
 
-**Statut :** ⏳ EN COURS (Étapes 1-2-3/4 complétées - 75%)
+**Statut :** ✅ COMPLÉTÉ (Wizard 4 étapes terminé - 100%)
 
 **Dépendances :** MODULE 1 (Gestion des plannings)
 
@@ -91,10 +91,61 @@
 - ✅ Deep copy pour éviter les références partagées
 - ✅ Navigation Retour/Suivant fonctionnelle
 
-### Étapes à Venir
-- ⏳ Étape 4 : Empêchements (dates + périodes) - DERNIÈRE ÉTAPE
-- ⏳ Sauvegarde finale du planning complet dans le store
-- ⏳ Création et affichage du planning
+### Étape 4 : Empêchements ✅ COMPLÉTÉE
+- ✅ Interface Étape 4 du wizard :
+  - Liste des empêchements avec compteur
+  - Bouton "➕ Ajouter" en haut à droite
+  - État vide avec icône 📅 et message explicite
+  - Cartes empêchements avec infos détaillées :
+    - Nom complet de l'interne
+    - Date formatée + période (Matin/Après-midi/Journée complète)
+    - Raison si renseignée (avec icône 💬)
+  - Action : Supprimer 🗑️ (pas de modification)
+  - Message info bleu : étape optionnelle
+- ✅ Modal Ajouter Empêchement :
+  - Dropdown interne* (depuis liste de l'étape 2)
+  - Date* avec min/max (période du planning)
+  - Aide contextuelle affichant la période valide
+  - Radio buttons période* :
+    - Matin (8h-13h)
+    - Après-midi (13h-18h)
+    - Journée complète
+  - Raison optionnelle (texte libre)
+  - Validation : interne + date + période obligatoires
+- ✅ Helper functions :
+  - `getInternName(internId)` : Récupère le nom complet
+  - `getPeriodLabel(period)` : Traduit la période en français
+- ✅ Validation : Date dans la période du planning
+- ✅ Étape optionnelle : toujours valide même si vide
+- ✅ Progress bar à 100%
+- ✅ Bouton "✓ Terminer et Créer le Planning" (vert)
+- ✅ Fonction `createPlanning()` :
+  - Affiche alert avec résumé complet
+  - Retour au dashboard
+  - TODO: Sauvegarder dans le store plannings
+
+## 🎉 MODULE 2 COMPLÉTÉ !
+
+### Wizard Complet - 4 Étapes
+Toutes les étapes du wizard de configuration sont terminées et fonctionnelles :
+- ✅ **Étape 1** : Paramètres généraux (nom, date, semaines)
+- ✅ **Étape 2** : Gestion des internes (CRUD + contacts globaux)
+- ✅ **Étape 3** : Gestion des practices (CRUD + jours/périodes)
+- ✅ **Étape 4** : Empêchements (optionnel, CRUD simplifié)
+
+### Fonctionnalités Globales
+- ✅ Navigation fluide entre les étapes (Retour/Suivant)
+- ✅ Progress bar dynamique (25% → 50% → 75% → 100%)
+- ✅ Validation à chaque étape avec messages d'erreur
+- ✅ Modals pour toutes les sous-entités
+- ✅ Messages d'aide contextuels
+- ✅ Interface moderne avec gradients et animations
+- ✅ Résumé final avant création du planning
+
+### Prochaines Étapes - MODULE 3
+- ⏳ Sauvegarder le planning dans le store `plannings`
+- ⏳ Implémenter l'algorithme de génération automatique
+- ⏳ Créer la vue hebdomadaire du planning généré
 
 ### Fonctionnalités Additionnelles à Prévoir
 

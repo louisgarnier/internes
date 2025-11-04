@@ -64,7 +64,7 @@
 
 ## 🎯 PHASE 3 : MODULE 2 - CONFIGURATION (EN COURS)
 
-### État : ⏳ En cours - Étapes 1-2-3/4 complétées (75%)
+### État : ✅ COMPLÉTÉ - Wizard 4 étapes terminé (100%)
 
 ### Réalisations :
 
@@ -114,10 +114,44 @@
 - **Modal** avec tableau de sélection des jours
 - **Progress bar** à 75%
 
-### À venir :
-- ⏳ Étape 4 : Empêchements (dates + périodes) - DERNIÈRE ÉTAPE !
-- ⏳ Sauvegarde du planning complet dans le store
-- 📝 **À PRÉVOIR** : Page dédiée de gestion des contacts (CRUD complet)
+#### ✅ Étape 4 : Empêchements (COMPLÉTÉE)
+- **Liste des empêchements** avec compteur
+- **Formulaire complet** :
+  - Dropdown pour sélectionner l'interne (depuis étape 2)
+  - Date avec validation (min/max dans période planning)
+  - Radio buttons période (Matin / Après-midi / Journée complète)
+  - Raison optionnelle (texte libre)
+- **Affichage des empêchements** :
+  - Nom complet de l'interne
+  - Date formatée + période
+  - Raison si renseignée
+- **Actions** : Ajouter, Supprimer (pas de modification)
+- **Validation** : Date dans la période du planning
+- **Étape optionnelle** : message explicite, peut être vide
+- **Progress bar** à 100% ✅
+- **Bouton "✓ Terminer et Créer le Planning"** en vert
+- **Fonction createPlanning()** :
+  - Affiche résumé complet du planning
+  - Retour au dashboard
+  - TODO: Sauvegarde dans store plannings
+
+### 🎉 MODULE 2 COMPLÉTÉ !
+Le wizard de configuration est terminé et fonctionnel :
+- ✅ 4 étapes complètes avec navigation
+- ✅ Progress bar dynamique
+- ✅ Validations à chaque étape
+- ✅ Modals pour toutes les sous-entités
+- ✅ Messages d'aide et d'erreur
+- ✅ Interface moderne et responsive
+- ✅ Résumé final avant création
+
+### À venir - MODULE 3 :
+- ⏳ Sauvegarde du planning dans le store
+- ⏳ Algorithme de génération automatique
+- ⏳ Vue hebdomadaire du planning généré
+
+### Évolutions futures :
+- 📝 **v1.1** : Page dédiée de gestion des contacts (CRUD complet)
 - 📝 **v2.0** : Intégration Google Calendar (export/import)
 
 ### Fichiers créés/modifiés :
@@ -133,7 +167,7 @@
 |-------|--------|------|----------------|
 | ✅ Phase 1 | Setup & Documentation | **COMPLÉTÉ** | Semaine 1-2 |
 | ✅ Phase 2 | MODULE 1 - Dashboard | **COMPLÉTÉ** | Semaine 3 |
-| ⏳ Phase 3 | MODULE 2 - Configuration | **EN COURS** (3/4 étapes - 75%) | Semaine 4-5 |
+| ✅ Phase 3 | MODULE 2 - Configuration | **COMPLÉTÉ** (Wizard 4 étapes) | Semaine 4-5 |
 | 📝 Phase 4 | MODULE 3 - Génération | À venir | Semaine 5-6 |
 | 📝 Phase 5 | MODULE 4 - Visualisation | À venir | Semaine 7 |
 | 📝 Phase 6 | MODULE 5 - Manipulation | À venir | Semaine 8 |
