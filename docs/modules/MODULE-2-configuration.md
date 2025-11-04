@@ -120,9 +120,12 @@
 - ✅ Progress bar à 100%
 - ✅ Bouton "✓ Terminer et Créer le Planning" (vert)
 - ✅ Fonction `createPlanning()` :
+  - ✅ Sauvegarde complète dans le store plannings
+  - Structure sauvegardée : name, status, weeks, internsCount, practicesCount, startDate, internsList, practicesList, unavailabilities
+  - Statut 'config' assigné automatiquement
   - Affiche alert avec résumé complet
   - Retour au dashboard
-  - TODO: Sauvegarder dans le store plannings
+  - Planning visible immédiatement avec badge "⏳ Config"
 
 ## 🎉 MODULE 2 COMPLÉTÉ !
 
@@ -142,10 +145,30 @@ Toutes les étapes du wizard de configuration sont terminées et fonctionnelles 
 - ✅ Interface moderne avec gradients et animations
 - ✅ Résumé final avant création du planning
 
+## 🔗 Intégration Dashboard
+
+### Sauvegarde du Planning ✅ COMPLÉTÉ
+- ✅ **Import du store plannings** dans le wizard
+- ✅ **Fonction `usePlanningsStore().addPlanning()`** appelée avec :
+  - `name` : Nom du planning
+  - `status: 'config'` : Statut initial (pas encore généré)
+  - `weeks` : Nombre de semaines
+  - `internsCount` : Nombre d'internes (pour affichage)
+  - `practicesCount` : Nombre de practices (pour affichage)
+  - `startDate` : Date de début (format ISO)
+  - `internsList` : Array complet des internes avec IDs, noms, emails, téléphones
+  - `practicesList` : Array complet des practices avec config jours/périodes
+  - `unavailabilities` : Array des empêchements avec internId, date, période, raison
+- ✅ **ID unique et timestamps** ajoutés automatiquement par le store
+- ✅ **Dashboard mis à jour** :
+  - Affichage avec `internsCount` et `practicesCount`
+  - Badge "⏳ Config" jaune pour plannings non générés
+  - Planning visible immédiatement après création
+
 ### Prochaines Étapes - MODULE 3
-- ⏳ Sauvegarder le planning dans le store `plannings`
 - ⏳ Implémenter l'algorithme de génération automatique
 - ⏳ Créer la vue hebdomadaire du planning généré
+- ⏳ Gérer le changement de statut 'config' → 'generated'
 
 ### Fonctionnalités Additionnelles à Prévoir
 
@@ -193,9 +216,11 @@ Toutes les étapes du wizard de configuration sont terminées et fonctionnelles 
 - Format de dates standardisé
 - API REST pour synchronisation
 
-### Fichiers Créés
-- `stores/interns.js` - Store Pinia global pour les internes
-- `pages/planning/new.vue` - Wizard étapes 1-2-3 avec navigation complète
+### Fichiers Créés/Modifiés
+- `stores/interns.js` - Store Pinia global pour les internes (nouveau)
+- `stores/plannings.js` - Store mis à jour avec structure de données complète
+- `pages/planning/new.vue` - Wizard 4 étapes complet + sauvegarde (1264 lignes)
+- `pages/index.vue` - Dashboard mis à jour pour internsCount/practicesCount
 
 ---
 

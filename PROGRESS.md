@@ -131,9 +131,10 @@
 - **Progress bar** à 100% ✅
 - **Bouton "✓ Terminer et Créer le Planning"** en vert
 - **Fonction createPlanning()** :
+  - ✅ Sauvegarde complète dans le store plannings
   - Affiche résumé complet du planning
   - Retour au dashboard
-  - TODO: Sauvegarde dans store plannings
+  - Planning visible immédiatement avec badge "Config"
 
 ### 🎉 MODULE 2 COMPLÉTÉ !
 Le wizard de configuration est terminé et fonctionnel :
@@ -145,10 +146,27 @@ Le wizard de configuration est terminé et fonctionnel :
 - ✅ Interface moderne et responsive
 - ✅ Résumé final avant création
 
+### 🔧 Intégration Dashboard (COMPLÉTÉE)
+- ✅ **Sauvegarde du planning dans le store** :
+  - Import du store plannings dans le wizard
+  - Fonction `addPlanning()` appelée avec toutes les données
+  - Statut 'config' assigné automatiquement
+  - Planning ajouté avec ID unique et timestamps
+- ✅ **Structure complète sauvegardée** :
+  - Nom, semaines, date de début
+  - internsCount / practicesCount pour l'affichage
+  - internsList : Liste complète des internes (avec IDs, noms, contacts)
+  - practicesList : Liste complète des practices (avec config jours/périodes)
+  - unavailabilities : Liste des empêchements
+- ✅ **Dashboard mis à jour** :
+  - Affichage avec internsCount/practicesCount
+  - Badge "⏳ Config" jaune pour plannings non générés
+  - Planning visible immédiatement après création
+
 ### À venir - MODULE 3 :
-- ⏳ Sauvegarde du planning dans le store
-- ⏳ Algorithme de génération automatique
+- ⏳ Algorithme de génération automatique (contraintes dures + souples)
 - ⏳ Vue hebdomadaire du planning généré
+- ⏳ Changement de statut 'config' → 'generated'
 
 ### Évolutions futures :
 - 📝 **v1.1** : Page dédiée de gestion des contacts (CRUD complet)
@@ -156,8 +174,9 @@ Le wizard de configuration est terminé et fonctionnel :
 
 ### Fichiers créés/modifiés :
 - `stores/interns.js` - Store global des internes (nouveau)
-- `pages/planning/new.vue` - Wizard étapes 1-2 complet
-- `pages/index.vue` - Navigation vers wizard
+- `stores/plannings.js` - Store mis à jour avec structure complète
+- `pages/planning/new.vue` - Wizard 4 étapes + sauvegarde
+- `pages/index.vue` - Dashboard mis à jour (internsCount/practicesCount)
 
 ---
 
