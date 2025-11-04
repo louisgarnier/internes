@@ -32,22 +32,33 @@
 
 ---
 
-## 🎯 PHASE 2 : MODULE 1 - DASHBOARD (EN COURS)
+## 🎯 PHASE 2 : MODULE 1 - DASHBOARD (COMPLÉTÉ ✅)
 
-### État : ⏳ Prêt à démarrer
+### État : ✅ Terminé
 
-### Objectifs :
-- [ ] Créer le layout principal
-- [ ] Dashboard avec liste des plannings (vide au départ)
-- [ ] Bouton "Nouveau Planning"
-- [ ] Carte pour chaque planning existant
-- [ ] Actions : Ouvrir, Dupliquer, Supprimer
+### Réalisations :
+- ✅ Layout principal avec header et footer
+- ✅ Dashboard avec liste des plannings
+- ✅ État vide (0 plannings) avec message et bouton CTA
+- ✅ État avec plannings (liste de cartes)
+- ✅ Bouton "➕ Nouveau" dans le header
+- ✅ Store Pinia configuré et opérationnel
+- ✅ Données de test (3 plannings)
+- ✅ Cartes de planning avec :
+  - Nom + Badge de statut (✅ Généré / ⏳ Config / ❌ Erreur)
+  - Informations : semaines, internes, practices
+  - Date de dernière modification
+- ✅ Actions fonctionnelles :
+  - 👁️ Voir (alerte temporaire)
+  - 📋 Dupliquer (fonctionnel)
+  - 🗑️ Supprimer (fonctionnel avec confirmation)
+- ✅ Tri automatique par date de modification
+- ✅ Animations et hover effects
 
-### Prochaines étapes :
-1. Ajouter un système de style simple (CSS ou Tailwind)
-2. Créer le composant Dashboard
-3. Implémenter le store Pinia pour les plannings
-4. Tester l'affichage
+### Fichiers créés/modifiés :
+- `stores/plannings.js` - Store Pinia avec gestion des plannings
+- `pages/index.vue` - Page dashboard complète
+- `nuxt.config.ts` - Configuration Pinia
 
 ---
 
@@ -56,8 +67,8 @@
 | Phase | Module | État | Semaine Prévue |
 |-------|--------|------|----------------|
 | ✅ Phase 1 | Setup & Documentation | **COMPLÉTÉ** | Semaine 1-2 |
-| ⏳ Phase 2 | MODULE 1 - Dashboard | Prêt | Semaine 3 |
-| 📝 Phase 3 | MODULE 2 - Configuration | À venir | Semaine 4-5 |
+| ✅ Phase 2 | MODULE 1 - Dashboard | **COMPLÉTÉ** | Semaine 3 |
+| ⏳ Phase 3 | MODULE 2 - Configuration | Prochaine étape | Semaine 4-5 |
 | 📝 Phase 4 | MODULE 3 - Génération | À venir | Semaine 5-6 |
 | 📝 Phase 5 | MODULE 4 - Visualisation | À venir | Semaine 7 |
 | 📝 Phase 6 | MODULE 5 - Manipulation | À venir | Semaine 8 |
@@ -75,9 +86,9 @@
 | **Runtime** | Node.js | 18.20.6 |
 | **Framework Vue** | Vue 3 | 3.4.0 |
 | **Router** | Vue Router | 4.3.0 |
-| **State Management** | Pinia | À installer |
-| **Styles** | CSS natif (temporaire) | - |
-| **Stockage** | LocalStorage | - |
+| **State Management** | Pinia | 2.x (installé) |
+| **Styles** | CSS inline | - |
+| **Stockage** | LocalStorage | À implémenter |
 
 ---
 

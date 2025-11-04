@@ -6,9 +6,47 @@
 
 **Priorité :** 🔴 CRITIQUE (Fondation de l'application)
 
-**Statut :** 📝 À développer
+**Statut :** ✅ COMPLÉTÉ (Dashboard fonctionnel)
 
 **Dépendances :** Aucune
+
+**Dernière mise à jour :** 4 novembre 2025
+
+---
+
+## ✅ État d'Implémentation
+
+### Fonctionnalités Complétées
+- ✅ **Dashboard principal** avec header et footer
+- ✅ **État initial (0 plannings)** : Message + bouton "Créer votre premier planning"
+- ✅ **Liste des plannings** : Affichage sous forme de cartes
+- ✅ **Bouton "Nouveau"** dans le header (visible si plannings > 0)
+- ✅ **Store Pinia** configuré avec state management
+- ✅ **Données de test** (3 plannings exemple)
+- ✅ **Cartes de planning** avec :
+  - Nom du planning
+  - Badge de statut (✅ Généré / ⏳ Config / ❌ Erreur)
+  - Infos : semaines, internes, practices
+  - Date de dernière modification
+- ✅ **Actions fonctionnelles** :
+  - 👁️ Voir (alerte temporaire, sera implémenté dans MODULE 4)
+  - 📋 Dupliquer (fonctionnel)
+  - 🗑️ Supprimer (fonctionnel avec confirmation)
+- ✅ **Tri automatique** par date de modification (plus récent en haut)
+- ✅ **Animations et effets hover** sur les cartes et boutons
+
+### Fonctionnalités à Venir (v1.1)
+- ⏳ **Recherche** par nom de planning
+- ⏳ **Filtres** par statut (tous, générés, en config, erreurs)
+- ⏳ **Tri avancé** (date création, nom, semaines)
+- ⏳ **Stockage LocalStorage** (actuellement en mémoire)
+- ⏳ **Ouverture du wizard** (MODULE 2) au clic sur "Nouveau"
+- ⏳ **Ouverture de la vue planning** (MODULE 4) au clic sur "Voir"
+
+### Fichiers Créés
+- `stores/plannings.js` - Store Pinia avec gestion des plannings
+- `pages/index.vue` - Page dashboard complète
+- `nuxt.config.ts` - Configuration avec module Pinia
 
 ---
 

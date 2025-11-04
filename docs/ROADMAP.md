@@ -47,9 +47,13 @@ Ce document décrit le plan de développement complet de l'application sur **10 
 
 **Objectif :** Fonctionnalités essentielles opérationnelles
 
-#### Semaine 3 : MODULE 1 - Gestion des Plannings
-- [ ] Dashboard principal (liste des plannings)
-- [ ] Création d'un planning (formulaire simple)
+#### Semaine 3 : MODULE 1 - Gestion des Plannings ✅
+- [x] Dashboard principal (liste des plannings)
+- [x] Store Pinia configuré
+- [x] État vide (0 plannings)
+- [x] Cartes de planning avec infos et actions
+- [x] Actions : Dupliquer, Supprimer
+- [ ] Création d'un planning (formulaire simple) → MODULE 2
 - [ ] Suppression d'un planning
 - [ ] Navigation entre plannings
 - [ ] Stockage LocalStorage basique
