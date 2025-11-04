@@ -93,21 +93,30 @@ git push -u origin main
 
 ### 3. Créer la Structure Initiale
 
-Une fois les choix faits, je peux vous aider à :
+Avec **Nuxt.js + Tailwind CSS** :
 
 ```bash
-# Exemple avec React + Vite
-npm create vite@latest . -- --template react
+# Créer le projet Nuxt.js
+npx nuxi@latest init .
 
-# Installer les dépendances de base
-npm install
+# Entrer dans le dossier
+cd .
 
-# Installer les librairies utiles
-npm install date-fns chart.js jspdf xlsx
+# Installer Tailwind CSS
+npm install -D @nuxtjs/tailwindcss
+npx tailwindcss init
+
+# Installer les dépendances utiles
+npm install date-fns chart.js jspdf xlsx pinia
+
+# Configurer Tailwind dans nuxt.config.ts
+# modules: ['@nuxtjs/tailwindcss']
 
 # Lancer le serveur de développement
 npm run dev
 ```
+
+Le serveur sera disponible sur `http://localhost:3000`
 
 ### 4. Commencer le Développement
 
@@ -167,6 +176,12 @@ npm run dev
 
 ## 🎯 Points de Vigilance
 
+### Priorité #1 : Visualisation
+- **LA fonctionnalité la plus importante selon l'utilisateur**
+- Vue hebdomadaire doit être claire et lisible
+- Navigation intuitive entre les semaines
+- Code couleur cohérent
+
 ### Complexité Algorithmique
 - L'algorithme de génération (MODULE 3) est le plus complexe
 - Prévoir **beaucoup de tests** pour cette partie
@@ -177,9 +192,10 @@ npm run dev
 - Optimiser si génération > 5 secondes
 
 ### UX/UI
-- Interface doit être **très intuitive**
+- Utilisateur non-technique → Interface **très simple**
 - Wizard doit guider pas à pas
 - Messages d'erreur clairs et utiles
+- Tester chaque fonctionnalité une par une
 
 ---
 

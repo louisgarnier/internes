@@ -151,42 +151,54 @@ Ce document décrit le plan de développement complet de l'application sur **10 
 
 ### ✅ V1.0 - MVP (Minimum Viable Product)
 
-**Obligatoire pour la v1.0 :**
-- ✅ MODULE 1 : Dashboard et gestion plannings
-- ✅ MODULE 2 : Configuration complète (wizard + modification)
-- ✅ MODULE 3 : Génération automatique
-- ✅ MODULE 4 : Visualisation (tableau + stats)
-- ✅ MODULE 5 : Échange de gardes
-- ✅ MODULE 6 : Export PDF et JSON
-- ✅ MODULE 7 : Stockage LocalStorage
+**Stack Technique :**
+- **Frontend :** Nuxt.js 3 + Tailwind CSS
+- **Stockage :** LocalStorage (ou SQLite local)
+- **State :** Pinia
 
-**Nice-to-have (peut être reporté) :**
-- ⏳ Vue calendrier (peut être simplifié)
-- ⏳ Export Excel (peut attendre v1.1)
+**Obligatoire pour la v1.0 (par priorité) :**
+1. ✅ **MODULE 4 : Visualisation** 🔥 **PRIORITÉ #1**
+   - Vue hebdomadaire claire
+   - Navigation entre semaines
+   - Affichage des gardes
+2. ✅ MODULE 1 : Dashboard et gestion plannings
+3. ✅ MODULE 2 : Configuration complète (wizard + modification)
+4. ✅ MODULE 3 : Génération automatique
+5. ✅ MODULE 5 : Échange de gardes (sans drag & drop)
+6. ✅ MODULE 6 : Export PDF
+7. ✅ MODULE 7 : Stockage LocalStorage
+
+**Nice-to-have (peut être reporté à v1.1) :**
+- ⏳ Drag & drop pour modifications
+- ⏳ Fonction "Annuler" (Ctrl+Z)
+- ⏳ Vue calendrier mensuelle
+- ⏳ Export Excel avancé
 - ⏳ Import CSV
-- ⏳ Drag & drop pour modification manuelle
-- ⏳ Graphiques avancés
+- ⏳ Graphiques statistiques avancés
 
 ---
 
 ### 🔮 V1.1 - Améliorations (Post-lancement)
 
 **Fonctionnalités additionnelles :**
+- 🖱️ **Drag & Drop** pour modifications manuelles
+- ↩️ **Fonction "Annuler"** (Ctrl+Z)
 - 📧 Notifications email aux internes
 - 📱 Version mobile responsive
 - 🎨 Personnalisation des couleurs
 - 📊 Statistiques avancées avec plus de graphiques
-- 💾 Backup cloud (optionnel)
-- 🔄 Synchronisation multi-devices
 - 📥 Import Excel pour internes/practices
+- 📅 Vue calendrier mensuelle améliorée
 
 ---
 
 ### 🚀 V2.0 - Future (Long terme)
 
 **Évolutions majeures :**
+- ☁️ **Migration vers Airtable** (backend centralisé)
+- 🔄 **Synchronisation multi-devices**
+- 💾 **Backup cloud automatique**
 - 👥 Multi-utilisateurs avec authentification
-- ☁️ Backend avec base de données centralisée
 - 📲 Application mobile native (iOS/Android)
 - 🤝 Système de préférences des internes
 - 🔗 Intégration avec systèmes RH hospitaliers
@@ -230,21 +242,22 @@ Ce document décrit le plan de développement complet de l'application sur **10 
 
 ### Décisions Architecturales
 
-**1. Application Web Pure (sans backend lourd)**
-- ✅ **Pour :** Simplicité, déploiement facile, hors ligne
-- ❌ **Contre :** Pas de collaboration temps-réel
-- **Décision :** OK pour v1.0, backend en v2.0 si besoin
+**1. Stack Technique : Nuxt.js + Tailwind CSS**
+- ✅ **Framework :** Nuxt.js 3 (Vue.js avec SSR, excellent DX)
+- ✅ **UI :** Tailwind CSS (flexibilité, moderne)
+- ✅ **État :** Pinia (store Vue officiel)
+- **Décision :** Validé ✅
 
-**2. LocalStorage pour stockage**
+**2. LocalStorage pour stockage (v1.0)**
 - ✅ **Pour :** Simple, pas de serveur, hors ligne
 - ❌ **Contre :** Limites de taille (5-10MB), pas de sync
-- **Décision :** OK pour v1.0, migration IndexedDB si nécessaire
+- **Décision :** OK pour v1.0, migration Airtable en v2.0
 
-**3. Framework Frontend : À définir**
-- **Option 1 :** React (moderne, populaire, bon écosystème)
-- **Option 2 :** Vue.js (plus simple, courbe d'apprentissage douce)
-- **Option 3 :** Vanilla JS (pas de dépendances, léger)
-- **Décision :** À valider Semaine 2
+**3. Priorité : Visualisation d'abord**
+- 🎯 **Visualisation = Fonctionnalité #1**
+- Interface simple pour utilisateur non-technique
+- Test de chaque fonctionnalité une par une
+- **Décision :** Développement itératif, focus UX
 
 ---
 

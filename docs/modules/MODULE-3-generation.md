@@ -210,9 +210,15 @@ Pour chaque interne :
 **Cas particulier Garde Samedi :**
 ```
 Si interne a garde samedi :
-  → Essayer de lui donner OFF vendredi PM en priorité
-  → Compensation pour la garde désavantageuse
+  → Afficher le montant de la garde (€)
+  → Pas de compensation automatique en demi-journées OFF
+  → Équilibrage sur la durée totale du planning
 ```
+
+**Affichage des Prix de Garde :**
+- Garde Semaine : XX € (à configurer)
+- Garde Samedi : XX € (montant plus élevé)
+- Garde Dimanche : XX € (montant le plus élevé)
 
 ---
 

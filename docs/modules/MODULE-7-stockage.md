@@ -84,7 +84,9 @@ exportez-les en JSON pour libérer de l'espace.
 
 ---
 
-### F7.3 - Historique des Modifications (Optionnel)
+### F7.3 - Historique des Modifications
+
+**Prévu pour v1.1** (pas prioritaire pour v1.0)
 
 **Objectif :** Permettre d'annuler les dernières actions.
 
@@ -99,17 +101,30 @@ Ctrl+Z (ou Cmd+Z sur Mac)
 Revenir à l'état précédent
 ```
 
-**Interface :**
-```
-┌────────────────────────────────────────┐
-│  Historique                            │
-├────────────────────────────────────────┤
-│  15:32 - Garde échangée (Lun)          │
-│  15:28 - Planning généré (Sem 2)       │
-│  15:20 - Interne ajouté (Dr. Hugo)     │
-│  15:15 - Planning créé                 │
-└────────────────────────────────────────┘
-```
+---
+
+### F7.4 - Migration Airtable (v2.0+)
+
+**Contexte :** Pour v1.0, utilisation de BDD locale (LocalStorage ou SQLite).
+
+**Plan de migration v2.0 :**
+1. **Airtable comme backend**
+   - Stockage centralisé
+   - Synchronisation multi-devices
+   - Collaboration possible
+
+2. **Migration des données**
+   - Export depuis LocalStorage en JSON
+   - Import dans Airtable via API
+   - Mapping des champs
+
+3. **Avantages Airtable**
+   - Interface de gestion des données
+   - API REST simple
+   - Vues personnalisées
+   - Historique des modifications
+
+**Note :** v1.0 reste 100% locale pour simplicité et rapidité de développement.
 
 ---
 

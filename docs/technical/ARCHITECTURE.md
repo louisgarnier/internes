@@ -11,64 +11,95 @@
 ## 📐 Stack Technique
 
 ### Frontend
-- **HTML5** / **CSS3** / **JavaScript ES6+**
-- **Framework** : React / Vue.js / Vanilla JS (à décider)
-- **UI Library** : Bootstrap / Tailwind CSS (à décider)
+- **Framework** : **Nuxt.js 3** (Vue.js avec SSR)
+- **UI Library** : **Tailwind CSS** (utility-first, flexible)
+- **Bundler** : **Vite** (inclus dans Nuxt 3)
+- **State Management** : **Pinia** (store Vue)
 - **Graphiques** : Chart.js / D3.js
 - **PDF Generation** : jsPDF / pdfmake
 - **Excel Export** : xlsx.js
 
 ### Stockage
-- **LocalStorage** : Données principales
+- **v1.0** : **LocalStorage** ou **SQLite** (données locales)
+- **v2.0+** : Migration vers **Airtable**
 - **IndexedDB** : Si volumétrie importante (optionnel)
 
 ### Outils de Développement
 - **Git** : Versioning
 - **npm** : Gestionnaire de paquets
-- **Webpack / Vite** : Bundler
-- **ESLint** : Linter JavaScript
+- **Vite** : Bundler ultra-rapide (intégré Nuxt)
+- **ESLint** : Linter JavaScript/Vue
 - **Prettier** : Formatage code
-- **Jest** : Tests unitaires
+- **Vitest** : Tests unitaires (natif Vite)
 
 ---
 
-## 🗂️ Structure de l'Application
+## 🗂️ Structure de l'Application (Nuxt.js)
 
 ```
-src/
-├── index.html              # Point d'entrée
-├── main.js                 # Initialisation
+internes/
+├── nuxt.config.ts          # Configuration Nuxt
+├── tailwind.config.js      # Configuration Tailwind
+├── package.json
 │
-├── components/             # Composants UI
-│   ├── Dashboard.js
-│   ├── Wizard.js
-│   ├── PlanningView.js
-│   ├── Statistics.js
-│   └── ...
+├── pages/                  # Routes automatiques
+│   ├── index.vue           # Dashboard (/)
+│   ├── planning/
+│   │   ├── [id].vue        # Vue planning (/planning/123)
+│   │   ├── [id]/config.vue # Configuration (/planning/123/config)
+│   │   └── [id]/stats.vue  # Statistiques (/planning/123/stats)
+│   └── wizard/
+│       └── [id].vue        # Wizard création
 │
-├── services/               # Logique métier
-│   ├── PlanningService.js  # CRUD plannings
-│   ├── GeneratorService.js # Algorithme génération
-│   ├── StorageService.js   # LocalStorage
-│   ├── ExportService.js    # Export PDF/Excel
-│   └── ImportService.js    # Import données
+├── components/             # Composants Vue réutilisables
+│   ├── Dashboard/
+│   │   ├── PlanningCard.vue
+│   │   └── PlanningList.vue
+│   ├── Wizard/
+│   │   ├── Step1Params.vue
+│   │   ├── Step2Internes.vue
+│   │   ├── Step3Practices.vue
+│   │   └── Step4Empechements.vue
+│   ├── Planning/
+│   │   ├── WeekView.vue
+│   │   ├── CalendarView.vue
+│   │   └── GardesPanel.vue
+│   └── Common/
+│       ├── Modal.vue
+│       ├── Button.vue
+│       └── Card.vue
 │
-├── models/                 # Modèles de données
-│   ├── Planning.js
-│   ├── Interne.js
-│   ├── Practice.js
-│   ├── Garde.js
-│   └── Affectation.js
+├── composables/            # Logique métier réutilisable
+│   ├── usePlanning.ts      # CRUD plannings
+│   ├── useGenerator.ts     # Algorithme génération
+│   ├── useStorage.ts       # LocalStorage/SQLite
+│   ├── useExport.ts        # Export PDF/Excel
+│   └── useImport.ts        # Import données
+│
+├── stores/                 # Pinia stores (state management)
+│   ├── planning.ts         # Store principal
+│   ├── config.ts           # Configuration globale
+│   └── ui.ts               # État UI (modals, etc.)
+│
+├── types/                  # Types TypeScript
+│   ├── Planning.ts
+│   ├── Interne.ts
+│   ├── Practice.ts
+│   ├── Garde.ts
+│   └── Affectation.ts
 │
 ├── utils/                  # Utilitaires
-│   ├── dateUtils.js
-│   ├── validators.js
-│   └── helpers.js
+│   ├── dateUtils.ts
+│   ├── validators.ts
+│   ├── helpers.ts
+│   └── constants.ts
 │
-├── styles/                 # CSS
-│   ├── main.css
-│   ├── dashboard.css
-│   └── ...
+├── assets/                 # Assets statiques
+│   └── css/
+│       └── main.css        # CSS global + Tailwind
+│
+├── public/                 # Fichiers publics
+│   └── images/
 │
 └── tests/                  # Tests
     ├── unit/

@@ -71,23 +71,21 @@ Repos mardi retiré pour Dr. Martin
 
 **Cas d'usage :** Déplacer un interne d'une practice à une autre.
 
-**Méthode 1 : Drag & Drop**
+**Méthode : Clic + Sélection (v1.0)**
 ```
-Glisser-déposer un interne d'une cellule à une autre
-  ↓
-Validation automatique
-  ↓
-Si OK : Modification appliquée
-Si KO : Rollback + Message d'erreur
+1. Clic sur une cellule du planning
+2. Liste déroulante des internes disponibles
+3. Sélection de l'interne
+4. Validation automatique des contraintes
+5. Application de la modification
 ```
 
-**Méthode 2 : Clic + Sélection**
-```
-1. Clic sur une cellule
-2. Liste déroulante des internes disponibles
-3. Sélection
-4. Validation + Application
-```
+**Note :** Le drag & drop est prévu pour v1.1 pour une meilleure UX.
+
+**Validations :**
+- Interne disponible (pas de garde, repos, OFF, empêchement)
+- Practice pas déjà complète
+- Capacité respectée
 
 ---
 
