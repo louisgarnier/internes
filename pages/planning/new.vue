@@ -774,6 +774,7 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useInternsStore } from '~/stores/interns'
+import { usePlanningsStore } from '~/stores/plannings'
 
 const router = useRouter()
 const internsStore = useInternsStore()
@@ -1197,6 +1198,21 @@ const nextStep = () => {
 }
 
 const createPlanning = () => {
+  // Sauvegarder le planning dans le store
+  const planningsStore = usePlanningsStore()
+  
+  planningsStore.addPlanning({
+    name: formData.value.name,
+    status: 'config', // Pas encore généré
+    weeks: formData.value.weeks,
+    internsCount: formData.value.interns.length,
+    practicesCount: formData.value.practices.length,
+    startDate: formData.value.startDate,
+    internsList: formData.value.interns,
+    practicesList: formData.value.practices,
+    unavailabilities: formData.value.unavailabilities
+  })
+  
   // Afficher un résumé du planning créé
   const summary = `
 ✅ Planning créé avec succès !
@@ -1211,13 +1227,12 @@ const createPlanning = () => {
 
 🎯 Prochaine étape : Génération automatique (MODULE 3)
 
-Le planning sera ajouté au dashboard et pourra être généré automatiquement.
+Le planning a été ajouté au dashboard.
   `
   
   alert(summary)
   
-  // TODO: Sauvegarder dans le store plannings
-  // Pour l'instant on retourne au dashboard
+  // Retourner au dashboard
   router.push('/')
 }
 </script>

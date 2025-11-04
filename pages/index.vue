@@ -88,9 +88,9 @@
               <div style="font-size: 14px; color: #666; display: flex; gap: 16px; flex-wrap: wrap;">
                 <span>{{ planning.weeks }} {{ planning.weeks > 1 ? 'semaines' : 'semaine' }}</span>
                 <span>•</span>
-                <span>{{ planning.interns }} internes</span>
+                <span>{{ planning.internsCount }} internes</span>
                 <span>•</span>
-                <span>{{ planning.practices }} practices</span>
+                <span>{{ planning.practicesCount }} practices</span>
               </div>
               
               <!-- Date -->
