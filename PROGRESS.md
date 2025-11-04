@@ -62,13 +62,43 @@
 
 ---
 
+## 🎯 PHASE 3 : MODULE 2 - CONFIGURATION (EN COURS)
+
+### État : ⏳ En cours - Étape 1/4 complétée
+
+### Réalisations :
+- ✅ **Wizard - Étape 1 : Paramètres Généraux**
+  - Page `/planning/new` créée
+  - Formulaire avec 3 champs :
+    - Nom du planning (input texte, min 3 caractères)
+    - Date de début (input date, validation lundi obligatoire)
+    - Nombre de semaines (slider 1-10)
+  - Validation en temps réel
+  - Message d'erreur si date n'est pas un lundi
+  - Calcul automatique de la période (date de fin)
+  - Progress bar (25% - étape 1/4)
+  - Boutons Annuler et Suivant
+  - Redirection depuis dashboard fonctionnelle
+
+### À venir :
+- ⏳ Étape 2 : Gestion des internes (ajouter/modifier/supprimer)
+- ⏳ Étape 3 : Gestion des practices (configuration)
+- ⏳ Étape 4 : Empêchements
+- ⏳ Sauvegarde du planning dans le store
+
+### Fichiers créés/modifiés :
+- `pages/planning/new.vue` - Wizard étape 1
+- `pages/index.vue` - Navigation vers wizard
+
+---
+
 ## 📅 Planning Prévisionnel
 
 | Phase | Module | État | Semaine Prévue |
 |-------|--------|------|----------------|
 | ✅ Phase 1 | Setup & Documentation | **COMPLÉTÉ** | Semaine 1-2 |
 | ✅ Phase 2 | MODULE 1 - Dashboard | **COMPLÉTÉ** | Semaine 3 |
-| ⏳ Phase 3 | MODULE 2 - Configuration | Prochaine étape | Semaine 4-5 |
+| ⏳ Phase 3 | MODULE 2 - Configuration | **EN COURS** (1/4 étapes) | Semaine 4-5 |
 | 📝 Phase 4 | MODULE 3 - Génération | À venir | Semaine 5-6 |
 | 📝 Phase 5 | MODULE 4 - Visualisation | À venir | Semaine 7 |
 | 📝 Phase 6 | MODULE 5 - Manipulation | À venir | Semaine 8 |

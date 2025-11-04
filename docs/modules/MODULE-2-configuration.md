@@ -6,9 +6,41 @@
 
 **Priorité :** 🔴 CRITIQUE (Fondation de l'application)
 
-**Statut :** 📝 À développer
+**Statut :** ⏳ EN COURS (Étape 1/4 complétée)
 
 **Dépendances :** MODULE 1 (Gestion des plannings)
+
+**Dernière mise à jour :** 4 novembre 2025
+
+---
+
+## ✅ État d'Implémentation
+
+### Étape 1 : Paramètres Généraux ✅ COMPLÉTÉE
+- ✅ Page `/planning/new` créée
+- ✅ Interface wizard avec header et progress bar (25%)
+- ✅ Formulaire avec 3 champs :
+  - ✅ Nom du planning (validation min 3 caractères)
+  - ✅ Date de début avec validation **lundi obligatoire**
+  - ✅ Nombre de semaines (slider interactif 1-10)
+- ✅ Calcul automatique de la date de fin
+- ✅ Affichage de la période complète
+- ✅ Validation en temps réel
+- ✅ Messages d'erreur contextuels
+- ✅ Confirmation du jour (label "Lundi" en vert)
+- ✅ Bouton "Annuler" avec confirmation
+- ✅ Bouton "Suivant" avec état désactivé si formulaire invalide
+- ✅ Navigation depuis le dashboard
+
+### Étapes à Venir
+- ⏳ Étape 2 : Gestion des internes (ajouter/modifier/supprimer, min 2)
+- ⏳ Étape 3 : Gestion des practices (configuration + jours requis)
+- ⏳ Étape 4 : Empêchements (dates + périodes)
+- ⏳ Sauvegarde finale dans le store Pinia
+- ⏳ Création du planning complet
+
+### Fichiers Créés
+- `pages/planning/new.vue` - Wizard étape 1 avec validation complète
 
 ---
 

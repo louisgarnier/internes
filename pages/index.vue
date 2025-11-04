@@ -181,7 +181,8 @@ const getStatusLabel = (status) => {
 
 // Actions
 const createNewPlanning = () => {
-  alert('🎯 Prochaine étape !\n\nCe bouton ouvrira le wizard de création (MODULE 2)')
+  // Rediriger vers le wizard
+  navigateTo('/planning/new')
 }
 
 const viewPlanning = (id) => {
