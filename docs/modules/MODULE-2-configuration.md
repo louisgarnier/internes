@@ -6,7 +6,7 @@
 
 **Priorité :** 🔴 CRITIQUE (Fondation de l'application)
 
-**Statut :** ⏳ EN COURS (Étape 1/4 complétée)
+**Statut :** ⏳ EN COURS (Étapes 1-2/4 complétées - 50%)
 
 **Dépendances :** MODULE 1 (Gestion des plannings)
 
@@ -32,15 +32,52 @@
 - ✅ Bouton "Suivant" avec état désactivé si formulaire invalide
 - ✅ Navigation depuis le dashboard
 
+### Étape 2 : Gestion des Internes ✅ COMPLÉTÉE
+- ✅ Store global des internes (`stores/interns.js`)
+  - Sauvegarde permanente de tous les internes (contacts)
+  - ID unique pour chaque interne
+  - Actions : add, update, delete, search
+  - Réutilisables entre différents plannings
+- ✅ Interface Étape 2 du wizard :
+  - Liste des internes avec compteur
+  - Bouton "➕ Ajouter" en haut à droite
+  - État vide avec message encourageant
+  - Cartes internes avec affichage enrichi :
+    - Numéro + Prénom + Nom
+    - Email et téléphone (si renseignés)
+    - Icônes 📧 et 📱
+  - Actions par interne : Modifier ✏️ et Supprimer 🗑️
+  - Message d'avertissement si < 2 internes
+- ✅ Modal Ajouter/Modifier Interne :
+  - Formulaire enrichi avec 4 champs :
+    - Prénom* et Nom* (obligatoires)
+    - Email et Téléphone (optionnels)
+  - **Sélection rapide** depuis contacts existants (dropdown bleu)
+  - Auto-remplissage au choix d'un contact
+  - Validation : prénom et nom obligatoires
+  - Sauvegarde dans le store global automatique
+- ✅ 2 internes de test pré-remplis (Martin Dupont, Sophie Bernard)
+- ✅ Validation : minimum 2 internes requis pour passer à l'étape 3
+- ✅ Progress bar à 50%
+
 ### Étapes à Venir
-- ⏳ Étape 2 : Gestion des internes (ajouter/modifier/supprimer, min 2)
 - ⏳ Étape 3 : Gestion des practices (configuration + jours requis)
 - ⏳ Étape 4 : Empêchements (dates + périodes)
-- ⏳ Sauvegarde finale dans le store Pinia
-- ⏳ Création du planning complet
+- ⏳ Sauvegarde finale du planning complet dans le store
+- ⏳ Création et affichage du planning
+
+### Fonctionnalité Additionnelle à Prévoir
+- 📝 **Page dédiée de gestion des contacts** :
+  - Liste complète de tous les internes/contacts
+  - CRUD complet (Create, Read, Update, Delete)
+  - Recherche et filtres
+  - Import/Export (CSV)
+  - Accessible depuis le dashboard ou menu principal
+  - Permettra de gérer les contacts en dehors de la création de planning
 
 ### Fichiers Créés
-- `pages/planning/new.vue` - Wizard étape 1 avec validation complète
+- `stores/interns.js` - Store Pinia global pour les internes
+- `pages/planning/new.vue` - Wizard étapes 1-2 avec navigation
 
 ---
 

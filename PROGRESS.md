@@ -64,30 +64,48 @@
 
 ## 🎯 PHASE 3 : MODULE 2 - CONFIGURATION (EN COURS)
 
-### État : ⏳ En cours - Étape 1/4 complétée
+### État : ⏳ En cours - Étapes 1-2/4 complétées (50%)
 
 ### Réalisations :
-- ✅ **Wizard - Étape 1 : Paramètres Généraux**
-  - Page `/planning/new` créée
-  - Formulaire avec 3 champs :
-    - Nom du planning (input texte, min 3 caractères)
-    - Date de début (input date, validation lundi obligatoire)
-    - Nombre de semaines (slider 1-10)
-  - Validation en temps réel
-  - Message d'erreur si date n'est pas un lundi
-  - Calcul automatique de la période (date de fin)
-  - Progress bar (25% - étape 1/4)
-  - Boutons Annuler et Suivant
-  - Redirection depuis dashboard fonctionnelle
+
+#### ✅ Étape 1 : Paramètres Généraux (COMPLÉTÉE)
+- Page `/planning/new` créée
+- Formulaire avec 3 champs :
+  - Nom du planning (input texte, min 3 caractères)
+  - Date de début (input date, validation lundi obligatoire)
+  - Nombre de semaines (slider 1-10)
+- Validation en temps réel
+- Message d'erreur si date n'est pas un lundi
+- Calcul automatique de la période (date de fin)
+- Progress bar dynamique (25% → 50% → ...)
+- Navigation entre étapes fonctionnelle
+
+#### ✅ Étape 2 : Gestion des Internes (COMPLÉTÉE)
+- **Store global des internes** (`stores/interns.js`) :
+  - Sauvegarde permanente de tous les internes (contacts)
+  - ID unique pour chaque interne
+  - Réutilisables entre plannings
+- **Liste des internes** avec compteur
+- **Formulaire enrichi** :
+  - Prénom et Nom (obligatoires)
+  - Email (optionnel) - nouveau !
+  - Téléphone (optionnel) - nouveau !
+- **Sélection rapide** depuis contacts existants (dropdown)
+- **Actions** : Ajouter, Modifier, Supprimer
+- **Affichage amélioré** : cartes avec email et téléphone
+- **Validation** : minimum 2 internes requis
+- **Modal** : formulaire complet avec auto-remplissage
+- 2 internes de test pré-remplis
 
 ### À venir :
-- ⏳ Étape 2 : Gestion des internes (ajouter/modifier/supprimer)
-- ⏳ Étape 3 : Gestion des practices (configuration)
-- ⏳ Étape 4 : Empêchements
-- ⏳ Sauvegarde du planning dans le store
+- ⏳ Étape 3 : Gestion des practices (configuration + jours requis)
+- ⏳ Étape 4 : Empêchements (dates + périodes)
+- ⏳ Sauvegarde du planning complet dans le store
+- 📝 **À PRÉVOIR** : Page dédiée de gestion des contacts (CRUD complet)
 
 ### Fichiers créés/modifiés :
-- `pages/planning/new.vue` - Wizard étape 1
+- `stores/interns.js` - Store global des internes (nouveau)
+- `pages/planning/new.vue` - Wizard étapes 1-2 complet
 - `pages/index.vue` - Navigation vers wizard
 
 ---
@@ -98,7 +116,7 @@
 |-------|--------|------|----------------|
 | ✅ Phase 1 | Setup & Documentation | **COMPLÉTÉ** | Semaine 1-2 |
 | ✅ Phase 2 | MODULE 1 - Dashboard | **COMPLÉTÉ** | Semaine 3 |
-| ⏳ Phase 3 | MODULE 2 - Configuration | **EN COURS** (1/4 étapes) | Semaine 4-5 |
+| ⏳ Phase 3 | MODULE 2 - Configuration | **EN COURS** (2/4 étapes - 50%) | Semaine 4-5 |
 | 📝 Phase 4 | MODULE 3 - Génération | À venir | Semaine 5-6 |
 | 📝 Phase 5 | MODULE 4 - Visualisation | À venir | Semaine 7 |
 | 📝 Phase 6 | MODULE 5 - Manipulation | À venir | Semaine 8 |

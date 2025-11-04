@@ -12,90 +12,191 @@
             Nouveau Planning
           </h1>
           <p style="color: rgba(255,255,255,0.9); margin: 0; font-size: 16px;">
-            Étape 1 sur 4 : Paramètres Généraux
+            {{ getStepTitle() }}
           </p>
         </div>
 
         <!-- Progress Bar -->
         <div style="background: #f3f4f6; height: 8px;">
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100%; width: 25%; transition: width 0.3s;"></div>
+          <div :style="{
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            height: '100%',
+            width: (currentStep * 25) + '%',
+            transition: 'width 0.3s'
+          }"></div>
         </div>
 
         <!-- Form Content -->
         <div style="padding: 40px;">
           
-          <!-- Nom du Planning -->
-          <div style="margin-bottom: 30px;">
-            <label style="display: block; font-size: 15px; font-weight: 600; color: #333; margin-bottom: 8px;">
-              Nom du Planning <span style="color: #ef4444;">*</span>
-            </label>
-            <input 
-              v-model="formData.name"
-              type="text"
-              placeholder="Ex: Planning Janvier 2025"
-              style="width: 100%; padding: 12px 16px; font-size: 15px; border: 2px solid #e5e7eb; border-radius: 8px; outline: none; transition: border-color 0.2s; box-sizing: border-box;"
-              @focus="$event.target.style.borderColor = '#667eea'"
-              @blur="$event.target.style.borderColor = '#e5e7eb'"
-            />
-            <p v-if="errors.name" style="color: #ef4444; font-size: 13px; margin: 6px 0 0 0;">
-              {{ errors.name }}
-            </p>
-          </div>
-
-          <!-- Date de Début -->
-          <div style="margin-bottom: 30px;">
-            <label style="display: block; font-size: 15px; font-weight: 600; color: #333; margin-bottom: 8px;">
-              Date de Début <span style="color: #ef4444;">*</span>
-              <span style="font-weight: normal; color: #666; font-size: 13px;">(doit être un lundi)</span>
-            </label>
-            <input 
-              v-model="formData.startDate"
-              type="date"
-              style="width: 100%; padding: 12px 16px; font-size: 15px; border: 2px solid #e5e7eb; border-radius: 8px; outline: none; transition: border-color 0.2s; box-sizing: border-box;"
-              @focus="$event.target.style.borderColor = '#667eea'"
-              @blur="$event.target.style.borderColor = '#e5e7eb'"
-              @change="validateDate"
-            />
-            <p v-if="errors.startDate" style="color: #ef4444; font-size: 13px; margin: 6px 0 0 0;">
-              ⚠️ {{ errors.startDate }}
-            </p>
-            <p v-else-if="formData.startDate && !errors.startDate" style="color: #10b981; font-size: 13px; margin: 6px 0 0 0;">
-              ✓ {{ getDateLabel(formData.startDate) }}
-            </p>
-          </div>
-
-          <!-- Nombre de Semaines -->
-          <div style="margin-bottom: 30px;">
-            <label style="display: block; font-size: 15px; font-weight: 600; color: #333; margin-bottom: 12px;">
-              Nombre de Semaines <span style="color: #ef4444;">*</span>
-              <span style="font-weight: normal; color: #666; font-size: 13px;">(1-10)</span>
-            </label>
+          <!-- ÉTAPE 1 : Paramètres Généraux -->
+          <div v-if="currentStep === 1">
             
-            <div style="display: flex; align-items: center; gap: 20px;">
+            <!-- Nom du Planning -->
+            <div style="margin-bottom: 30px;">
+              <label style="display: block; font-size: 15px; font-weight: 600; color: #333; margin-bottom: 8px;">
+                Nom du Planning <span style="color: #ef4444;">*</span>
+              </label>
               <input 
-                v-model.number="formData.weeks"
-                type="range"
-                min="1"
-                max="10"
-                step="1"
-                style="flex: 1; height: 6px; border-radius: 3px; outline: none; -webkit-appearance: none; appearance: none; background: #e5e7eb;"
+                v-model="formData.name"
+                type="text"
+                placeholder="Ex: Planning Janvier 2025"
+                style="width: 100%; padding: 12px 16px; font-size: 15px; border: 2px solid #e5e7eb; border-radius: 8px; outline: none; transition: border-color 0.2s; box-sizing: border-box;"
+                @focus="$event.target.style.borderColor = '#667eea'"
+                @blur="$event.target.style.borderColor = '#e5e7eb'"
               />
-              <div style="min-width: 100px; text-align: center; padding: 8px 16px; background: #667eea; color: white; border-radius: 8px; font-weight: 600; font-size: 16px;">
-                {{ formData.weeks }} {{ formData.weeks > 1 ? 'semaines' : 'semaine' }}
+              <p v-if="errors.name" style="color: #ef4444; font-size: 13px; margin: 6px 0 0 0;">
+                {{ errors.name }}
+              </p>
+            </div>
+
+            <!-- Date de Début -->
+            <div style="margin-bottom: 30px;">
+              <label style="display: block; font-size: 15px; font-weight: 600; color: #333; margin-bottom: 8px;">
+                Date de Début <span style="color: #ef4444;">*</span>
+                <span style="font-weight: normal; color: #666; font-size: 13px;">(doit être un lundi)</span>
+              </label>
+              <input 
+                v-model="formData.startDate"
+                type="date"
+                style="width: 100%; padding: 12px 16px; font-size: 15px; border: 2px solid #e5e7eb; border-radius: 8px; outline: none; transition: border-color 0.2s; box-sizing: border-box;"
+                @focus="$event.target.style.borderColor = '#667eea'"
+                @blur="$event.target.style.borderColor = '#e5e7eb'"
+                @change="validateDate"
+              />
+              <p v-if="errors.startDate" style="color: #ef4444; font-size: 13px; margin: 6px 0 0 0;">
+                ⚠️ {{ errors.startDate }}
+              </p>
+              <p v-else-if="formData.startDate && !errors.startDate" style="color: #10b981; font-size: 13px; margin: 6px 0 0 0;">
+                ✓ {{ getDateLabel(formData.startDate) }}
+              </p>
+            </div>
+
+            <!-- Nombre de Semaines -->
+            <div style="margin-bottom: 30px;">
+              <label style="display: block; font-size: 15px; font-weight: 600; color: #333; margin-bottom: 12px;">
+                Nombre de Semaines <span style="color: #ef4444;">*</span>
+                <span style="font-weight: normal; color: #666; font-size: 13px;">(1-10)</span>
+              </label>
+              
+              <div style="display: flex; align-items: center; gap: 20px;">
+                <input 
+                  v-model.number="formData.weeks"
+                  type="range"
+                  min="1"
+                  max="10"
+                  step="1"
+                  style="flex: 1; height: 6px; border-radius: 3px; outline: none; -webkit-appearance: none; appearance: none; background: #e5e7eb;"
+                />
+                <div style="min-width: 100px; text-align: center; padding: 8px 16px; background: #667eea; color: white; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                  {{ formData.weeks }} {{ formData.weeks > 1 ? 'semaines' : 'semaine' }}
+                </div>
               </div>
             </div>
+
+            <!-- Info Période -->
+            <div v-if="formData.startDate && !errors.startDate" style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 10px; padding: 16px; margin-bottom: 30px;">
+              <p style="margin: 0; color: #1e40af; font-size: 14px; font-weight: 500;">
+                ℹ️ Période : Du {{ formatDate(formData.startDate) }} au {{ formatDate(endDate) }}
+              </p>
+            </div>
+
           </div>
 
-          <!-- Info Période -->
-          <div v-if="formData.startDate && !errors.startDate" style="background: #eff6ff; border: 2px solid #3b82f6; border-radius: 10px; padding: 16px; margin-bottom: 30px;">
-            <p style="margin: 0; color: #1e40af; font-size: 14px; font-weight: 500;">
-              ℹ️ Période : Du {{ formatDate(formData.startDate) }} au {{ formatDate(endDate) }}
-            </p>
+          <!-- ÉTAPE 2 : Gestion des Internes -->
+          <div v-if="currentStep === 2">
+            
+            <!-- Header avec bouton Ajouter -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+              <div>
+                <h3 style="font-size: 18px; font-weight: 600; color: #333; margin: 0;">
+                  Liste des Internes ({{ formData.interns.length }})
+                </h3>
+                <p style="font-size: 13px; color: #666; margin: 4px 0 0 0;">
+                  Minimum 2 internes requis
+                </p>
+              </div>
+              <button 
+                @click="openAddIntern"
+                style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 14px; font-weight: 600; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+                @mouseover="$event.target.style.transform = 'translateY(-2px)'"
+                @mouseout="$event.target.style.transform = 'translateY(0)'"
+              >
+                ➕ Ajouter
+              </button>
+            </div>
+
+            <!-- Liste des internes -->
+            <div v-if="formData.interns.length === 0" style="text-align: center; padding: 60px 20px; background: #f9fafb; border-radius: 10px; border: 2px dashed #d1d5db;">
+              <div style="font-size: 48px; margin-bottom: 16px;">👥</div>
+              <p style="color: #6b7280; font-size: 15px; margin: 0;">
+                Aucun interne ajouté. Cliquez sur "➕ Ajouter" pour commencer.
+              </p>
+            </div>
+
+            <div v-else style="display: grid; gap: 12px; margin-bottom: 30px;">
+              <div 
+                v-for="(intern, index) in formData.interns"
+                :key="index"
+                style="background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px; transition: all 0.2s;"
+                @mouseover="$event.currentTarget.style.background = '#f3f4f6'"
+                @mouseout="$event.currentTarget.style.background = '#f9fafb'"
+              >
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px;">
+                  <div style="flex: 1;">
+                    <div style="font-size: 15px; color: #333; font-weight: 600; margin-bottom: 4px;">
+                      {{ index + 1 }}. {{ intern.firstName }} {{ intern.lastName }}
+                    </div>
+                    <div v-if="intern.email || intern.phone" style="font-size: 13px; color: #666;">
+                      <div v-if="intern.email">📧 {{ intern.email }}</div>
+                      <div v-if="intern.phone">📱 {{ intern.phone }}</div>
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 8px;">
+                    <button 
+                      @click="editIntern(index)"
+                      style="background: #3b82f6; color: white; font-size: 13px; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s;"
+                      @mouseover="$event.target.style.background = '#2563eb'"
+                      @mouseout="$event.target.style.background = '#3b82f6'"
+                    >
+                      ✏️
+                    </button>
+                    <button 
+                      @click="deleteIntern(index)"
+                      style="background: #ef4444; color: white; font-size: 13px; padding: 6px 12px; border: none; border-radius: 6px; cursor: pointer; transition: all 0.2s;"
+                      @mouseover="$event.target.style.background = '#dc2626'"
+                      @mouseout="$event.target.style.background = '#ef4444'"
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message d'avertissement si < 2 internes -->
+            <div v-if="formData.interns.length < 2" style="background: #fef3c7; border: 2px solid #f59e0b; border-radius: 10px; padding: 16px; margin-bottom: 30px;">
+              <p style="margin: 0; color: #92400e; font-size: 14px; font-weight: 500;">
+                ⚠️ Vous devez ajouter au moins 2 internes pour continuer
+              </p>
+            </div>
+
           </div>
 
           <!-- Buttons -->
           <div style="display: flex; gap: 12px; margin-top: 40px;">
             <button 
+              v-if="currentStep > 1"
+              @click="previousStep"
+              style="flex: 1; background: #e5e7eb; color: #374151; font-size: 16px; font-weight: 600; padding: 14px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+              @mouseover="$event.target.style.background = '#d1d5db'"
+              @mouseout="$event.target.style.background = '#e5e7eb'"
+            >
+              ← Retour
+            </button>
+            
+            <button 
+              v-else
               @click="cancel"
               style="flex: 1; background: #e5e7eb; color: #374151; font-size: 16px; font-weight: 600; padding: 14px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
               @mouseover="$event.target.style.background = '#d1d5db'"
@@ -123,7 +224,7 @@
               @mouseover="handleButtonHover"
               @mouseout="handleButtonLeave"
             >
-              Suivant → Étape 2
+              {{ currentStep === 4 ? 'Créer le Planning' : 'Suivant → Étape ' + (currentStep + 1) }}
             </button>
           </div>
 
@@ -133,20 +234,146 @@
 
     </div>
 
+    <!-- Modal Ajouter/Modifier Interne -->
+    <div v-if="showInternModal" @click="closeModal" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;">
+      <div @click.stop style="background: white; border-radius: 16px; padding: 30px; max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+        <h2 style="font-size: 22px; font-weight: 600; color: #333; margin: 0 0 8px 0;">
+          {{ editingInternIndex !== null ? 'Modifier un Interne' : 'Ajouter un Interne' }}
+        </h2>
+        <p style="font-size: 13px; color: #666; margin: 0 0 24px 0;">
+          Les informations seront sauvegardées dans vos contacts
+        </p>
+        
+        <!-- Sélection rapide depuis contacts existants -->
+        <div v-if="editingInternIndex === null && internsStore.allInterns.length > 0" style="margin-bottom: 20px; padding: 16px; background: #f0f9ff; border: 2px solid #3b82f6; border-radius: 10px;">
+          <label style="display: block; font-size: 13px; font-weight: 600; color: #1e40af; margin-bottom: 10px;">
+            💡 Ou sélectionner depuis vos contacts :
+          </label>
+          <select 
+            @change="selectExistingIntern($event.target.value)"
+            style="width: 100%; padding: 10px 14px; font-size: 14px; border: 2px solid #3b82f6; border-radius: 8px; outline: none; box-sizing: border-box; cursor: pointer; background: white;"
+          >
+            <option value="">-- Choisir un contact --</option>
+            <option v-for="intern in internsStore.allInterns" :key="intern.id" :value="intern.id">
+              {{ intern.firstName }} {{ intern.lastName }}
+            </option>
+          </select>
+        </div>
+
+        <!-- Prénom -->
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 6px;">
+            Prénom <span style="color: #ef4444;">*</span>
+          </label>
+          <input 
+            v-model="internForm.firstName"
+            type="text"
+            placeholder="Ex: Martin"
+            style="width: 100%; padding: 10px 14px; font-size: 14px; border: 2px solid #e5e7eb; border-radius: 8px; outline: none; box-sizing: border-box;"
+            @focus="$event.target.style.borderColor = '#667eea'"
+            @blur="$event.target.style.borderColor = '#e5e7eb'"
+          />
+        </div>
+
+        <!-- Nom -->
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 6px;">
+            Nom <span style="color: #ef4444;">*</span>
+          </label>
+          <input 
+            v-model="internForm.lastName"
+            type="text"
+            placeholder="Ex: Dupont"
+            style="width: 100%; padding: 10px 14px; font-size: 14px; border: 2px solid #e5e7eb; border-radius: 8px; outline: none; box-sizing: border-box;"
+            @focus="$event.target.style.borderColor = '#667eea'"
+            @blur="$event.target.style.borderColor = '#e5e7eb'"
+          />
+        </div>
+
+        <!-- Email -->
+        <div style="margin-bottom: 16px;">
+          <label style="display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 6px;">
+            Email <span style="font-weight: normal; color: #666; font-size: 12px;">(optionnel)</span>
+          </label>
+          <input 
+            v-model="internForm.email"
+            type="email"
+            placeholder="Ex: martin.dupont@hospital.fr"
+            style="width: 100%; padding: 10px 14px; font-size: 14px; border: 2px solid #e5e7eb; border-radius: 8px; outline: none; box-sizing: border-box;"
+            @focus="$event.target.style.borderColor = '#667eea'"
+            @blur="$event.target.style.borderColor = '#e5e7eb'"
+          />
+        </div>
+
+        <!-- Téléphone -->
+        <div style="margin-bottom: 24px;">
+          <label style="display: block; font-size: 14px; font-weight: 600; color: #333; margin-bottom: 6px;">
+            Téléphone <span style="font-weight: normal; color: #666; font-size: 12px;">(optionnel)</span>
+          </label>
+          <input 
+            v-model="internForm.phone"
+            type="tel"
+            placeholder="Ex: 06 12 34 56 78"
+            style="width: 100%; padding: 10px 14px; font-size: 14px; border: 2px solid #e5e7eb; border-radius: 8px; outline: none; box-sizing: border-box;"
+            @focus="$event.target.style.borderColor = '#667eea'"
+            @blur="$event.target.style.borderColor = '#e5e7eb'"
+          />
+        </div>
+
+        <!-- Buttons -->
+        <div style="display: flex; gap: 10px;">
+          <button 
+            @click="closeModal"
+            style="flex: 1; background: #e5e7eb; color: #374151; font-size: 15px; font-weight: 600; padding: 12px; border: none; border-radius: 8px; cursor: pointer;"
+            @mouseover="$event.target.style.background = '#d1d5db'"
+            @mouseout="$event.target.style.background = '#e5e7eb'"
+          >
+            Annuler
+          </button>
+          <button 
+            @click="saveIntern"
+            :disabled="!internForm.firstName || !internForm.lastName"
+            :style="{
+              flex: 1,
+              background: (internForm.firstName && internForm.lastName) ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : '#d1d5db',
+              color: 'white',
+              fontSize: '15px',
+              fontWeight: '600',
+              padding: '12px',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: (internForm.firstName && internForm.lastName) ? 'pointer' : 'not-allowed',
+              opacity: (internForm.firstName && internForm.lastName) ? 1 : 0.6
+            }"
+          >
+            Enregistrer
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useInternsStore } from '~/stores/interns'
 
 const router = useRouter()
+const internsStore = useInternsStore()
+
+// Current step
+const currentStep = ref(1)
 
 // Form data
 const formData = ref({
+  // Étape 1
   name: '',
   startDate: '',
-  weeks: 3
+  weeks: 3,
+  // Étape 2
+  interns: []
 })
 
 // Errors
@@ -154,6 +381,28 @@ const errors = ref({
   name: '',
   startDate: ''
 })
+
+// Modal interne
+const showInternModal = ref(false)
+const internForm = ref({
+  id: null,
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: ''
+})
+const editingInternIndex = ref(null)
+
+// Get step title
+const getStepTitle = () => {
+  const titles = {
+    1: 'Étape 1 sur 4 : Paramètres Généraux',
+    2: 'Étape 2 sur 4 : Gestion des Internes',
+    3: 'Étape 3 sur 4 : Gestion des Practices',
+    4: 'Étape 4 sur 4 : Empêchements'
+  }
+  return titles[currentStep.value]
+}
 
 // Valider la date (doit être un lundi)
 const validateDate = () => {
@@ -166,7 +415,6 @@ const validateDate = () => {
   const date = new Date(formData.value.startDate + 'T00:00:00')
   const dayOfWeek = date.getDay()
   
-  // 1 = Lundi
   if (dayOfWeek !== 1) {
     errors.value.startDate = 'La date de début doit être un lundi'
   }
@@ -200,22 +448,91 @@ const endDate = computed(() => {
   return end.toISOString().split('T')[0]
 })
 
-// Validation de l'étape
+// Validation de l'étape courante
 const isStepValid = computed(() => {
-  return formData.value.name.length >= 3 && 
-         formData.value.startDate && 
-         !errors.value.startDate &&
-         formData.value.weeks >= 1 && 
-         formData.value.weeks <= 10
+  if (currentStep.value === 1) {
+    return formData.value.name.length >= 3 && 
+           formData.value.startDate && 
+           !errors.value.startDate &&
+           formData.value.weeks >= 1 && 
+           formData.value.weeks <= 10
+  } else if (currentStep.value === 2) {
+    return formData.value.interns.length >= 2
+  }
+  return true
 })
 
-// Actions
-const cancel = () => {
-  if (confirm('Êtes-vous sûr de vouloir annuler ? Les données saisies seront perdues.')) {
-    router.push('/')
+// Actions Modal Interne
+const openAddIntern = () => {
+  internForm.value = { id: null, firstName: '', lastName: '', email: '', phone: '' }
+  editingInternIndex.value = null
+  showInternModal.value = true
+}
+
+const selectExistingIntern = (internId) => {
+  if (!internId) return
+  
+  const intern = internsStore.getInternById(internId)
+  if (intern) {
+    // Remplir le formulaire avec les données du contact
+    internForm.value = { ...intern }
   }
 }
 
+const editIntern = (index) => {
+  internForm.value = { ...formData.value.interns[index] }
+  editingInternIndex.value = index
+  showInternModal.value = true
+}
+
+const deleteIntern = (index) => {
+  if (confirm('Êtes-vous sûr de vouloir supprimer cet interne ?')) {
+    formData.value.interns.splice(index, 1)
+  }
+}
+
+const saveIntern = () => {
+  if (!internForm.value.firstName || !internForm.value.lastName) return
+  
+  let internToAdd = { ...internForm.value }
+  
+  // Si c'est un nouvel interne (pas d'ID), l'ajouter au store global
+  if (!internForm.value.id) {
+    const newIntern = internsStore.addIntern({
+      firstName: internForm.value.firstName,
+      lastName: internForm.value.lastName,
+      email: internForm.value.email,
+      phone: internForm.value.phone
+    })
+    internToAdd = newIntern
+  } else {
+    // Mettre à jour les infos dans le store si modifiées
+    internsStore.updateIntern(internForm.value.id, {
+      firstName: internForm.value.firstName,
+      lastName: internForm.value.lastName,
+      email: internForm.value.email,
+      phone: internForm.value.phone
+    })
+  }
+  
+  if (editingInternIndex.value !== null) {
+    // Modifier dans le planning
+    formData.value.interns[editingInternIndex.value] = internToAdd
+  } else {
+    // Ajouter au planning
+    formData.value.interns.push(internToAdd)
+  }
+  
+  closeModal()
+}
+
+const closeModal = () => {
+  showInternModal.value = false
+  internForm.value = { id: null, firstName: '', lastName: '', email: '', phone: '' }
+  editingInternIndex.value = null
+}
+
+// Navigation
 const handleButtonHover = (e) => {
   if (isStepValid.value) {
     e.target.style.transform = 'translateY(-2px)'
@@ -228,23 +545,39 @@ const handleButtonLeave = (e) => {
   }
 }
 
-const nextStep = () => {
-  // Valider le nom
-  if (formData.value.name.length < 3) {
-    errors.value.name = 'Le nom doit contenir au moins 3 caractères'
-    return
+const cancel = () => {
+  if (confirm('Êtes-vous sûr de vouloir annuler ? Les données saisies seront perdues.')) {
+    router.push('/')
   }
-  
-  // Valider la date
-  validateDate()
-  if (errors.value.startDate) {
-    return
+}
+
+const previousStep = () => {
+  if (currentStep.value > 1) {
+    currentStep.value--
+  }
+}
+
+const nextStep = () => {
+  // Valider l'étape 1
+  if (currentStep.value === 1) {
+    if (formData.value.name.length < 3) {
+      errors.value.name = 'Le nom doit contenir au moins 3 caractères'
+      return
+    }
+    
+    validateDate()
+    if (errors.value.startDate) {
+      return
+    }
   }
   
   if (isStepValid.value) {
-    // Pour l'instant, juste une alerte
-    // Plus tard, on passera à l'étape 2
-    alert(`✅ Étape 1 validée !\n\nNom: ${formData.value.name}\nDate: ${formatDate(formData.value.startDate)}\nSemaines: ${formData.value.weeks}\n\nProchaine étape : Ajouter les internes (à développer)`)
+    if (currentStep.value < 4) {
+      currentStep.value++
+    } else {
+      // Créer le planning (à implémenter)
+      alert('✅ Planning créé !\n\nÉtapes 3 et 4 à venir...')
+    }
   }
 }
 </script>
@@ -273,4 +606,3 @@ input[type="range"]::-moz-range-thumb {
   box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
 }
 </style>
-
