@@ -72,17 +72,129 @@ export const usePlanningsStore = defineStore('plannings', {
       },
       {
         id: '3',
-        name: 'Planning Décembre 2024',
-        status: 'generated',
+        name: 'Planning Test Complet 2025',
+        status: 'config',
         weeks: 4,
-        internsCount: 0,
-        practicesCount: 0,
-        startDate: '2024-12-02',
-        internsList: [],
-        practicesList: [],
-        unavailabilities: [],
-        lastModified: new Date('2024-12-20'),
-        createdAt: new Date('2024-12-01')
+        internsCount: 8,
+        practicesCount: 7,
+        startDate: '2025-03-03', // Lundi 3 mars 2025
+        internsList: [
+          { id: 'int1', firstName: 'Alice', lastName: 'Moreau', email: 'alice.moreau@email.com', phone: '+33 6 11 11 11 11' },
+          { id: 'int2', firstName: 'Baptiste', lastName: 'Lefebvre', email: 'baptiste.lefebvre@email.com', phone: '+33 6 22 22 22 22' },
+          { id: 'int3', firstName: 'Clara', lastName: 'Rousseau', email: 'clara.rousseau@email.com', phone: '+33 6 33 33 33 33' },
+          { id: 'int4', firstName: 'David', lastName: 'Simon', email: 'david.simon@email.com', phone: '+33 6 44 44 44 44' },
+          { id: 'int5', firstName: 'Élise', lastName: 'Laurent', email: 'elise.laurent@email.com', phone: '+33 6 55 55 55 55' },
+          { id: 'int6', firstName: 'Félix', lastName: 'Michel', email: 'felix.michel@email.com', phone: '+33 6 66 66 66 66' },
+          { id: 'int7', firstName: 'Gabrielle', lastName: 'Garcia', email: 'gabrielle.garcia@email.com', phone: '+33 6 77 77 77 77' },
+          { id: 'int8', firstName: 'Hugo', lastName: 'Fontaine', email: 'hugo.fontaine@email.com', phone: '+33 6 88 88 88 88' }
+        ],
+        practicesList: [
+          { 
+            id: 'p1', 
+            name: 'Médecine Générale', 
+            requiredInterns: 2,
+            schedule: {
+              // Tous les jours (Lun-Sam)
+              monday: { morning: true, afternoon: true },
+              tuesday: { morning: true, afternoon: true },
+              wednesday: { morning: true, afternoon: true },
+              thursday: { morning: true, afternoon: true },
+              friday: { morning: true, afternoon: true },
+              saturday: { morning: true, afternoon: false }
+            }
+          },
+          { 
+            id: 'p2', 
+            name: 'Chirurgie', 
+            requiredInterns: 1,
+            schedule: {
+              // Lun-Ven matin uniquement
+              monday: { morning: true, afternoon: false },
+              tuesday: { morning: true, afternoon: false },
+              wednesday: { morning: true, afternoon: false },
+              thursday: { morning: true, afternoon: false },
+              friday: { morning: true, afternoon: false },
+              saturday: { morning: false, afternoon: false }
+            }
+          },
+          { 
+            id: 'p3', 
+            name: 'Pédiatrie', 
+            requiredInterns: 2,
+            schedule: {
+              // Lun-Ven après-midi uniquement
+              monday: { morning: false, afternoon: true },
+              tuesday: { morning: false, afternoon: true },
+              wednesday: { morning: false, afternoon: true },
+              thursday: { morning: false, afternoon: true },
+              friday: { morning: false, afternoon: true },
+              saturday: { morning: false, afternoon: false }
+            }
+          },
+          { 
+            id: 'p4', 
+            name: 'Radiologie', 
+            requiredInterns: 1,
+            schedule: {
+              // Lun, Mer, Ven (matin + après-midi)
+              monday: { morning: true, afternoon: true },
+              tuesday: { morning: false, afternoon: false },
+              wednesday: { morning: true, afternoon: true },
+              thursday: { morning: false, afternoon: false },
+              friday: { morning: true, afternoon: true },
+              saturday: { morning: false, afternoon: false }
+            }
+          },
+          { 
+            id: 'p5', 
+            name: 'Laboratoire', 
+            requiredInterns: 1,
+            schedule: {
+              // Mar, Jeu, Sam matin uniquement
+              monday: { morning: false, afternoon: false },
+              tuesday: { morning: true, afternoon: false },
+              wednesday: { morning: false, afternoon: false },
+              thursday: { morning: true, afternoon: false },
+              friday: { morning: false, afternoon: false },
+              saturday: { morning: true, afternoon: false }
+            }
+          },
+          { 
+            id: 'p6', 
+            name: 'Urgences', 
+            requiredInterns: 2,
+            schedule: {
+              // Tous les jours sauf mercredi
+              monday: { morning: true, afternoon: true },
+              tuesday: { morning: true, afternoon: true },
+              wednesday: { morning: false, afternoon: false },
+              thursday: { morning: true, afternoon: true },
+              friday: { morning: true, afternoon: true },
+              saturday: { morning: true, afternoon: false }
+            }
+          },
+          { 
+            id: 'p7', 
+            name: 'Consultation Externe', 
+            requiredInterns: 1,
+            schedule: {
+              // Mar, Mer, Jeu après-midi uniquement
+              monday: { morning: false, afternoon: false },
+              tuesday: { morning: false, afternoon: true },
+              wednesday: { morning: false, afternoon: true },
+              thursday: { morning: false, afternoon: true },
+              friday: { morning: false, afternoon: false },
+              saturday: { morning: false, afternoon: false }
+            }
+          }
+        ],
+        unavailabilities: [
+          { id: 'u1', internId: 'int2', date: '2025-03-10', period: 'morning', reason: 'RDV médical' },
+          { id: 'u2', internId: 'int5', date: '2025-03-17', period: 'fullday', reason: 'Formation obligatoire' },
+          { id: 'u3', internId: 'int7', date: '2025-03-24', period: 'afternoon', reason: 'Démarche administrative' }
+        ],
+        lastModified: new Date('2025-02-01'),
+        createdAt: new Date('2025-02-01')
       }
     ]
   }),

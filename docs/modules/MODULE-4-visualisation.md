@@ -23,31 +23,31 @@
 - ✅ **m4-1.6** : Test : Toggle fonctionne visuellement
 
 ### Phase 2 : Vue "Par Jour/Période" - Structure (m4-2)
-- ⏳ **m4-2.1** : Créer structure HTML tableau (3 lignes: Matin, AM, Garde)
-- ⏳ **m4-2.2** : Header colonnes jours (Lun-Dim avec dates)
-- ⏳ **m4-2.3** : Labels lignes (🌅 MATIN, 🌆 APRÈS-MIDI, 🌙 GARDE)
-- ⏳ **m4-2.4** : Cellules vides avec bordures
-- ⏳ **m4-2.5** : Navigation semaines (réutiliser existant)
-- ⏳ **m4-2.6** : Test : Structure tableau visible
+- ✅ **m4-2.1** : Créer structure HTML tableau (3 lignes: Matin, AM, Garde)
+- ✅ **m4-2.2** : Header colonnes jours (Lun-Dim avec dates)
+- ✅ **m4-2.3** : Labels lignes (🌅 MATIN, 🌆 APRÈS-MIDI, 🌙 GARDE)
+- ✅ **m4-2.4** : Cellules vides avec bordures
+- ✅ **m4-2.5** : Navigation semaines (réutiliser existant)
+- ✅ **m4-2.6** : Test : Structure tableau visible
 
 ### Phase 3 : Vue "Par Jour/Période" - Logique Matin (m4-3)
-- ⏳ **m4-3.1** : Fonction `getPracticesByDayPeriod(weekIndex, dayIndex, 'matin')`
-- ⏳ **m4-3.2** : Grouper affectations par practice
-- ⏳ **m4-3.3** : Pour chaque practice : afficher nom + liste internes
-- ⏳ **m4-3.4** : Styling : nom practice en gras, internes en liste à puces
-- ⏳ **m4-3.5** : Test : Affichage practices matin fonctionne
+- ✅ **m4-3.1** : Fonction `getPracticesByDayPeriod(weekIndex, dayIndex, 'matin')`
+- ✅ **m4-3.2** : Grouper affectations par practice
+- ✅ **m4-3.3** : Pour chaque practice : afficher nom + liste internes
+- ✅ **m4-3.4** : Styling : nom practice en gras, internes en liste à puces
+- ✅ **m4-3.5** : Test : Affichage practices matin fonctionne
 
 ### Phase 4 : Vue "Par Jour/Période" - Logique Après-midi (m4-4)
-- ⏳ **m4-4.1** : Réutiliser `getPracticesByDayPeriod` pour 'apres_midi'
-- ⏳ **m4-4.2** : Affichage similaire à matin
-- ⏳ **m4-4.3** : Gérer samedi AM (vide, pas de travail)
-- ⏳ **m4-4.4** : Test : Affichage practices après-midi fonctionne
+- ✅ **m4-4.1** : Réutiliser `getPracticesByDayPeriod` pour 'apres_midi'
+- ✅ **m4-4.2** : Affichage similaire à matin
+- ✅ **m4-4.3** : Gérer samedi AM (vide, pas de travail)
+- ✅ **m4-4.4** : Test : Affichage practices après-midi fonctionne
 
 ### Phase 5 : Vue "Par Jour/Période" - Gardes (m4-5)
-- ⏳ **m4-5.1** : Fonction `getGardeByDay(weekIndex, dayIndex)`
-- ⏳ **m4-5.2** : Afficher nom interne de garde (simple texte)
-- ⏳ **m4-5.3** : Styling : fond orange, texte blanc
-- ⏳ **m4-5.4** : Test : Affichage gardes fonctionne
+- ✅ **m4-5.1** : Fonction `getGardeByDay(weekIndex, dayIndex)`
+- ✅ **m4-5.2** : Afficher nom interne de garde (simple texte)
+- ✅ **m4-5.3** : Styling : fond orange, texte blanc
+- ⏳ **m4-5.4** : Test : Affichage gardes fonctionne → **PRÊT POUR TEST UTILISATEUR**
 
 ### Phase 6 : Samedi matin Astreinte (m4-6)
 - ⏳ **m4-6.1** : Détecter samedi matin (dayIndex === 5, periode === 'matin')

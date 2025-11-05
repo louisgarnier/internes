@@ -269,15 +269,125 @@
           </div>
         </div>
 
-        <!-- m4-1.4 : Vue par Jour/Période (placeholder temporaire) -->
-        <div v-else style="background: white; border-radius: 12px; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center;">
-          <div style="font-size: 48px; margin-bottom: 20px;">📅</div>
-          <h3 style="font-size: 20px; font-weight: 600; color: #333; margin: 0 0 10px 0;">
-            Vue par Jour/Période
+        <!-- m4-2 : Vue par Jour/Période -->
+        <div 
+          v-else
+          v-for="semaine in semaines" 
+          :key="'period-' + semaine.numero"
+          style="background: white; border-radius: 12px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);"
+        >
+          <h3 style="font-size: 18px; font-weight: 600; color: #333; margin: 0 0 20px 0;">
+            📅 Semaine {{ semaine.numero }} : Du {{ formatDate(semaine.dateDebut) }} au {{ formatDate(semaine.dateFin) }}
           </h3>
-          <p style="font-size: 15px; color: #666; margin: 0;">
-            En cours de développement... (Phase 2)
-          </p>
+
+          <!-- m4-2.1 : Structure tableau Par Jour/Période -->
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; border: 2px solid #e5e7eb; border-radius: 8px;">
+              <!-- m4-2.2 : Header colonnes jours -->
+              <thead>
+                <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                  <th style="padding: 12px; text-align: left; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2); width: 150px;">
+                    Période
+                  </th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2);">
+                    Lundi
+                  </th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2);">
+                    Mardi
+                  </th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2);">
+                    Mercredi
+                  </th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2);">
+                    Jeudi
+                  </th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2);">
+                    Vendredi
+                  </th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2);">
+                    Samedi
+                  </th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600;">
+                    Dimanche
+                  </th>
+                </tr>
+              </thead>
+              
+              <!-- m4-2.3 + m4-2.4 : Corps tableau avec 3 lignes -->
+              <tbody>
+                <!-- Ligne 1 : MATIN -->
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                  <td style="padding: 12px; font-weight: 600; background: #fef3c7; border-right: 1px solid #e5e7eb;">
+                    🌅 MATIN
+                  </td>
+                  <!-- m4-3.3 : Afficher practices matin pour chaque jour -->
+                  <td v-for="dayIndex in [0,1,2,3,4,5]" :key="'matin-' + dayIndex" style="padding: 12px; border-right: 1px solid #e5e7eb; min-height: 80px; vertical-align: top;">
+                    <div v-for="practice in getPracticesByDayPeriod(semaine.numero - 1, dayIndex, 'matin')" :key="practice.name" style="margin-bottom: 8px;">
+                      <div style="font-weight: 600; color: #2563eb; font-size: 13px;">{{ practice.name }}:</div>
+                      <ul style="margin: 4px 0 0 0; padding-left: 20px; list-style: disc; font-size: 12px; color: #374151;">
+                        <li v-for="intern in practice.interns" :key="intern">{{ intern }}</li>
+                      </ul>
+                    </div>
+                    <span v-if="getPracticesByDayPeriod(semaine.numero - 1, dayIndex, 'matin').length === 0" style="color: #9ca3af; font-size: 12px;">-</span>
+                  </td>
+                  <td style="padding: 12px; min-height: 80px; vertical-align: top;">
+                    -
+                  </td>
+                </tr>
+                
+                <!-- Ligne 2 : APRÈS-MIDI -->
+                <tr style="border-bottom: 1px solid #e5e7eb;">
+                  <td style="padding: 12px; font-weight: 600; background: #fbcfe8; border-right: 1px solid #e5e7eb;">
+                    🌆 APRÈS-MIDI
+                  </td>
+                  <!-- m4-4.1 + m4-4.2 : Afficher practices après-midi (Lun-Ven uniquement) -->
+                  <td v-for="dayIndex in [0,1,2,3,4]" :key="'am-' + dayIndex" style="padding: 12px; border-right: 1px solid #e5e7eb; min-height: 80px; vertical-align: top;">
+                    <div v-for="practice in getPracticesByDayPeriod(semaine.numero - 1, dayIndex, 'apres_midi')" :key="practice.name" style="margin-bottom: 8px;">
+                      <div style="font-weight: 600; color: #2563eb; font-size: 13px;">{{ practice.name }}:</div>
+                      <ul style="margin: 4px 0 0 0; padding-left: 20px; list-style: disc; font-size: 12px; color: #374151;">
+                        <li v-for="intern in practice.interns" :key="intern">{{ intern }}</li>
+                      </ul>
+                    </div>
+                    <span v-if="getPracticesByDayPeriod(semaine.numero - 1, dayIndex, 'apres_midi').length === 0" style="color: #9ca3af; font-size: 12px;">-</span>
+                  </td>
+                  <!-- m4-4.3 : Samedi AM et Dimanche = vide (pas de travail) -->
+                  <td style="padding: 12px; border-right: 1px solid #e5e7eb; min-height: 80px; vertical-align: top;">
+                    -
+                  </td>
+                  <td style="padding: 12px; min-height: 80px; vertical-align: top;">
+                    -
+                  </td>
+                </tr>
+                
+                <!-- Ligne 3 : GARDE -->
+                <tr>
+                  <td style="padding: 12px; font-weight: 600; background: #dbeafe; border-right: 1px solid #e5e7eb;">
+                    🌙 GARDE
+                  </td>
+                  <!-- m4-5.2 + m4-5.3 : Afficher interne de garde pour chaque jour -->
+                  <td v-for="dayIndex in [0,1,2,3,4,5,6]" :key="'garde-' + dayIndex" :style="{
+                    padding: '12px',
+                    borderRight: dayIndex !== 6 ? '1px solid #e5e7eb' : 'none',
+                    textAlign: 'center',
+                    background: getGardeByDay(semaine.numero - 1, dayIndex) ? '#f97316' : 'transparent',
+                    color: getGardeByDay(semaine.numero - 1, dayIndex) ? 'white' : '#9ca3af',
+                    fontWeight: getGardeByDay(semaine.numero - 1, dayIndex) ? '600' : 'normal',
+                    fontSize: '13px',
+                    borderRadius: getGardeByDay(semaine.numero - 1, dayIndex) ? '6px' : '0'
+                  }">
+                    {{ getGardeByDay(semaine.numero - 1, dayIndex) || '-' }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Message si planning non généré -->
+          <div v-if="planning.status !== 'generated'" style="text-align: center; margin-top: 20px; padding: 20px; background: #eff6ff; border: 2px solid #3b82f6; border-radius: 10px;">
+            <p style="margin: 0; color: #1e40af; font-size: 14px; font-weight: 500;">
+              ℹ️ Cliquez sur "Générer le Planning" ci-dessus pour remplir automatiquement ce tableau
+            </p>
+          </div>
         </div>
 
       </div>
@@ -564,6 +674,81 @@ const getJourContent = (interneId, dayKey, weekIndex) => {
   const style = `background: ${bgColor || 'transparent'}; color: ${textColor}; font-size: 11px; padding: 8px; text-align: center; line-height: 1.5;`
   
   return { html, style }
+}
+
+// ✅ m4-3.1 : Fonction pour récupérer les practices d'un jour/période (Vue par Jour/Période)
+const getPracticesByDayPeriod = (weekIndex, dayIndex, periode) => {
+  // Si pas de données générées, retourner vide
+  if (!planning.value?.generatedData?.weeks) {
+    return []
+  }
+  
+  const week = planning.value.generatedData.weeks[weekIndex]
+  if (!week || !week.days || !week.affectations) {
+    return []
+  }
+  
+  const day = week.days[dayIndex]
+  if (!day) {
+    return []
+  }
+  
+  // Récupérer toutes les affectations pour ce jour/période
+  const affectations = week.affectations.filter(aff => 
+    aff.date === day.date && 
+    aff.periode === periode
+  )
+  
+  // m4-3.2 : Grouper par practice
+  const practicesMap = {}
+  affectations.forEach(aff => {
+    if (!practicesMap[aff.practiceId]) {
+      practicesMap[aff.practiceId] = {
+        name: aff.practiceName,
+        interns: []
+      }
+    }
+    practicesMap[aff.practiceId].interns.push(aff.interneName)
+  })
+  
+  // Convertir en array
+  return Object.values(practicesMap)
+}
+
+// ✅ m4-5.1 : Fonction pour récupérer la garde d'un jour
+const getGardeByDay = (weekIndex, dayIndex) => {
+  // Si pas de données générées, retourner vide
+  if (!planning.value?.generatedData?.weeks) {
+    return null
+  }
+  
+  const week = planning.value.generatedData.weeks[weekIndex]
+  if (!week || !week.gardes || !week.days) {
+    return null
+  }
+  
+  const day = week.days[dayIndex]
+  if (!day) {
+    return null
+  }
+  
+  // Dimanche (index 6)
+  if (dayIndex === 6 && week.gardes.dimanche) {
+    return week.gardes.dimanche.interneName
+  }
+  
+  // Samedi (index 5)
+  if (dayIndex === 5 && week.gardes.samedi) {
+    return week.gardes.samedi.interneName
+  }
+  
+  // Lun-Ven (indices 0-4)
+  if (dayIndex >= 0 && dayIndex <= 4 && week.gardes.semaine) {
+    const garde = week.gardes.semaine.find(g => g.date === day.date)
+    return garde ? garde.interneName : null
+  }
+  
+  return null
 }
 
 // Action Générer

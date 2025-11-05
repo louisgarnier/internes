@@ -392,51 +392,79 @@ Le module de configuration est terminé et fonctionnel :
 
 ---
 
-## 📅 MODULE 4 : VISUALISATION (SPECS MISES À JOUR)
+## 🎯 PHASE 5 : MODULE 4 - VISUALISATION (EN COURS 🚧)
 
-### État : 📝 Spécifications documentées
+### État : 🚧 En cours - Vue "Par Jour/Période" (60%)
 
 ### Réalisations :
-- ✅ **2 vues complémentaires documentées** :
-  - **Vue 1 : Par Interne** (pour les internes - voir leur planning personnel)
-  - **Vue 2 : Par Jour/Période** (pour les managers - vérifier couverture practices)
-- ✅ Toggle pour switcher entre les 2 vues
-- ✅ Codes couleur définis (travail, OFF, repos, empêchement, garde)
-- ✅ Samedi matin = Astreinte (traitée comme practice)
-- ✅ Affichage REPOS, OFF, empêchements
 
-### À développer (après MODULE 3) :
-- Implémenter Vue 1 (Par Interne)
-- Implémenter Vue 2 (Par Jour/Période)
-- Toggle dynamique avec persistance LocalStorage
-- Code couleur CSS
-- Navigation entre semaines
+#### ✅ Phase 1 : Toggle & Structure (COMPLÉTÉ - m4-1)
+- ✅ `ref` viewMode ('byIntern' / 'byPeriod') avec état réactif
+- ✅ Composant toggle (2 boutons : 👤 Vue par Interne / 📅 Vue par Jour/Période)
+- ✅ Styling dynamique (bouton actif : fond violet, inactif : fond blanc)
+- ✅ Affichage conditionnel (v-if sur tableau existant, v-else pour nouvelle vue)
+- ✅ Persistance LocalStorage ('planning_viewMode')
+- ✅ Transitions smooth (0.2s)
+
+#### ✅ Phase 2 : Structure tableau "Par Jour/Période" (COMPLÉTÉ - m4-2)
+- ✅ Structure HTML tableau (3 lignes : MATIN, APRÈS-MIDI, GARDE)
+- ✅ Headers colonnes (Lun-Dim avec dates formatées)
+- ✅ Labels lignes (🌅 MATIN, 🌆 APRÈS-MIDI, 🌙 GARDE)
+- ✅ Cellules avec bordures et styling
+- ✅ Navigation entre semaines (réutilisée de Vue 1)
+
+#### ✅ Phase 3 : Logique MATIN (COMPLÉTÉ - m4-3)
+- ✅ Fonction `getPracticesByDayPeriod(weekIndex, dayIndex, 'matin')`
+- ✅ Groupement affectations par practice
+- ✅ Affichage : nom practice en gras + liste internes à puces
+- ✅ Styling : practices en bleu (#2563eb), internes en gris
+- ✅ Gestion cellules vides ("-")
+
+#### ✅ Phase 4 : Logique APRÈS-MIDI (COMPLÉTÉ - m4-4)
+- ✅ Réutilisation `getPracticesByDayPeriod` pour 'apres_midi'
+- ✅ Affichage Lun-Ven uniquement (Sam-Dim = "-")
+- ✅ Styling identique à MATIN
+
+#### ✅ Phase 5 : Logique GARDES (COMPLÉTÉ - m4-5)
+- ✅ Fonction `getGardeByDay(weekIndex, dayIndex)`
+- ✅ Affichage nom interne de garde (Lun-Dim)
+- ✅ Styling : fond orange (#f97316), texte blanc, gras
+- ✅ Gestion tous types gardes (Dimanche, Samedi, Semaine)
+
+### À développer (en cours) :
+- ⏳ Phase 6 : Samedi matin Astreinte (m4-6)
+- ⏳ Phase 7 : Affichage REPOS (m4-7)
+- ⏳ Phase 8 : Affichage OFF (m4-8)
+- ⏳ Phase 9 : Affichage Indisponibilités (m4-9)
+- ⏳ Phase 10 : Tests finaux & polish
 
 ### Évolutions futures :
 - 📝 **v1.1** : Page dédiée de gestion des contacts (CRUD complet)
 - 📝 **v2.0** : Intégration Google Calendar (export/import)
 
 ### Fichiers créés/modifiés :
-- `stores/interns.js` - Store global des internes (nouveau)
-- `stores/plannings.js` - Store mis à jour avec structure complète
-- `pages/planning/new.vue` - Wizard 4 étapes + sauvegarde
-- `pages/index.vue` - Dashboard mis à jour (internsCount/practicesCount)
+- `pages/planning/[id]/index.vue` - Vue principale avec toggle et 2 vues
+  - Fonctions : `getPracticesByDayPeriod()`, `getGardeByDay()`
+  - Toggle avec état LocalStorage
+  - Vue "Par Interne" (existante, complète)
+  - Vue "Par Jour/Période" (en cours, 60%)
+- `docs/modules/MODULE-4-visualisation.md` - Spécifications détaillées (mis à jour)
 
 ---
 
 ## 📅 Planning Prévisionnel
 
-| Phase | Module | État | Semaine Prévue |
-|-------|--------|------|----------------|
-| ✅ Phase 1 | Setup & Documentation | **COMPLÉTÉ** | Semaine 1-2 |
-| ✅ Phase 2 | MODULE 1 - Dashboard | **COMPLÉTÉ** | Semaine 3 |
-| ✅ Phase 3 | MODULE 2 - Configuration | **COMPLÉTÉ** (Wizard 4 étapes) | Semaine 4-5 |
-| 📝 Phase 4 | MODULE 3 - Génération | À venir | Semaine 5-6 |
-| 📝 Phase 5 | MODULE 4 - Visualisation | À venir | Semaine 7 |
-| 📝 Phase 6 | MODULE 5 - Manipulation | À venir | Semaine 8 |
-| 📝 Phase 7 | MODULE 6 - Export | À venir | Semaine 8 |
-| 📝 Phase 8 | MODULE 7 - Stockage | À venir | Semaine 9 |
-| 📝 Phase 9 | Tests & Polish | À venir | Semaine 10 |
+| Phase | Module | État | Progression |
+|-------|--------|------|-------------|
+| ✅ Phase 1 | Setup & Documentation | **COMPLÉTÉ** | 100% |
+| ✅ Phase 2 | MODULE 1 - Dashboard | **COMPLÉTÉ** | 100% |
+| ✅ Phase 3 | MODULE 2 - Configuration | **COMPLÉTÉ** (Wizard 4 étapes) | 100% |
+| ✅ Phase 4 | MODULE 3 - Génération | **COMPLÉTÉ** (Toutes phases + tests) | 80% |
+| 🚧 Phase 5 | MODULE 4 - Visualisation | **EN COURS** (Vue Par Jour/Période) | 60% |
+| 📝 Phase 6 | MODULE 5 - Manipulation | À venir | 0% |
+| 📝 Phase 7 | MODULE 6 - Export | À venir | 0% |
+| 📝 Phase 8 | MODULE 7 - Stockage | À venir | 0% |
+| 📝 Phase 9 | Tests & Polish | À venir | 0% |
 
 ---
 
