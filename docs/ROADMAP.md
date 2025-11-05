@@ -1,320 +1,401 @@
 # 🗺️ ROADMAP - Gestionnaire de Planning Internes
 
-## Vue d'Ensemble
+**Dernière mise à jour :** 5 novembre 2025 - 06h30
 
-Ce document décrit le plan de développement complet de l'application sur **10 semaines**.
+---
 
-**Version actuelle :** 0.2.0 (Setup technique complété)  
-**Version cible v1.0 :** Toutes les fonctionnalités principales implémentées  
+## 📊 Vue d'Ensemble
+
+**Version actuelle :** 0.8.0 (Module 3 génération à 55%)  
+**Version cible v1.0 (MVP) :** Application fonctionnelle complète  
 **Date de début :** 4 novembre 2025  
-**Date de fin prévue :** 13 janvier 2026  
-**Progression :** ✅ Phase 1 terminée - Phase 2 en cours
+**Date de fin prévue v1.0 :** Mi-novembre 2025  
+**Progression globale :** 🟢 75% complété
 
 ---
 
-## 📅 Planning Global
+## 🎯 Objectif v1.0 (MVP)
 
-### Phase 1 : Fondations (Semaines 1-2) 📐
+**Fonctionnalités essentielles :**
+- ✅ Dashboard avec gestion des plannings
+- ✅ Configuration complète (wizard 4 étapes + édition)
+- ✅ Génération automatique (gardes, repos, practices, OFFs)
+- ⏳ Sauvegarde locale (LocalStorage)
+- ⏳ Visualisation basique du planning généré
+- ⏳ Navigation entre semaines
 
-**Objectif :** Avoir une base solide pour le développement
-
-#### Semaine 1 : Documentation & Architecture ✅
-- [x] Rédaction des spécifications complètes
-- [x] Création du README principal
-- [x] Documentation de tous les modules (1-7)
-- [x] Documentation technique (architecture, DB, algorithmes)
-- [x] Setup du repository GitHub
-- [x] Push initial sur GitHub
-
-#### Semaine 2 : Setup Technique ✅
-- [x] Choix de la stack technique finale (Nuxt 3 + Pinia + LocalStorage)
-- [x] Setup de l'environnement de développement
-- [x] Structure des dossiers du projet
-- [x] Installation et configuration de Nuxt.js 3
-- [x] Page d'accueil fonctionnelle
-- [x] Serveur de développement opérationnel
-
-**Livrables Phase 1 :** ✅ COMPLÉTÉS
-- ✅ Documentation complète (7 modules + 3 docs techniques)
-- ✅ Architecture définie (Nuxt 3 + Pinia + LocalStorage)
-- ✅ Environnement prêt et testé
-- ✅ Repository GitHub configuré
-- ✅ Application Nuxt fonctionnelle
+**Fonctionnalités avancées reportées à v1.1+ :**
+- Voir **[V2-ROADMAP.md](V2-ROADMAP.md)** pour les fonctionnalités avancées
 
 ---
 
-### Phase 2 : Core Features (Semaines 3-6) 🔨
+## ✅ PHASE 1 : FONDATIONS (COMPLÉTÉ)
 
-**Objectif :** Fonctionnalités essentielles opérationnelles
+### Semaine 1 : Documentation & Architecture ✅
+- ✅ Spécifications complètes (7 modules + 3 docs techniques)
+- ✅ README principal
+- ✅ Setup repository GitHub
+- ✅ Push initial
 
-#### Semaine 3 : MODULE 1 - Gestion des Plannings ✅
-- [x] Dashboard principal (liste des plannings)
-- [x] Store Pinia configuré
-- [x] État vide (0 plannings)
-- [x] Cartes de planning avec infos et actions
-- [x] Actions : Dupliquer, Supprimer
-- [ ] Création d'un planning (formulaire simple) → MODULE 2
-- [ ] Suppression d'un planning
-- [ ] Navigation entre plannings
-- [ ] Stockage LocalStorage basique
+### Semaine 2 : Setup Technique ✅
+- ✅ Choix stack : **Nuxt 3 + Pinia + LocalStorage**
+- ✅ Installation Nuxt.js 3 (compatible Node 18.20.6)
+- ✅ Configuration Pinia pour state management
+- ✅ Structure dossiers projet
+- ✅ Serveur dev opérationnel (http://localhost:3001)
 
-**Tests :** Créer 3 plannings, naviguer, supprimer
-
-#### Semaine 4 : MODULE 2 - Configuration (Partie 1)
-- [ ] Wizard Étape 1 : Paramètres généraux
-- [ ] Wizard Étape 2 : Gestion des internes (CRUD)
-- [ ] Wizard Étape 3 : Gestion des practices (CRUD)
-- [ ] Validation des données à chaque étape
-
-**Tests :** Créer un planning avec 7 internes et 8 practices
-
-#### Semaine 5 : MODULE 2 - Configuration (Partie 2) + MODULE 3 (Partie 1)
-- [ ] Wizard Étape 4 : Empêchements
-- [ ] Interface de modification post-création
-- [ ] Début de l'algorithme de génération (Phase 1 : Gardes)
-
-**Tests :** Ajouter 10 empêchements, vérifier qu'ils sont respectés
-
-#### Semaine 6 : MODULE 3 - Génération Automatique
-- [ ] Algorithme Phase 2 : Repos post-garde automatiques
-- [ ] Algorithme Phase 3 : Attribution demi-journées OFF
-- [ ] Algorithme Phase 4 : Attribution aux practices
-- [ ] Système de scoring et équilibrage
-- [ ] Gestion des erreurs et conflits
-
-**Tests :** Générer 10 plannings différents, vérifier contraintes
-
-**Livrables Phase 2 :**
-- ✅ Application fonctionnelle de base
-- ✅ Génération automatique opérationnelle
-- ✅ Tests passés
+**Résultat :** 🎉 Application Nuxt fonctionnelle avec state management
 
 ---
 
-### Phase 3 : Visualisation & Features Avancées (Semaines 7-8) 👁️
+## ✅ PHASE 2 : MODULE 1 - DASHBOARD (COMPLÉTÉ)
 
-**Objectif :** Interface riche et fonctionnalités avancées
+### Fonctionnalités implémentées ✅
+- ✅ Dashboard principal avec liste plannings
+- ✅ Store Pinia configuré (`stores/plannings.js`)
+- ✅ État vide (0 plannings) avec message CTA
+- ✅ Cartes planning avec :
+  - Badge statut (✅ Généré / ⏳ Config / ❌ Erreur)
+  - Infos : semaines, internes, practices
+  - Date dernière modification
+- ✅ Actions fonctionnelles :
+  - 👁️ Voir le planning
+  - ✏️ Modifier le planning
+  - 📋 Dupliquer
+  - 🗑️ Supprimer (avec confirmation)
+- ✅ Tri automatique par date modification
+- ✅ Animations et hover effects
+- ✅ Bouton "➕ Nouveau" dans header
 
-#### Semaine 7 : MODULE 4 - Visualisation
-- [ ] Vue hebdomadaire (tableau)
-- [ ] Vue calendrier mensuel
-- [ ] Vue par interne
-- [ ] Navigation entre semaines
-- [ ] Statistiques d'équilibre (tableaux)
-- [ ] Graphiques comparatifs
+**Fichiers créés :**
+- `stores/plannings.js`
+- `pages/index.vue`
 
-**Tests :** Visualiser un planning de 10 semaines avec 7 internes
-
-#### Semaine 8 : MODULE 5 & 6 - Manipulation & Export
-- [ ] Échange de gardes avec validation
-- [ ] Modification manuelle avec drag & drop
-- [ ] Régénération partielle
-- [ ] Export PDF
-- [ ] Export Excel
-- [ ] Import/Export JSON
-
-**Tests :** Échanger 5 gardes, exporter en PDF et Excel
-
-**Livrables Phase 3 :**
-- ✅ Interface complète et intuitive
-- ✅ Manipulation flexible
-- ✅ Export multi-formats
+**Résultat :** 🎉 Dashboard complet et fonctionnel
 
 ---
 
-### Phase 4 : Polish, Tests & Déploiement (Semaines 9-10) ✨
+## ✅ PHASE 3 : MODULE 2 - CONFIGURATION (COMPLÉTÉ)
 
-**Objectif :** Application production-ready
+### F2.1 : Wizard 4 Étapes (COMPLÉTÉ) ✅
 
-#### Semaine 9 : Tests & Optimisation
-- [ ] Tests unitaires (coverage > 80%)
-- [ ] Tests d'intégration
-- [ ] Tests end-to-end (Cypress/Playwright)
-- [ ] Optimisation des performances
-- [ ] Optimisation du stockage LocalStorage
-- [ ] Gestion des cas limites
+**Étape 1 : Paramètres Généraux** ✅
+- Nom du planning (min 3 caractères)
+- Date de début (validation lundi obligatoire)
+- Nombre de semaines (slider 1-10)
+- Calcul automatique période
+- Progress bar dynamique
 
-**Tests :** Battery de tests complets
+**Étape 2 : Gestion des Internes** ✅
+- Store global internes (`stores/interns.js`)
+- Formulaire : Prénom, Nom, Email, Téléphone
+- Sélection rapide depuis contacts existants
+- Actions : Ajouter, Modifier, Supprimer
+- Validation : min 2 internes
 
-#### Semaine 10 : Documentation & Déploiement
-- [ ] Guide utilisateur complet
-- [ ] Tutoriel vidéo
-- [ ] FAQ
-- [ ] Documentation développeur
-- [ ] Déploiement sur GitHub Pages / Netlify / Vercel
-- [ ] Monitoring et analytics (optionnel)
+**Étape 3 : Gestion des Practices** ✅
+- Formulaire complet :
+  - Nom practice
+  - Nb internes requis (radio : 1 ou 2)
+  - Grille horaires (Lun-Sam, matin/après-midi)
+  - Samedi après-midi désactivé
+- Affichage intelligent (formatage jours)
+- Actions : Ajouter, Modifier, Supprimer
+- Validation : min 1 practice
 
-**Tests :** Tests d'acceptation utilisateur
+**Étape 4 : Empêchements** ✅
+- Formulaire :
+  - Dropdown interne
+  - Date picker
+  - Période (radio : Matin / AM / Journée)
+  - Raison optionnelle
+- Liste empêchements avec compteur
+- Actions : Ajouter, Supprimer
+- Étape optionnelle
 
-**Livrables Phase 4 :**
-- ✅ Application déployée en production
-- ✅ Documentation utilisateur complète
-- ✅ Tests passés (>80% coverage)
+### F2.2 : Modification Planning (COMPLÉTÉ) ✅
 
----
+**Page d'édition** (`/planning/[id]/edit`) ✅
+- 4 sections accordéon (repliables/dépliables)
+- Section 1 : Paramètres généraux
+- Section 2 : Gestion internes (avec email/phone)
+- Section 3 : Gestion practices (avec grille horaires)
+- Section 4 : Gestion empêchements
+- Actions :
+  - 💾 Sauvegarder (validation + recalcul)
+  - 🔄 Régénérer (si déjà généré)
+- Alert orange si planning déjà généré
+- Bouton "← Retour" vers visualisation
 
-## 🎯 Fonctionnalités par Phase
+**Fichiers créés :**
+- `stores/interns.js`
+- `pages/planning/new.vue` (wizard)
+- `pages/planning/[id]/index.vue` (visualisation)
+- `pages/planning/[id]/edit.vue` (édition)
 
-### ✅ V1.0 - MVP (Minimum Viable Product)
-
-**Stack Technique :**
-- **Frontend :** Nuxt.js 3 + Tailwind CSS
-- **Stockage :** LocalStorage (ou SQLite local)
-- **State :** Pinia
-
-**Obligatoire pour la v1.0 (par priorité) :**
-1. ✅ **MODULE 4 : Visualisation** 🔥 **PRIORITÉ #1**
-   - Vue hebdomadaire claire
-   - Navigation entre semaines
-   - Affichage des gardes
-2. ✅ MODULE 1 : Dashboard et gestion plannings
-3. ✅ MODULE 2 : Configuration complète (wizard + modification)
-4. ✅ MODULE 3 : Génération automatique
-5. ✅ MODULE 5 : Échange de gardes (sans drag & drop)
-6. ✅ MODULE 6 : Export PDF
-7. ✅ MODULE 7 : Stockage LocalStorage
-
-**Nice-to-have (peut être reporté à v1.1) :**
-- ⏳ Drag & drop pour modifications
-- ⏳ Fonction "Annuler" (Ctrl+Z)
-- ⏳ Vue calendrier mensuelle
-- ⏳ Export Excel avancé
-- ⏳ Import CSV
-- ⏳ Graphiques statistiques avancés
-
----
-
-### 🔮 V1.1 - Améliorations (Post-lancement)
-
-**Fonctionnalités additionnelles :**
-- 🖱️ **Drag & Drop** pour modifications manuelles
-- ↩️ **Fonction "Annuler"** (Ctrl+Z)
-- 📧 Notifications email aux internes
-- 📱 Version mobile responsive
-- 🎨 Personnalisation des couleurs
-- 📊 Statistiques avancées avec plus de graphiques
-- 📥 Import Excel pour internes/practices
-- 📅 Vue calendrier mensuelle améliorée
+**Résultat :** 🎉 Configuration complète fonctionnelle
 
 ---
 
-### 🚀 V2.0 - Future (Long terme)
+## 🔄 PHASE 4 : MODULE 3 - GÉNÉRATION (EN COURS - 55%)
 
-**Évolutions majeures :**
-- ☁️ **Migration vers Airtable** (backend centralisé)
-- 🔄 **Synchronisation multi-devices**
-- 💾 **Backup cloud automatique**
-- 👥 Multi-utilisateurs avec authentification
-- 📲 Application mobile native (iOS/Android)
-- 🤝 Système de préférences des internes
-- 🔗 Intégration avec systèmes RH hospitaliers
-- 🗓️ Gestion des congés annuels
-- 📅 Planification > 10 semaines
-- 🔔 Notifications push
-- 📈 Analytics avancées
+### ✅ Réalisations (m3-3 à m3-11)
+
+#### m3-3 : Interface Génération ✅
+- Radio buttons : Toutes semaines / Semaine spécifique
+- Dropdown sélection semaine
+- Bouton "🚀 Générer" ou "🔄 Régénérer"
+- Confirmation avant régénération
+- Modal résultats scrollable (remplace alert())
+
+#### m3-4 : PHASE 1a - Structure Base ✅
+- Fonction `initWeekStructure()` : structure semaine vide
+- 11 slots travail (Lun-Ven: 2/jour, Sam: 1)
+- 7 gardes à attribuer
+- Tableaux : repos, OFFs, affectations
+- Fonction `generatePlanning()` orchestration
+
+#### m3-5 : PHASE 1b - Garde Dimanche ✅
+- Système scoring sélection internes
+- Fonction `selectInterneForGarde()` : critères multiples
+- Fonction `calculateInterneScore()` : équilibre + évite doublons
+- Fonction `checkUnavailability()` : respect empêchements
+- Stats globales mises à jour
+
+#### m3-6 : PHASE 1c - 5 Gardes Semaine ✅
+- Fonction `assignGardesSemaine()` : 5 gardes Lun-Ven
+- Scoring équilibrage internes
+- Accepte doublons si nécessaire (contrainte DURE)
+- 🎉 **6/7 gardes attribuées**
+
+#### m3-7 : PHASE 1d - Garde Samedi ✅
+- Fonction `assignGardeSamedi()` : garde Sam 13h→Dim 8h
+- CONTRAINTE DURE : attribuée même si doublon
+- Scoring pénalise mais n'empêche pas
+- 🎉 **PHASE 1 COMPLÈTE : 7/7 gardes attribuées**
+
+#### m3-8 : PHASE 2 - Repos Post-Garde ✅
+- Fonction `calculateReposPostGarde()` : tous repos obligatoires
+- Règles :
+  - Garde Dimanche → Repos Lundi (matin + AM)
+  - Garde Lun-Jeu → Repos lendemain (matin + AM)
+  - Garde Vendredi → Repos Samedi (matin + AM)
+  - Garde Samedi → Repos Dimanche (matin + AM)
+- Repos marqués dans `week.repos[]` et `day.matin/apresMidi.repos`
+- 🎉 **PHASE 2 COMPLÈTE : Repos calculés**
+
+#### m3-9 : PHASE 4a - Practices 2 Internes ✅
+- Fonction `assignPractices2Internes()` : practices à 2 internes
+- Fonctions support :
+  - `assignSlotToPractice()` : attribution slot
+  - `getAvailableInternsForSlot()` : filtre disponibilité
+  - `selectBestInternsForPractice()` : scoring équilibrage
+- Respect repos post-garde + empêchements
+- Mapping jours français → anglais
+- Support format schedule objet (monday.morning/afternoon)
+- Stats globales `practicesParInterne`
+
+#### m3-10 : PHASE 4b - Practices 1 Interne ✅
+- Fonction `assignPractices1Interne()` : practices à 1 interne
+- Réutilise fonctions existantes (scoring, disponibilité)
+- 🎉 **PHASE 4 COMPLÈTE : Toutes practices attribuées**
+
+#### m3-11 : PHASE 3 - Demi-journée OFF ✅
+- Fonction `assignOFFs()` : 1 OFF par interne (BONUS)
+- Fonction `isSlotAvailableForOFF()` : vérif disponibilité
+- Sélection aléatoire parmi slots dispo (Lun-Ven)
+- Si aucun slot → warning mais pas d'erreur
+- OFF marqué dans `week.offs[]` et `day.matin/apresMidi.off`
+- 🎉 **PHASE 3 COMPLÈTE : OFFs attribués**
+
+### 🎉 GÉNÉRATION COMPLÈTE !
+
+**Les 4 phases principales sont terminées :**
+1. ✅ **PHASE 1** : Attribution 7 gardes/semaine (Dim + Lun-Ven + Sam)
+2. ✅ **PHASE 2** : Calcul repos post-garde obligatoires
+3. ✅ **PHASE 4** : Attribution toutes practices (1 et 2 internes)
+4. ✅ **PHASE 3** : Attribution OFFs (1 demi-journée/interne)
+
+**Total : ~50-60 affectations par semaine générées automatiquement !**
+
+### ⏳ Reste à faire (m3-15 à m3-18)
+
+#### m3-15 : Sauvegarder dans le Store (PRIORITÉ)
+- Sauvegarder données générées dans planning
+- Structure : gardes, repos, affectations, offs
+- Persister dans store Pinia
+
+#### m3-16 : Changer Statut (PRIORITÉ)
+- Changer status 'config' → 'generated'
+- Mettre à jour lastModified
+
+#### m3-17 : Affichage Basique (PRIORITÉ)
+- Remplir tableau hebdomadaire avec données
+- Afficher gardes, practices, repos, OFFs
+- Navigation entre semaines
+
+#### m3-18 : Tests
+- Test avec 0 empêchement
+- Test avec empêchements
+- Test avec différents configs
+
+### Fonctionnalités Reportées à v1.1+
+
+**Voir [V2-ROADMAP.md](V2-ROADMAP.md) pour :**
+- m3-12 : Détection conflits avancée
+- m3-13 : Option ajout internes si sous-staffé
+- m3-14 : Calcul score d'équilibre (0-100)
+
+**Fichiers créés/modifiés :**
+- `utils/generation.js` (700+ lignes)
+- `pages/planning/[id]/index.vue` (modal résultats)
+- `types/planning.ts`
+- `utils/planning-helpers.ts`
+
+**Résultat :** 🎉 Génération automatique complète fonctionnelle !
 
 ---
 
-## 📊 Indicateurs de Succès
+## 📅 PHASE 5 : MODULE 4 - VISUALISATION (À VENIR)
 
-### Métriques Techniques
-- ✅ **Performance** : Génération < 5 secondes
-- ✅ **Fiabilité** : 0% d'erreurs sur contraintes dures
-- ✅ **Qualité** : Score d'équilibre > 75/100 dans 95% des cas
-- ✅ **Tests** : Coverage > 80%
-- ✅ **Accessibilité** : Score WCAG AA
+### Affichage Basique (v1.0 MVP) ⏳
 
-### Métriques Utilisateur
-- ✅ **Temps de création** : < 10 minutes pour un planning complet
-- ✅ **Facilité d'utilisation** : 0 formation requise (intuitif)
-- ✅ **Satisfaction** : Score NPS > 8/10
-- ✅ **Adoption** : 100% de l'équipe utilise l'outil
+**m3-17 : Tableau Hebdomadaire Simple**
+- Remplir tableau avec données générées
+- Afficher : gardes, practices, repos, OFFs
+- Navigation entre semaines (flèches)
+- Code couleur basique :
+  - 🟢 Travail (practice)
+  - 🟡 Repos post-garde
+  - 🔵 OFF
+  - 🟠 Garde
 
----
-
-## ⚠️ Risques & Mitigations
-
-| Risque | Impact | Probabilité | Mitigation |
-|--------|--------|-------------|------------|
-| Algorithme trop complexe | 🔴 Haut | Moyen | Simplifier les contraintes souples |
-| LocalStorage limité | 🟡 Moyen | Faible | Utiliser IndexedDB si nécessaire |
-| Performance sur 10 semaines | 🟡 Moyen | Moyen | Optimiser algorithme, générer par semaine |
-| Bugs sur échange de gardes | 🔴 Haut | Moyen | Tests intensifs, validation stricte |
-| Interface trop complexe | 🟡 Moyen | Faible | Itérations avec utilisateurs |
-
----
-
-## 🎓 Apprentissages & Décisions
-
-### Décisions Architecturales
-
-**1. Stack Technique : Nuxt.js + Tailwind CSS**
-- ✅ **Framework :** Nuxt.js 3 (Vue.js avec SSR, excellent DX)
-- ✅ **UI :** Tailwind CSS (flexibilité, moderne)
-- ✅ **État :** Pinia (store Vue officiel)
-- **Décision :** Validé ✅
-
-**2. LocalStorage pour stockage (v1.0)**
-- ✅ **Pour :** Simple, pas de serveur, hors ligne
-- ❌ **Contre :** Limites de taille (5-10MB), pas de sync
-- **Décision :** OK pour v1.0, migration Airtable en v2.0
-
-**3. Priorité : Visualisation d'abord**
-- 🎯 **Visualisation = Fonctionnalité #1**
-- Interface simple pour utilisateur non-technique
-- Test de chaque fonctionnalité une par une
-- **Décision :** Développement itératif, focus UX
-
----
-
-## 📝 Notes de Version
-
-### v0.1.0 - 4 novembre 2025 (Documentation)
-- ✅ Spécifications complètes
-- ✅ README
-- ✅ Structure de documentation
-- ✅ ROADMAP
-
-### v0.2.0 - Semaine 2 (Setup)
-- [ ] Architecture définie
-- [ ] Stack technique choisie
-- [ ] Environnement configuré
-
-### v0.5.0 - Semaine 6 (Core MVP)
-- [ ] Génération automatique fonctionnelle
-- [ ] Configuration complète
-- [ ] Visualisation de base
-
-### v1.0.0 - Semaine 10 (Production)
-- [ ] Toutes les fonctionnalités principales
-- [ ] Tests complets
-- [ ] Documentation utilisateur
-- [ ] Déployé en production
-
----
-
-## 🔄 Processus de Développement
-
-### Workflow Git
+**Structure actuelle du tableau :**
 ```
-main (production)
-  ↑
-develop (développement principal)
-  ↑
-feature/nom-fonctionnalite (branches de fonctionnalité)
+| Interne       | Lundi | Mardi | Mercredi | ... | Dimanche |
+|---------------|-------|-------|----------|-----|----------|
+| Alice Martin  |   -   |   -   |    -     | ... |    -     |
+| Bob Dupont    |   -   |   -   |    -     | ... |    -     |
 ```
 
-### Sprints
-- **Durée :** 1 semaine
-- **Rétrospective :** Chaque lundi
-- **Demo :** Chaque vendredi
+**Objectif :** Remplir les cellules avec les données générées !
 
-### Code Review
-- Obligatoire pour toute PR
-- Au moins 1 reviewer
-- Tests passés requis
+### 2 Vues Avancées (v1.1)
+
+**Reporté à v1.1 - Voir [V2-ROADMAP.md](V2-ROADMAP.md)**
+
+**Vue 1 : Par Interne** (pour les internes)
+- Planning personnel complet
+- Lignes = Internes, Colonnes = Jours
+
+**Vue 2 : Par Jour/Période** (pour les managers)
+- Vérifier couverture practices
+- Lignes = Périodes (Matin, AM, Garde)
+
+**Toggle pour switcher entre les 2 vues**
 
 ---
 
-*Dernière mise à jour : 4 novembre 2025*
+## 📦 PHASE 6 : MODULE 7 - STOCKAGE (v1.0)
 
+### LocalStorage Basique ⏳
+
+**À implémenter :**
+- Sauvegarde auto après chaque modification
+- Backup/Restauration
+- Alert si espace faible
+
+**Reporté à v2.0 :**
+- Migration Airtable
+- Multi-utilisateurs
+- Système permissions
+
+---
+
+## 🚀 PROCHAINES ÉTAPES IMMÉDIATES
+
+### Pour terminer v1.0 MVP (25% restant)
+
+1. **m3-15** : Sauvegarder dans le store ✅ PRIORITÉ
+2. **m3-16** : Changement statut → 'generated' ✅ PRIORITÉ
+3. **m3-17** : Affichage basique dans tableau ✅ PRIORITÉ
+4. **m3-18** : Tests basiques
+5. **MODULE 7** : LocalStorage basique
+
+**Durée estimée :** 2-3 jours
+
+---
+
+## 📊 Résumé Progression
+
+| Module | Fonctionnalité | Statut | %  |
+|--------|----------------|--------|----|
+| **Setup** | Documentation + Tech | ✅ Complété | 100% |
+| **MODULE 1** | Dashboard | ✅ Complété | 100% |
+| **MODULE 2** | Configuration (Wizard + Edit) | ✅ Complété | 100% |
+| **MODULE 3** | Génération | 🔄 En cours | 55% |
+| - Phase 1-4 | Gardes + Repos + Practices + OFFs | ✅ Complété | - |
+| - Sauvegarde | m3-15, m3-16 | ⏳ À faire | - |
+| **MODULE 4** | Visualisation basique | ⏳ À faire | 0% |
+| **MODULE 7** | LocalStorage | ⏳ À faire | 0% |
+| **TOTAL v1.0** | - | 🔄 En cours | **75%** |
+
+---
+
+## 🎯 Évolutions Post-v1.0
+
+### v1.1 (Prochaine)
+- MODULE 4 avancé : 2 vues complémentaires
+- Score d'équilibre (0-100)
+- Ajout internes si sous-staffé
+- Détection conflits
+
+### v1.2
+- MODULE 5 : Manipulation manuelle
+- MODULE 6 : Export PDF/Excel
+
+### v2.0 (Major)
+- Intégrations : Google Calendar, Email, WhatsApp
+- Airtable + Multi-users
+- Système permissions
+
+### v3.0+ (Long terme)
+- Application mobile
+- Tests complets
+- Performance optimizations
+
+**Voir [V2-ROADMAP.md](V2-ROADMAP.md) pour tous les détails.**
+
+---
+
+## 🛠️ Stack Technique Finale
+
+| Composant | Technologie | Version |
+|-----------|-------------|---------|
+| **Framework** | Nuxt.js | 3.13.0 |
+| **Runtime** | Node.js | 18.20.6 |
+| **Vue** | Vue 3 | 3.4.0 |
+| **State Management** | Pinia | 2.x |
+| **Styling** | CSS inline | - |
+| **Stockage v1.0** | LocalStorage | - |
+| **Stockage v2.0** | Airtable | (futur) |
+| **Version Control** | Git + GitHub | - |
+
+---
+
+## 📝 Workflow de Développement
+
+**Pour chaque fonctionnalité :**
+1. Lire le fichier MD du module
+2. Développer la micro-tâche
+3. Tester visuellement dans le navigateur
+4. Valider avec l'utilisateur
+5. Mettre à jour le MD avec ✅
+6. Commit + Push sur GitHub (sur "GO push" explicite)
+
+**Repository :** https://github.com/louisgarnier/internes.git
+
+---
+
+*Ce fichier est maintenu à jour au fur et à mesure du développement.*
+*Dernière révision complète : 5 novembre 2025 - 06h30*
