@@ -25,6 +25,7 @@
 | **CD2b** - Repos post-garde Vendredi (samedi matin+AM) | ✅ IMPLÉMENTÉ | Fonctionne correctement |
 | **CD2c** - Repos post-garde Samedi (dimanche matin+AM) | ✅ IMPLÉMENTÉ | Fonctionne correctement |
 | **CD2d** - Repos post-garde Dimanche (lundi matin+AM) | ✅ IMPLÉMENTÉ | Repos placé sur lundi de la semaine suivante (cross-semaine) |
+| **CD2e** - Pas de garde Lundi si garde Dimanche | ✅ IMPLÉMENTÉ | Garde Dimanche finit Lundi 8h → Impossible garde Lundi 18h |
 | **CD3** - Unicité des gardes (1 interne = max 1 garde/jour) | ✅ IMPLÉMENTÉ | Vérifié dans le scoring |
 | **CD4** - Respect des empêchements (indisponibilités) | ✅ IMPLÉMENTÉ | Vérifié pour gardes + practices + OFFs |
 | **CD5** - Demi-journée OFF (1 par interne/semaine) | ⚠️ PARTIEL | Attribué si slots disponibles (bonus) |

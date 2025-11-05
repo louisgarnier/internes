@@ -174,7 +174,7 @@ function assignGardeDimanche(week, interns, unavailabilities, globalStats) {
  * 
  * Gardes de semaine : 18h → 8h lendemain (moins difficiles que samedi/dimanche)
  */
-function assignGardesSemaine(week, interns, unavailabilities, globalStats) {
+function assignGardesSemaine(week, interns, unavailabilities, globalStats, previousWeek = null) {
   console.log(`\n🌙 Phase 1c : Attribution 5 gardes de semaine ${week.weekNumber}`)
   
   const joursSemaine = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi']
@@ -192,7 +192,9 @@ function assignGardesSemaine(week, interns, unavailabilities, globalStats) {
       'semaine',
       unavailabilities,
       globalStats,
-      week
+      week,
+      jourName,
+      previousWeek
     )
     
     if (!selectedIntern) {
@@ -960,7 +962,7 @@ function checkUnavailability(interneId, date, unavailabilities, periode = null) 
  * 2. Équilibre (qui a eu le moins de gardes ?)
  * 3. Type de garde (équilibrer les types : semaine, samedi, dimanche)
  */
-function selectInterneForGarde(interns, date, gardeType, unavailabilities, globalStats, week) {
+function selectInterneForGarde(interns, date, gardeType, unavailabilities, globalStats, week, jourName = null, previousWeek = null) {
   const candidates = []
   
   for (const intern of interns) {
@@ -969,6 +971,14 @@ function selectInterneForGarde(interns, date, gardeType, unavailabilities, globa
     if (isUnavailable) {
       console.log(`  ⏭️ ${intern.firstName} ${intern.lastName} : indisponible`)
       continue
+    }
+    
+    // ✅ CD2e : Si c'est lundi, vérifier que l'interne n'a pas eu la garde dimanche (qui finit lundi 8h)
+    if (jourName === 'lundi' && previousWeek && previousWeek.gardes.dimanche) {
+      if (previousWeek.gardes.dimanche.interneId === intern.id) {
+        console.log(`  ⛔ ${intern.firstName} ${intern.lastName} : avait garde Dimanche (finit Lundi 8h) → Impossible garde Lundi 18h`)
+        continue
+      }
     }
     
     // Calculer le score
@@ -1088,8 +1098,11 @@ export function generatePlanning(planning, weekNumbers = null) {
   console.log('\n✅ Phase 1b terminée : Gardes Dimanche attribuées')
   
   // PHASE 1c : Attribuer les 5 gardes de semaine (Lun-Ven)
-  for (const week of weeksStructure) {
-    const success = assignGardesSemaine(week, planning.internsList, planning.unavailabilities, globalStats)
+  for (let i = 0; i < weeksStructure.length; i++) {
+    const week = weeksStructure[i]
+    const previousWeek = i > 0 ? weeksStructure[i - 1] : null // Semaine précédente (pour vérifier garde dimanche)
+    
+    const success = assignGardesSemaine(week, planning.internsList, planning.unavailabilities, globalStats, previousWeek)
     if (!success) {
       return {
         success: false,
