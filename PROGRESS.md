@@ -258,7 +258,17 @@ Le module de configuration est terminé et fonctionnel :
 - CONTRAINTE DURE : doit être attribuée même si doublon
 - Système de scoring pénalise mais n'empêche pas
 - Mise à jour stats globales (total + samedi)
-- **🎉 PHASE 1 COMPLÈTE : Toutes les 7 gardes attribuées par semaine**
+
+#### ✅ m3-7b : PHASE 1e - Astreinte Samedi (COMPLÉTÉ)
+- Fonction `assignAstreinteSamedi()` pour astreinte Sam 8h-13h (5h)
+- **1 interne obligatoire** (titulaire)
+- Contrainte AS2 : **Pas l'interne de garde samedi** (incompatibilité)
+- Contrainte AS3 : Peut être l'interne de garde vendredi (compatible)
+- Système de scoring avec `calculateInterneScore('astreinte')`
+- Stockage : `week.gardes.astreinteSamedi`
+- Génération automatique (comme les gardes, pas via practices)
+- Affichage : 🚨 Astreinte (M) avec fond orange
+- **🎉 PHASE 1 COMPLÈTE : 7 gardes + 1 astreinte attribuées par semaine**
 
 #### ✅ m3-8 : PHASE 2 - Repos post-garde (COMPLÉTÉ)
 - Fonction `calculateReposPostGarde()` pour tous repos obligatoires
@@ -394,7 +404,7 @@ Le module de configuration est terminé et fonctionnel :
 
 ## 🎯 PHASE 5 : MODULE 4 - VISUALISATION (EN COURS 🚧)
 
-### État : 🚧 En cours - Vue "Par Jour/Période" (60%)
+### État : 🚧 En cours - Vue "Par Jour/Période" (75% - Phases 1-6 complètes)
 
 ### Réalisations :
 
@@ -431,12 +441,20 @@ Le module de configuration est terminé et fonctionnel :
 - ✅ Styling : fond orange (#f97316), texte blanc, gras
 - ✅ Gestion tous types gardes (Dimanche, Samedi, Semaine)
 
+#### ✅ Phase 6 : Samedi matin Astreinte (COMPLÉTÉ - m4-6)
+- ✅ Détection astreinte depuis `week.gardes.astreinteSamedi`
+- ✅ Vue "Par Jour/Période" : Affichage "🚨 Astreinte:" (orange, 1 seul interne)
+- ✅ Vue "Par Interne" : Affichage "🚨 Astreinte (M)" avec fond orange (#f59e0b)
+- ✅ Pas de practices normales le samedi matin (astreinte automatique)
+- ✅ Modal génération : Ligne "🚨 Astreinte Samedi : [Nom]"
+
 ### À développer (en cours) :
-- ⏳ Phase 6 : Samedi matin Astreinte (m4-6)
-- ⏳ Phase 7 : Affichage REPOS (m4-7)
-- ⏳ Phase 8 : Affichage OFF (m4-8)
-- ⏳ Phase 9 : Affichage Indisponibilités (m4-9)
-- ⏳ Phase 10 : Tests finaux & polish
+- ⏳ Phase 7 : Styling & Finitions (hauteur cellules, espacement)
+- ⏳ Phase 8 : Tests & validation complète
+
+### Fonctionnalités reportées v1.1+ :
+- 📝 Phase 7 avancée : Affichage REPOS/OFF/Indisponibilités dans vue Par Jour/Période
+- 📝 Phase 9 : Tests edge cases approfondis
 
 ### Évolutions futures :
 - 📝 **v1.1** : Page dédiée de gestion des contacts (CRUD complet)
@@ -459,8 +477,8 @@ Le module de configuration est terminé et fonctionnel :
 | ✅ Phase 1 | Setup & Documentation | **COMPLÉTÉ** | 100% |
 | ✅ Phase 2 | MODULE 1 - Dashboard | **COMPLÉTÉ** | 100% |
 | ✅ Phase 3 | MODULE 2 - Configuration | **COMPLÉTÉ** (Wizard 4 étapes) | 100% |
-| ✅ Phase 4 | MODULE 3 - Génération | **COMPLÉTÉ** (Toutes phases + tests) | 80% |
-| 🚧 Phase 5 | MODULE 4 - Visualisation | **EN COURS** (Vue Par Jour/Période) | 60% |
+| ✅ Phase 4 | MODULE 3 - Génération | **COMPLÉTÉ** (7 gardes + astreinte) | 85% |
+| 🚧 Phase 5 | MODULE 4 - Visualisation | **EN COURS** (2 vues fonctionnelles) | 75% |
 | 📝 Phase 6 | MODULE 5 - Manipulation | À venir | 0% |
 | 📝 Phase 7 | MODULE 6 - Export | À venir | 0% |
 | 📝 Phase 8 | MODULE 7 - Stockage | À venir | 0% |

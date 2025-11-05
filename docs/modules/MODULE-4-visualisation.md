@@ -47,13 +47,13 @@
 - ✅ **m4-5.1** : Fonction `getGardeByDay(weekIndex, dayIndex)`
 - ✅ **m4-5.2** : Afficher nom interne de garde (simple texte)
 - ✅ **m4-5.3** : Styling : fond orange, texte blanc
-- ⏳ **m4-5.4** : Test : Affichage gardes fonctionne → **PRÊT POUR TEST UTILISATEUR**
+- ✅ **m4-5.4** : Test : Affichage gardes fonctionne (validé utilisateur)
 
 ### Phase 6 : Samedi matin Astreinte (m4-6)
-- ✅ **m4-6.1** : Détecter samedi matin (dayIndex === 5, periode === 'matin')
-- ✅ **m4-6.2** : Afficher "Astreinte:" au lieu du nom practice
-- ✅ **m4-6.3** : Liste internes assignés à l'astreinte
-- ⏳ **m4-6.4** : Test : Astreinte samedi affichée correctement → **PRÊT POUR TEST UTILISATEUR**
+- ✅ **m4-6.1** : Détecter astreinte depuis week.gardes.astreinteSamedi
+- ✅ **m4-6.2** : Afficher "🚨 Astreinte:" (orange, 1 seul interne)
+- ✅ **m4-6.3** : Vue Par Interne : "🚨 Astreinte (M)" avec fond orange
+- ✅ **m4-6.4** : Test : Astreinte samedi affichée correctement (validé utilisateur)
 
 ### Phase 7 : Styling & Finitions (m4-7)
 - ⏳ **m4-7.1** : Cellules adaptatives en hauteur (min-height, auto)

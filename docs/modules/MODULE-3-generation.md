@@ -117,9 +117,9 @@ VALIDATION: Vérification des contraintes
 
 ---
 
-### PHASE 1 : Attribution des Gardes 🌙
+### PHASE 1 : Attribution des Gardes 🌙 + Astreinte 🚨
 
-**Objectif :** Assigner les 7 gardes de la semaine de manière optimale.
+**Objectif :** Assigner les 7 gardes de la semaine + 1 astreinte samedi matin de manière optimale.
 
 **Les 7 gardes à attribuer :**
 1. Garde Lundi soir (GS)
@@ -130,10 +130,14 @@ VALIDATION: Vérification des contraintes
 6. Garde Samedi (GSam) → 13h-8h dimanche
 7. Garde Dimanche (GDim) → 24h
 
+**+ 1 Astreinte :**
+8. Astreinte Samedi matin → 8h-13h (5h)
+
 **Ordre de priorité :**
-1. **Garde Dimanche** (la plus difficile, 24h)
-2. **Gardes Semaine** (Lundi-Vendredi)
-3. **Garde Samedi** (la moins désirable)
+1. **Garde Dimanche** (la plus difficile, 24h) - Phase 1b
+2. **Gardes Semaine** (Lundi-Vendredi) - Phase 1c
+3. **Garde Samedi** (la moins désirable) - Phase 1d
+4. **Astreinte Samedi** (obligatoire, 1 interne) - Phase 1e
 
 **Pour chaque garde :**
 ```
@@ -294,23 +298,25 @@ FIN SI
 
 ---
 
-### 🚨 CAS SPÉCIAL : Astreinte Samedi Matin
+### 🚨 CAS SPÉCIAL : Astreinte Samedi Matin ✅ IMPLÉMENTÉ
 
-**Nature :** L'astreinte samedi matin (8h-13h) est traitée comme une practice dans le code, mais avec des **règles spécifiques**.
+**Nature :** L'astreinte samedi matin (8h-13h) est générée **automatiquement** (comme les gardes), **PAS via les practices**.
 
 **Caractéristiques :**
 - **Horaires :** Samedi 8h → 13h (5 heures)
 - **Effectif requis :** **1 interne obligatoire** (titulaire)
 - **Backup :** Non implémenté dans v1.0 (voir MODULE 5 pour v1.1+)
+- **Génération :** Phase 1e (après gardes samedi, avant repos)
+- **Stockage :** `week.gardes.astreinteSamedi`
 
 **Contraintes spécifiques :**
 
-| Règle | Description |
-|-------|-------------|
-| **AS1** - 1 interne titulaire | Obligatoire, traité comme une practice à 1 interne |
-| **AS2** - Incompatibilité garde samedi | L'interne de garde samedi (13h→Dim 8h) **NE PEUT PAS** être titulaire astreinte |
-| **AS3** - Compatibilité garde vendredi | L'interne de garde vendredi (18h→Sam 8h) **PEUT** enchaîner avec astreinte (Sam 8h-13h) |
-| **AS4** - Scoring intermédiaire | Difficulté > matin normal, mais < garde |
+| Règle | Description | Statut |
+|-------|-------------|--------|
+| **AS1** - 1 interne titulaire | Obligatoire, généré automatiquement | ✅ IMPLÉMENTÉ |
+| **AS2** - Incompatibilité garde samedi | L'interne de garde samedi (13h→Dim 8h) **NE PEUT PAS** être titulaire astreinte | ✅ IMPLÉMENTÉ |
+| **AS3** - Compatibilité garde vendredi | L'interne de garde vendredi (18h→Sam 8h) **PEUT** enchaîner avec astreinte (Sam 8h-13h) | ✅ IMPLÉMENTÉ |
+| **AS4** - Scoring intermédiaire | Difficulté > matin normal, mais < garde | ✅ IMPLÉMENTÉ |
 
 **Scoring de l'astreinte :**
 ```
