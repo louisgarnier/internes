@@ -6,11 +6,51 @@
 
 **Priorité :** 🔴 CRITIQUE (Cœur de l'application)
 
-**Statut :** 📝 À développer
+**Statut :** 🟡 EN DÉVELOPPEMENT (70% complété)
 
 **Dépendances :** MODULE 2 (Configuration complète)
 
 **Complexité :** ⭐⭐⭐⭐⭐ TRÈS ÉLEVÉE
+
+---
+
+## ✅ État d'Implémentation des Contraintes
+
+### Contraintes DURES (Obligatoires)
+
+| Contrainte | Statut | Notes |
+|------------|--------|-------|
+| **CD1** - Capacité des practices (exactement N internes requis) | ✅ IMPLÉMENTÉ | Attribution à 1 ou 2 internes selon config |
+| **CD2a** - Repos post-garde Lun-Jeu (lendemain matin+AM) | ✅ IMPLÉMENTÉ | Fonctionne correctement |
+| **CD2b** - Repos post-garde Vendredi (samedi matin+AM) | ✅ IMPLÉMENTÉ | Fonctionne correctement |
+| **CD2c** - Repos post-garde Samedi (dimanche matin+AM) | ✅ IMPLÉMENTÉ | Fonctionne correctement |
+| **CD2d** - Repos post-garde Dimanche (lundi matin+AM) | ✅ IMPLÉMENTÉ | Repos placé sur lundi de la semaine suivante (cross-semaine) |
+| **CD3** - Unicité des gardes (1 interne = max 1 garde/jour) | ✅ IMPLÉMENTÉ | Vérifié dans le scoring |
+| **CD4** - Respect des empêchements (indisponibilités) | ✅ IMPLÉMENTÉ | Vérifié pour gardes + practices + OFFs |
+| **CD5** - Demi-journée OFF (1 par interne/semaine) | ⚠️ PARTIEL | Attribué si slots disponibles (bonus) |
+| **CD6** - Couverture complète (7 gardes/semaine) | ✅ IMPLÉMENTÉ | 7/7 gardes toujours attribuées |
+
+### Contraintes SOUPLES (Objectifs d'équilibre)
+
+| Contrainte | Statut | Notes |
+|------------|--------|-------|
+| **CS1** - Équilibre global des gardes (~7×S/N par interne) | ⚠️ PARTIEL | Scoring basique, pas de vérification finale |
+| **CS2** - Équilibre par type de garde (GS/GSam/GDim) | ⚠️ PARTIEL | Scoring favorise dimanche en premier, mais déséquilibre possible (ex: Hugo 3 weekends, Léa 1) |
+| **CS3** - Équilibre des practices (même temps dans chaque practice) | ⚠️ PARTIEL | Scoring basique, pas optimisé |
+| **CS4** - Équilibre des demi-journées travaillées (~11×S/N) | ❌ NON IMPLÉMENTÉ | Pas de vérification |
+| **CS5** - Distribution temporelle (éviter concentration gardes) | ❌ NON IMPLÉMENTÉ | Pas de vérification |
+| **CS6** - Équilibre OFF + Manque | ✅ IMPLÉMENTÉ | OFFs priorisés pour ceux avec doublons |
+| **CS7** - Équilibre des doublons (surcharge équitable) | ✅ IMPLÉMENTÉ | Scoring tri par nb doublons semaine |
+
+### Fonctionnalités Avancées (v1.1+)
+
+| Fonctionnalité | Statut | Module |
+|----------------|--------|--------|
+| Détection conflits détaillés | ❌ PLANIFIÉ | m3-12 |
+| Option "Ajouter internes" si sous-effectif | ❌ PLANIFIÉ | m3-13 |
+| Calcul score d'équilibre 0-100 | ❌ PLANIFIÉ | m3-14 |
+| Vue "Par Jour/Période" | ❌ PLANIFIÉ | m4 |
+| Export PDF/Excel | ❌ PLANIFIÉ | m6 |
 
 ---
 

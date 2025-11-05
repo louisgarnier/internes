@@ -361,6 +361,33 @@ const getJourContent = (interneId, dayKey, weekIndex) => {
   const content = []
   let bgColor = ''
   
+  // 0️⃣ Vérifier EMPÊCHEMENTS (priorité absolue - doit être affiché en premier)
+  const unavailabilities = planning.value.unavailabilities || []
+  const unavailForThisDay = unavailabilities.filter(unavail => {
+    if (unavail.internId !== interneId) return false
+    if (unavail.date !== day.date) return false
+    return true
+  })
+  
+  if (unavailForThisDay.length > 0) {
+    // Normaliser les périodes pour l'affichage
+    const unavailPeriod = unavailForThisDay[0].period === 'morning' ? 'matin' :
+                         (unavailForThisDay[0].period === 'afternoon' ? 'apres_midi' :
+                         unavailForThisDay[0].period)
+    
+    if (unavailPeriod === 'fullday') {
+      content.push('🚫 Indisponible (journée)')
+      bgColor = '#fee2e2' // Rouge clair
+    } else if (unavailPeriod === 'matin') {
+      content.push('🚫 Indisponible (M)')
+    } else if (unavailPeriod === 'apres_midi') {
+      content.push('🚫 Indisponible (AM)')
+    } else {
+      content.push('🚫 Indisponible')
+      bgColor = '#fee2e2'
+    }
+  }
+  
   // 1️⃣ Vérifier GARDE (depuis week.gardes)
   const gardes = []
   if (week.gardes?.dimanche?.interneId === interneId && dayKey === 'dimanche') {
@@ -401,11 +428,19 @@ const getJourContent = (interneId, dayKey, weekIndex) => {
   ) || []
   
   practicesMatin.forEach(aff => {
-    content.push(`🏥 ${aff.practiceName} (M)`)
+    const doublonText = aff.isDoublonManqueEffectif ? ' (doublon manque effectif)' : ''
+    content.push(`🏥 ${aff.practiceName} (M)${doublonText}`)
+    if (aff.isDoublonManqueEffectif) {
+      bgColor = '#fef3c7' // Fond jaune pour signaler doublon
+    }
   })
   
   practicesAM.forEach(aff => {
-    content.push(`🏥 ${aff.practiceName} (AM)`)
+    const doublonText = aff.isDoublonManqueEffectif ? ' (doublon manque effectif)' : ''
+    content.push(`🏥 ${aff.practiceName} (AM)${doublonText}`)
+    if (aff.isDoublonManqueEffectif) {
+      bgColor = '#fef3c7' // Fond jaune pour signaler doublon
+    }
   })
   
   // 4️⃣ Vérifier OFF (depuis day.matin.off et day.apresMidi.off)
@@ -420,6 +455,44 @@ const getJourContent = (interneId, dayKey, weekIndex) => {
   
   // 5️⃣ Ajouter les gardes à la fin
   content.push(...gardes)
+  
+  // ✅ VÉRIFICATION : Détecter les demi-journées manquantes (Lun-Ven uniquement)
+  const dayIndexNum = dayMapping[dayKey] // 0=lundi, 1=mardi, ..., 4=vendredi, 5=samedi, 6=dimanche
+  const isWeekday = dayIndexNum < 5 // 0-4 = lundi-vendredi
+  
+  if (isWeekday) {
+    // ✅ CORRECTION : Toujours vérifier les demi-journées, MÊME si l'interne a une garde
+    // La garde c'est le SOIR, donc il doit quand même avoir quelque chose pour M et AM
+    
+    // Vérifier indisponibilités (journée complète = OK, on ne peut rien faire)
+    const unavailFullday = unavailForThisDay.some(u => u.period === 'fullday')
+    
+    if (!unavailFullday) {
+      // Vérifier matin : practice, OFF, repos, ou indisponibilité
+      const hasMatin = practicesMatin.length > 0 || 
+                      day.matin?.off?.interneId === interneId || 
+                      reposMatin || 
+                      unavailForThisDay.some(u => u.period === 'morning')
+      
+      // Vérifier après-midi : practice, OFF, repos, ou indisponibilité
+      const hasAM = practicesAM.length > 0 || 
+                   day.apresMidi?.off?.interneId === interneId || 
+                   reposApresMidi || 
+                   unavailForThisDay.some(u => u.period === 'afternoon')
+      
+      // Si manque matin ET pas d'indisponibilité matin
+      if (!hasMatin && !unavailForThisDay.some(u => u.period === 'morning')) {
+        content.push('⚠️ Manque M')
+        if (!bgColor) bgColor = '#fef3c7' // Jaune pour warning
+      }
+      
+      // Si manque après-midi ET pas d'indisponibilité après-midi
+      if (!hasAM && !unavailForThisDay.some(u => u.period === 'afternoon')) {
+        content.push('⚠️ Manque AM')
+        if (!bgColor) bgColor = '#fef3c7' // Jaune pour warning
+      }
+    }
+  }
   
   // Si aucun contenu, retourner tiret
   if (content.length === 0) {

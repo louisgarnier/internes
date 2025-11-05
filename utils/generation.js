@@ -304,36 +304,8 @@ function calculateReposPostGarde(week) {
   
   let reposCount = 0
   
-  // Garde Dimanche → Repos Lundi (matin + après-midi)
-  if (week.gardes.dimanche) {
-    const garde = week.gardes.dimanche
-    const lundiDate = week.days[0].date // Index 0 = Lundi
-    
-    const reposMatin = {
-      id: `repos-${week.weekNumber}-lun-matin`,
-      interneId: garde.interneId,
-      interneName: garde.interneName,
-      date: lundiDate,
-      periode: 'matin',
-      reason: 'Repos post-garde Dimanche'
-    }
-    
-    const reposApresMidi = {
-      id: `repos-${week.weekNumber}-lun-aprem`,
-      interneId: garde.interneId,
-      interneName: garde.interneName,
-      date: lundiDate,
-      periode: 'apres_midi',
-      reason: 'Repos post-garde Dimanche'
-    }
-    
-    week.repos.push(reposMatin, reposApresMidi)
-    week.days[0].matin.repos = reposMatin
-    week.days[0].apresMidi.repos = reposApresMidi
-    reposCount += 2
-    
-    console.log(`  💤 Repos Lundi (matin + AM) pour ${garde.interneName} (garde Dim)`)
-  }
+  // ✅ SKIP : Garde Dimanche → Repos calculé dans un second passage (car le lundi est dans la semaine SUIVANTE)
+  // Le repos post-garde dimanche est maintenant calculé après toutes les semaines dans generatePlanning()
   
   // Gardes de semaine (Lun-Jeu) → Repos lendemain
   if (week.gardes.semaine && week.gardes.semaine.length > 0) {
@@ -590,40 +562,77 @@ function assignPractices1Interne(week, practicesList, internsList, unavailabilit
 /**
  * PHASE 3 : Attribuer 1 demi-journée OFF par interne (BONUS)
  * 
- * Si un interne n'a pas de slot disponible, tant pis (pas d'erreur)
+ * ✅ NOUVELLE LOGIQUE : Équilibrer OFF + Manque
+ * - Compter les slots vides par interne (= futurs "Manque")
+ * - Prioriser les internes avec le PLUS de slots vides pour recevoir un OFF
+ * - Résultat : Total (OFF + Manque) équilibré entre tous
  */
-function assignOFFs(week, internsList, globalStats) {
+function assignOFFs(week, internsList, unavailabilities, globalStats) {
   console.log(`\n💤 Phase 3 : Attribution OFFs - Semaine ${week.weekNumber}`)
   
-  let offsCount = 0
-  
-  // Pour chaque interne
-  for (const intern of internsList) {
-    // Trouver les slots disponibles pour cet interne
+  // 1️⃣ Calculer les slots disponibles (vides) ET les doublons pour chaque interne
+  const internsWithSlots = internsList.map(intern => {
     const availableSlots = []
     
     for (let dayIndex = 0; dayIndex < 5; dayIndex++) { // Lun-Ven uniquement
       const day = week.days[dayIndex]
       
       // Vérifier matin
-      const matinDispo = isSlotAvailableForOFF(intern.id, day, 'matin', week)
+      const matinDispo = isSlotAvailableForOFF(intern.id, day, 'matin', week, unavailabilities)
       if (matinDispo) {
         availableSlots.push({ day, periode: 'matin' })
       }
       
       // Vérifier après-midi
-      const apresMidiDispo = isSlotAvailableForOFF(intern.id, day, 'apres_midi', week)
+      const apresMidiDispo = isSlotAvailableForOFF(intern.id, day, 'apres_midi', week, unavailabilities)
       if (apresMidiDispo) {
         availableSlots.push({ day, periode: 'apres_midi' })
       }
     }
+    
+    // ✅ CRITIQUE : Compter le nombre de DOUBLONS (affectations avec isDoublonManqueEffectif)
+    const doublonCount = week.affectations?.filter(aff => 
+      aff.interneId === intern.id && 
+      aff.isDoublonManqueEffectif === true
+    ).length || 0
+    
+    return {
+      intern,
+      availableSlots,
+      emptyCount: availableSlots.length, // Nombre de slots vides (= futurs "Manque")
+      doublonCount // Nombre de doublons (= surcharge)
+    }
+  })
+  
+  // 2️⃣ Trier par PRIORITÉ : 
+  //    1) Ceux avec le PLUS de doublons en premier (compensation surcharge)
+  //    2) Ensuite par slots vides
+  internsWithSlots.sort((a, b) => {
+    // Priorité 1 : Plus de doublons = priorité pour OFF
+    if (a.doublonCount !== b.doublonCount) {
+      return b.doublonCount - a.doublonCount // Décroissant
+    }
+    // Priorité 2 : Plus de slots vides = priorité pour OFF
+    return b.emptyCount - a.emptyCount // Décroissant
+  })
+  
+  console.log(`  📊 Distribution charge/doublons (avant attribution OFFs) :`)
+  internsWithSlots.forEach(item => {
+    console.log(`    - ${item.intern.firstName} ${item.intern.lastName} : ${item.doublonCount} doublon(s), ${item.emptyCount} slot(s) vide(s)`)
+  })
+  
+  // 3️⃣ Attribuer les OFFs dans cet ordre (prioriser ceux avec le plus de manques)
+  let offsCount = 0
+  
+  for (const item of internsWithSlots) {
+    const { intern, availableSlots } = item
     
     if (availableSlots.length === 0) {
       console.log(`  ⚠️ ${intern.firstName} ${intern.lastName} : Aucun slot disponible pour OFF`)
       continue
     }
     
-    // Sélectionner un slot aléatoire (ou le premier pour simplifier)
+    // Sélectionner un slot aléatoire parmi les disponibles
     const selectedSlot = availableSlots[Math.floor(Math.random() * availableSlots.length)]
     
     // Créer l'OFF
@@ -648,18 +657,26 @@ function assignOFFs(week, internsList, globalStats) {
     offsCount++
     
     const periodeLabel = selectedSlot.periode === 'matin' ? 'matin' : 'après-midi'
-    console.log(`  ✅ ${intern.firstName} ${intern.lastName} : OFF ${selectedSlot.day.dayName} ${periodeLabel}`)
+    const doublonInfo = item.doublonCount > 0 ? ` [${item.doublonCount} doublon(s)]` : ''
+    console.log(`  ✅ ${intern.firstName} ${intern.lastName} : OFF ${selectedSlot.day.dayName} ${periodeLabel}${doublonInfo} (${availableSlots.length} → ${availableSlots.length - 1} slot(s) vide(s))`)
   }
   
   console.log(`  ✅ ${offsCount} OFFs attribués sur ${internsList.length} internes`)
+  console.log(`  📊 Résultat : Internes avec doublons priorisés pour OFFs → charge mieux équilibrée`)
   week.stats.offsAttribues = offsCount
 }
 
 /**
  * Vérifier si un slot est disponible pour un OFF
  */
-function isSlotAvailableForOFF(interneId, day, periode, week) {
-  // 1. Vérifier si l'interne a un repos ce slot
+function isSlotAvailableForOFF(interneId, day, periode, week, unavailabilities) {
+  // 1. ✅ CRITIQUE : Vérifier si l'interne est indisponible ce slot
+  const isUnavailable = checkUnavailability(interneId, day.date, unavailabilities, periode)
+  if (isUnavailable) {
+    return false // Ne pas attribuer OFF si indisponible
+  }
+  
+  // 2. Vérifier si l'interne a un repos ce slot
   if (periode === 'matin' && day.matin.repos && day.matin.repos.interneId === interneId) {
     return false
   }
@@ -667,7 +684,7 @@ function isSlotAvailableForOFF(interneId, day, periode, week) {
     return false
   }
   
-  // 2. Vérifier si l'interne a déjà un OFF ce slot
+  // 3. Vérifier si l'interne a déjà un OFF ce slot
   if (periode === 'matin' && day.matin.off && day.matin.off.interneId === interneId) {
     return false
   }
@@ -675,7 +692,7 @@ function isSlotAvailableForOFF(interneId, day, periode, week) {
     return false
   }
   
-  // 3. Vérifier si l'interne a une affectation practice ce slot
+  // 4. Vérifier si l'interne a une affectation practice ce slot
   const hasAffectation = week.affectations.some(aff => 
     aff.interneId === interneId && 
     aff.date === day.date && 
@@ -685,7 +702,7 @@ function isSlotAvailableForOFF(interneId, day, periode, week) {
     return false
   }
   
-  // 4. Vérifier si l'interne a une garde le soir (on évite OFF le même jour)
+  // 5. Vérifier si l'interne a une garde le soir (on évite OFF le même jour)
   const hasGardeToday = 
     (week.gardes.dimanche && week.gardes.dimanche.interneId === interneId && week.gardes.dimanche.date === day.date) ||
     (week.gardes.samedi && week.gardes.samedi.interneId === interneId && week.gardes.samedi.date === day.date) ||
@@ -702,26 +719,111 @@ function isSlotAvailableForOFF(interneId, day, periode, week) {
  * Assigner un slot spécifique à une practice
  */
 function assignSlotToPractice(week, day, periode, practice, nbRequired, internsList, unavailabilities, globalStats) {
-  // Trouver les internes disponibles pour ce slot
+  // Trouver les internes disponibles pour ce slot (sans affectation existante)
   const available = getAvailableInternsForSlot(week, day, periode, internsList, unavailabilities)
   
-  if (available.length < nbRequired) {
-    console.error(`    ❌ Seulement ${available.length} internes disponibles (besoin: ${nbRequired})`)
-    return false
+  let selected = []
+  let isDoublonManqueEffectif = false
+  
+  if (available.length >= nbRequired) {
+    // ✅ Assez d'internes disponibles : sélection normale
+    selected = selectBestInternsForPractice(available, practice, globalStats, nbRequired)
+  } else {
+    // ⚠️ Pas assez d'internes disponibles : utiliser doublon avec marquage
+    console.warn(`    ⚠️ Seulement ${available.length} internes disponibles (besoin: ${nbRequired})`)
+    console.warn(`    ⚠️ Utilisation de doublon manque effectif pour ${practice.name}`)
+    
+    isDoublonManqueEffectif = true
+    
+    // Utiliser tous les internes disponibles
+    selected = [...available]
+    
+    // Si on n'a toujours pas assez, chercher parmi TOUS les internes (doublon forcé)
+    if (selected.length < nbRequired) {
+      // ✅ CRITIQUE : Équilibrer les doublons - prendre ceux qui ont le MOINS de practices CETTE PÉRIODE
+      
+      // ✅ CORRECTION MAJEURE : Compter les practices pour la PÉRIODE ACTUELLE UNIQUEMENT (pas toute la journée)
+      // Cela évite qu'un interne avec 1 practice le matin et 0 l'après-midi soit choisi
+      // avant un interne avec 0 le matin et 1 l'après-midi, quand on assigne l'après-midi
+      
+      // Filtrer les internes qui ne sont pas déjà sélectionnés et qui ne sont pas en repos/indisponibles
+      const candidatesForDoublon = internsList
+        .filter(intern => {
+          // Ne pas prendre ceux déjà dans selected
+          if (selected.some(s => s.id === intern.id)) return false
+          
+          // Ne pas prendre ceux en repos cette période
+          if (periode === 'matin' && day.matin.repos && day.matin.repos.interneId === intern.id) return false
+          if (periode === 'apres_midi' && day.apresMidi.repos && day.apresMidi.repos.interneId === intern.id) return false
+          
+          // Ne pas prendre ceux indisponibles
+          const isUnavailable = checkUnavailability(intern.id, day.date, unavailabilities, periode)
+          if (isUnavailable) return false
+          
+          return true
+        })
+        .map(intern => {
+          // ✅ Compter uniquement les practices de la PÉRIODE ACTUELLE (matin OU après-midi)
+          const practicesThisPeriod = week.affectations?.filter(aff =>
+            aff.interneId === intern.id &&
+            aff.date === day.date &&
+            aff.periode === periode
+          ).length || 0
+          
+          // ✅ CRITIQUE : Vérifier si l'interne a une garde CE JOUR-LÀ
+          // Un interne avec garde + 2 practices est plus chargé qu'un sans garde + 2 practices
+          const hasGardeThisDay = 
+            (week.gardes?.semaine?.some(g => g.interneId === intern.id && g.date === day.date)) ||
+            (week.gardes?.samedi?.interneId === intern.id && week.gardes.samedi.date === day.date) ||
+            (week.gardes?.dimanche?.interneId === intern.id && week.gardes.dimanche.date === day.date)
+          
+          // ✅✅ SUPER CRITIQUE : Compter combien de DOUBLONS cet interne a DÉJÀ reçu cette semaine
+          // Si Marie a déjà 3 doublons et Sophie 0, on priorise Sophie pour le prochain doublon
+          const doublonsThisWeek = week.affectations?.filter(aff =>
+            aff.interneId === intern.id &&
+            aff.isDoublonManqueEffectif === true
+          ).length || 0
+          
+          return { intern, practicesThisPeriod, hasGardeThisDay, doublonsThisWeek }
+        })
+        // ✅ Trier par : 1) Moins de doublons cette semaine, 2) moins practices cette période, 3) pas de garde
+        .sort((a, b) => {
+          // Priorité 1 : Celui qui a le MOINS de doublons cette semaine (équilibrage global)
+          if (a.doublonsThisWeek !== b.doublonsThisWeek) {
+            return a.doublonsThisWeek - b.doublonsThisWeek
+          }
+          // Priorité 2 : Moins de practices cette période
+          if (a.practicesThisPeriod !== b.practicesThisPeriod) {
+            return a.practicesThisPeriod - b.practicesThisPeriod
+          }
+          // Priorité 3 : Pas de garde (false < true en JS)
+          if (a.hasGardeThisDay !== b.hasGardeThisDay) {
+            return a.hasGardeThisDay ? 1 : -1 // Ceux SANS garde en premier
+          }
+          return 0
+        })
+      
+      console.warn(`    📊 Internes disponibles pour doublon (triés équitablement) :`)
+      candidatesForDoublon.slice(0, 5).forEach(item => {
+        const gardeText = item.hasGardeThisDay ? '🌙 garde' : 'pas de garde'
+        console.warn(`      - ${item.intern.firstName} ${item.intern.lastName} : ${item.doublonsThisWeek} doublon(s) semaine, ${item.practicesThisPeriod} practice(s) période, ${gardeText}`)
+      })
+      
+      // Ajouter les internes les moins chargés pour compléter
+      const needed = nbRequired - selected.length
+      selected.push(...candidatesForDoublon.slice(0, needed).map(item => item.intern))
+    }
   }
   
-  // Sélectionner les meilleurs internes (équilibrage)
-  const selected = selectBestInternsForPractice(available, practice, globalStats, nbRequired)
-  
-  if (selected.length !== nbRequired) {
-    console.error(`    ❌ Impossible de sélectionner ${nbRequired} internes`)
+  if (selected.length < nbRequired) {
+    console.error(`    ❌ Impossible d'affecter ${nbRequired} internes (même avec doublon)`)
     return false
   }
   
   // Créer les affectations
   for (const intern of selected) {
     const affectation = {
-      id: `affectation-${week.weekNumber}-${day.date}-${periode}-${intern.id}`,
+      id: `affectation-${week.weekNumber}-${day.date}-${periode}-${intern.id}-${Date.now()}`,
       interneId: intern.id,
       interneName: `${intern.firstName} ${intern.lastName}`,
       practiceId: practice.id,
@@ -729,7 +831,8 @@ function assignSlotToPractice(week, day, periode, practice, nbRequired, internsL
       date: day.date,
       periode,
       type: 'travail',
-      weekNumber: week.weekNumber
+      weekNumber: week.weekNumber,
+      isDoublonManqueEffectif: isDoublonManqueEffectif // ✅ Marquer les doublons
     }
     
     week.affectations.push(affectation)
@@ -747,7 +850,8 @@ function assignSlotToPractice(week, day, periode, practice, nbRequired, internsL
     globalStats.practicesParInterne[intern.id][practice.id]++
   }
   
-  console.log(`    ✅ ${day.dayName} ${periode} : ${selected.map(i => `${i.firstName} ${i.lastName}`).join(', ')}`)
+  const doublonText = isDoublonManqueEffectif ? ' (doublon manque effectif)' : ''
+  console.log(`    ${isDoublonManqueEffectif ? '⚠️' : '✅'} ${day.dayName} ${periode} : ${selected.map(i => `${i.firstName} ${i.lastName}`).join(', ')}${doublonText}`)
   
   return true
 }
@@ -768,7 +872,18 @@ function getAvailableInternsForSlot(week, day, periode, internsList, unavailabil
     // Vérifier empêchements
     const isUnavailable = checkUnavailability(intern.id, day.date, unavailabilities, periode)
     if (isUnavailable) {
+      console.log(`  🚫 ${intern.firstName} ${intern.lastName} indisponible le ${day.date} ${periode}`)
       return false
+    }
+    
+    // ✅ CRITIQUE : Vérifier si l'interne est déjà assigné à une practice ce jour/période
+    const alreadyAssigned = week.affectations?.some(aff => 
+      aff.interneId === intern.id && 
+      aff.date === day.date && 
+      aff.periode === periode
+    )
+    if (alreadyAssigned) {
+      return false // Déjà assigné à une autre practice
     }
     
     // Vérifier si l'interne a une garde ce jour (éviter de surcharger)
@@ -818,13 +933,20 @@ function checkUnavailability(interneId, date, unavailabilities, periode = null) 
     if (unavail.internId !== interneId) return false
     if (unavail.date !== date) return false
     
+    // Normaliser les périodes (support 'morning'/'afternoon' du store ET 'matin'/'apres_midi' de la génération)
+    const unavailPeriod = unavail.period === 'morning' ? 'matin' : 
+                         (unavail.period === 'afternoon' ? 'apres_midi' : unavail.period)
+    
     // Si période spécifiée, vérifier la correspondance
     if (periode) {
-      if (unavail.period === 'fullday') return true
-      if (unavail.period === 'matin' && periode === 'matin') return true
-      if (unavail.period === 'apres_midi' && periode === 'apres_midi') return true
+      if (unavailPeriod === 'fullday') return true
+      if (unavailPeriod === 'matin' && periode === 'matin') return true
+      if (unavailPeriod === 'apres_midi' && periode === 'apres_midi') return true
       return false
     }
+    
+    // Si pas de période spécifiée, un empêchement de type 'fullday' bloque tout
+    if (unavailPeriod === 'fullday') return true
     
     return true
   })
@@ -919,6 +1041,13 @@ export function generatePlanning(planning, weekNumbers = null) {
   const weeksToGenerate = weekNumbers || Array.from({ length: planning.weeks }, (_, i) => i + 1)
   
   console.log('📅 Semaines à générer:', weeksToGenerate)
+  console.log('🚫 Empêchements:', planning.unavailabilities?.length || 0, 'empêchement(s)')
+  if (planning.unavailabilities && planning.unavailabilities.length > 0) {
+    planning.unavailabilities.forEach(unavail => {
+      const intern = planning.internsList.find(i => i.id === unavail.internId)
+      console.log(`  - ${intern?.firstName} ${intern?.lastName} : ${unavail.date} (${unavail.period})`)
+    })
+  }
   
   // Initialiser les statistiques globales (pour équilibrage entre semaines)
   const globalStats = {
@@ -992,7 +1121,42 @@ export function generatePlanning(planning, weekNumbers = null) {
     calculateReposPostGarde(week)
   }
   
-  console.log('\n✅ Phase 2 terminée : Repos post-garde calculés')
+  // ✅ CORRECTION : Calculer les repos post-garde DIMANCHE (qui tombent le lundi de la semaine SUIVANTE)
+  for (let i = 0; i < weeksStructure.length; i++) {
+    const week = weeksStructure[i]
+    const nextWeek = weeksStructure[i + 1] // Semaine suivante (peut être undefined pour la dernière)
+    
+    if (week.gardes.dimanche && nextWeek) {
+      const garde = week.gardes.dimanche
+      const lundiNextWeek = nextWeek.days[0] // Lundi de la semaine suivante
+      
+      const reposMatin = {
+        id: `repos-${nextWeek.weekNumber}-lun-matin-postdim`,
+        interneId: garde.interneId,
+        interneName: garde.interneName,
+        date: lundiNextWeek.date,
+        periode: 'matin',
+        reason: `Repos post-garde Dimanche (semaine ${week.weekNumber})`
+      }
+      
+      const reposApresMidi = {
+        id: `repos-${nextWeek.weekNumber}-lun-aprem-postdim`,
+        interneId: garde.interneId,
+        interneName: garde.interneName,
+        date: lundiNextWeek.date,
+        periode: 'apres_midi',
+        reason: `Repos post-garde Dimanche (semaine ${week.weekNumber})`
+      }
+      
+      nextWeek.repos.push(reposMatin, reposApresMidi)
+      nextWeek.days[0].matin.repos = reposMatin
+      nextWeek.days[0].apresMidi.repos = reposApresMidi
+      
+      console.log(`  💤 Repos Lundi ${lundiNextWeek.date} (matin + AM) pour ${garde.interneName} (garde Dim semaine ${week.weekNumber})`)
+    }
+  }
+  
+  console.log('\n✅ Phase 2 terminée : Repos post-garde calculés (+ repos dimanche cross-semaine)')
   
   // PHASE 4a : Attribuer practices à 2 internes (priorité absolue)
   for (const week of weeksStructure) {
@@ -1025,7 +1189,7 @@ export function generatePlanning(planning, weekNumbers = null) {
   
   // PHASE 3 : Attribuer 1 demi-journée OFF par interne (BONUS)
   for (const week of weeksStructure) {
-    assignOFFs(week, planning.internsList, globalStats)
+    assignOFFs(week, planning.internsList, planning.unavailabilities, globalStats)
   }
   
   console.log('\n✅ Phase 3 terminée : OFFs attribués (bonus)')
