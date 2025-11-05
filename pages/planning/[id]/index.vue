@@ -333,7 +333,19 @@ const genererPlanning = () => {
       
       // Afficher les gardes attribuées
       if (week.gardes.dimanche) {
-        message += `    - 🌙 Garde Dimanche : ${week.gardes.dimanche.interneName}\n`
+        message += `    - 🌙 Dimanche : ${week.gardes.dimanche.interneName}\n`
+      }
+      
+      // Gardes de semaine
+      if (week.gardes.semaine && week.gardes.semaine.length > 0) {
+        week.gardes.semaine.forEach(garde => {
+          message += `    - 🌙 ${garde.jour.charAt(0).toUpperCase() + garde.jour.slice(1)} : ${garde.interneName}\n`
+        })
+      }
+      
+      // Garde Samedi
+      if (week.gardes.samedi) {
+        message += `    - 🌙 Samedi : ${week.gardes.samedi.interneName}\n`
       }
     })
     
@@ -341,25 +353,38 @@ const genererPlanning = () => {
     if (result.globalStats) {
       message += `\n📊 Statistiques d'équilibre :\n`
       const gardesStats = result.globalStats.gardesParInterne
-      Object.keys(gardesStats).forEach(interneId => {
-        const intern = planning.value.internsList.find(i => i.id === interneId)
-        if (intern) {
-          const stats = gardesStats[interneId]
-          message += `  • ${intern.firstName} ${intern.lastName} : ${stats.total} garde(s)`
-          if (stats.dimanche > 0) message += ` (dont ${stats.dimanche} dimanche)`
-          message += `\n`
+      
+      // Trier les internes par nombre de gardes (pour voir l'équilibre)
+      const sortedInterns = Object.keys(gardesStats)
+        .map(interneId => ({
+          intern: planning.value.internsList.find(i => i.id === interneId),
+          stats: gardesStats[interneId]
+        }))
+        .filter(item => item.intern)
+        .sort((a, b) => b.stats.total - a.stats.total)
+      
+      sortedInterns.forEach(item => {
+        const { intern, stats } = item
+        message += `  • ${intern.firstName} ${intern.lastName} : ${stats.total} garde(s)`
+        
+        const details = []
+        if (stats.semaine > 0) details.push(`${stats.semaine} sem`)
+        if (stats.dimanche > 0) details.push(`${stats.dimanche} dim`)
+        if (stats.samedi > 0) details.push(`${stats.samedi} sam`)
+        
+        if (details.length > 0) {
+          message += ` (${details.join(', ')})`
         }
+        message += `\n`
       })
     }
     
     message += '\n⏳ Prochaines phases (en développement) :\n'
-    message += '  1. Attribution 5 gardes semaine (Lun-Ven)\n'
-    message += '  2. Attribution garde Samedi\n'
-    message += '  3. Calcul des repos post-garde\n'
-    message += '  4. Attribution aux practices (priorité)\n'
-    message += '  5. Attribution des OFF (bonus)\n'
-    message += '  6. Détection des conflits\n'
-    message += '  7. Calcul du score d\'équilibre'
+    message += '  1. Calcul des repos post-garde\n'
+    message += '  2. Attribution aux practices (priorité)\n'
+    message += '  3. Attribution des OFF (bonus)\n'
+    message += '  4. Détection des conflits\n'
+    message += '  5. Calcul du score d\'équilibre'
     
     alert(message)
   } catch (error) {

@@ -167,6 +167,127 @@ function assignGardeDimanche(week, interns, unavailabilities, globalStats) {
 }
 
 /**
+ * PHASE 1c : Attribuer les 5 gardes de semaine (Lundi-Vendredi)
+ * 
+ * Gardes de semaine : 18h → 8h lendemain (moins difficiles que samedi/dimanche)
+ */
+function assignGardesSemaine(week, interns, unavailabilities, globalStats) {
+  console.log(`\n🌙 Phase 1c : Attribution 5 gardes de semaine ${week.weekNumber}`)
+  
+  const joursSemaine = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi']
+  
+  for (let i = 0; i < 5; i++) {
+    const jourName = joursSemaine[i]
+    const jourDate = week.days[i].date // Index 0-4 = Lun-Ven
+    
+    console.log(`\n  📅 Attribution garde ${jourName}`)
+    
+    // Trouver le meilleur interne pour cette garde
+    const selectedIntern = selectInterneForGarde(
+      interns,
+      jourDate,
+      'semaine',
+      unavailabilities,
+      globalStats,
+      week
+    )
+    
+    if (!selectedIntern) {
+      console.error(`❌ Impossible de trouver un interne pour la garde ${jourName}`)
+      return false
+    }
+    
+    // Créer l'objet garde
+    const garde = {
+      id: `garde-sem-${week.weekNumber}-${i}`,
+      interneId: selectedIntern.id,
+      interneName: `${selectedIntern.firstName} ${selectedIntern.lastName}`,
+      date: jourDate,
+      type: 'semaine',
+      jour: jourName,
+      horaire: `${jourName.charAt(0).toUpperCase() + jourName.slice(1)} 18h → Lendemain 8h`,
+      weekNumber: week.weekNumber
+    }
+    
+    // Assigner la garde
+    week.gardes.semaine.push(garde)
+    week.stats.gardesAttribuees++
+    
+    // Mettre à jour les stats globales
+    if (!globalStats.gardesParInterne[selectedIntern.id]) {
+      globalStats.gardesParInterne[selectedIntern.id] = { total: 0, semaine: 0, samedi: 0, dimanche: 0 }
+    }
+    globalStats.gardesParInterne[selectedIntern.id].total++
+    globalStats.gardesParInterne[selectedIntern.id].semaine++
+    
+    console.log(`  ✅ Garde ${jourName} attribuée à ${garde.interneName}`)
+  }
+  
+  console.log(`\n✅ 5 gardes de semaine attribuées (${week.stats.gardesAttribuees}/7 total)`)
+  
+  return true
+}
+
+/**
+ * PHASE 1d : Attribuer la garde Samedi (la moins désirable)
+ * 
+ * Garde Samedi : Samedi 13h → Dimanche 8h (la plus pénible)
+ * CONTRAINTE DURE : Cette garde DOIT être attribuée, même si un interne a déjà une garde dans la semaine
+ */
+function assignGardeSamedi(week, interns, unavailabilities, globalStats) {
+  console.log(`\n🌙 Phase 1d : Attribution garde Samedi ${week.weekNumber}`)
+  
+  const samediDate = week.days[5].date // Index 5 = Samedi
+  
+  console.log(`  📅 Attribution garde Samedi (${samediDate})`)
+  
+  // Trouver le meilleur interne pour cette garde
+  // Note : Le système de scoring va naturellement éviter les doublons de gardes,
+  // mais si nécessaire, il attribuera quand même (contrainte DURE)
+  const selectedIntern = selectInterneForGarde(
+    interns,
+    samediDate,
+    'samedi',
+    unavailabilities,
+    globalStats,
+    week
+  )
+  
+  if (!selectedIntern) {
+    console.error(`❌ Impossible de trouver un interne pour la garde Samedi`)
+    return false
+  }
+  
+  // Créer l'objet garde
+  const garde = {
+    id: `garde-sam-${week.weekNumber}`,
+    interneId: selectedIntern.id,
+    interneName: `${selectedIntern.firstName} ${selectedIntern.lastName}`,
+    date: samediDate,
+    type: 'samedi',
+    jour: 'samedi',
+    horaire: 'Samedi 13h → Dimanche 8h',
+    weekNumber: week.weekNumber
+  }
+  
+  // Assigner la garde
+  week.gardes.samedi = garde
+  week.stats.gardesAttribuees++
+  
+  // Mettre à jour les stats globales
+  if (!globalStats.gardesParInterne[selectedIntern.id]) {
+    globalStats.gardesParInterne[selectedIntern.id] = { total: 0, semaine: 0, samedi: 0, dimanche: 0 }
+  }
+  globalStats.gardesParInterne[selectedIntern.id].total++
+  globalStats.gardesParInterne[selectedIntern.id].samedi++
+  
+  console.log(`  ✅ Garde Samedi attribuée à ${garde.interneName}`)
+  console.log(`  🎯 Total gardes cette semaine : ${week.stats.gardesAttribuees}/7`)
+  
+  return true
+}
+
+/**
  * Sélectionner le meilleur interne pour une garde
  * 
  * Critères de scoring :
@@ -305,9 +426,36 @@ export function generatePlanning(planning, weekNumbers = null) {
   
   console.log('\n✅ Phase 1b terminée : Gardes Dimanche attribuées')
   
+  // PHASE 1c : Attribuer les 5 gardes de semaine (Lun-Ven)
+  for (const week of weeksStructure) {
+    const success = assignGardesSemaine(week, planning.internsList, planning.unavailabilities, globalStats)
+    if (!success) {
+      return {
+        success: false,
+        error: `Impossible d'attribuer toutes les gardes de semaine pour la semaine ${week.weekNumber}`,
+        weeks: weeksStructure
+      }
+    }
+  }
+  
+  console.log('\n✅ Phase 1c terminée : Gardes de semaine attribuées')
+  
+  // PHASE 1d : Attribuer la garde Samedi (la moins désirable)
+  for (const week of weeksStructure) {
+    const success = assignGardeSamedi(week, planning.internsList, planning.unavailabilities, globalStats)
+    if (!success) {
+      return {
+        success: false,
+        error: `Impossible d'attribuer la garde Samedi pour la semaine ${week.weekNumber}`,
+        weeks: weeksStructure
+      }
+    }
+  }
+  
+  console.log('\n✅ Phase 1d terminée : Gardes Samedi attribuées')
+  console.log('\n🎉 PHASE 1 COMPLÈTE : Toutes les 7 gardes attribuées par semaine !')
+  
   // TODO: Les phases suivantes seront implémentées dans les prochaines tâches
-  // - Phase 1c : Attribution gardes semaine (Lun-Ven)
-  // - Phase 1d : Attribution garde Samedi
   // - Phase 2 : Calcul repos post-garde
   // - Phase 4 : Attribution practices
   // - Phase 3 : Attribution OFFs
@@ -316,7 +464,7 @@ export function generatePlanning(planning, weekNumbers = null) {
     success: true,
     weeks: weeksStructure,
     globalStats,
-    message: `✅ Phase 1a-1b : Structures créées + Gardes Dimanche attribuées pour ${weeksStructure.length} semaine(s)`
+    message: `✅ Phase 1 complète : Toutes les gardes attribuées (7/7) pour ${weeksStructure.length} semaine(s)`
   }
 }
 
