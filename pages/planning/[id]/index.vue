@@ -387,6 +387,24 @@ const genererPlanning = () => {
           message += `       • ${interneName} : ${reposParInterne[interneName]} demi-journées\n`
         })
       }
+      
+      // Affectations practices créées
+      if (week.affectations && week.affectations.length > 0) {
+        message += `    - 🏥 Affectations practices : ${week.affectations.length} créées\n`
+        
+        // Grouper par practice
+        const affectationsParPractice = {}
+        week.affectations.forEach(aff => {
+          if (!affectationsParPractice[aff.practiceName]) {
+            affectationsParPractice[aff.practiceName] = 0
+          }
+          affectationsParPractice[aff.practiceName]++
+        })
+        
+        Object.keys(affectationsParPractice).forEach(practiceName => {
+          message += `       • ${practiceName} : ${affectationsParPractice[practiceName]} affectations\n`
+        })
+      }
     })
     
     // Stats globales si disponibles
@@ -420,7 +438,7 @@ const genererPlanning = () => {
     }
     
     message += '\n⏳ Prochaines phases (en développement) :\n'
-    message += '  1. Attribution aux practices (priorité absolue)\n'
+    message += '  1. Attribution practices à 1 interne\n'
     message += '  2. Attribution des OFF (bonus, si slots restants)\n'
     message += '  3. Détection des conflits\n'
     message += '  4. Calcul du score d\'équilibre'

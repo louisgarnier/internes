@@ -440,6 +440,213 @@ function calculateReposPostGarde(week) {
 }
 
 /**
+ * PHASE 4a : Attribuer practices nécessitant 2 internes
+ * 
+ * PRIORITÉ ABSOLUE : Couvrir toutes les practices avant les OFFs
+ */
+function assignPractices2Internes(week, practicesList, internsList, unavailabilities, globalStats) {
+  console.log(`\n🏥 Phase 4a : Attribution practices à 2 internes - Semaine ${week.weekNumber}`)
+  
+  // Filtrer les practices nécessitant 2 internes
+  const practices2 = practicesList.filter(p => p.requiredInterns === 2)
+  
+  if (practices2.length === 0) {
+    console.log('  ℹ️ Aucune practice à 2 internes configurée')
+    return true
+  }
+  
+  console.log(`  📋 ${practices2.length} practice(s) à 2 internes trouvée(s)`)
+  
+  let affectationsCount = 0
+  
+  // Pour chaque practice
+  for (const practice of practices2) {
+    console.log(`\n  🔹 Practice: ${practice.name}`)
+    
+    // Pour chaque jour de la semaine (Lun-Sam)
+    for (let dayIndex = 0; dayIndex < 6; dayIndex++) {
+      const day = week.days[dayIndex]
+      const dayName = day.dayName
+      
+      // Vérifier si la practice est active ce jour
+      const schedule = practice.schedule || {}
+      
+      // Mapper le nom du jour français vers anglais
+      const dayMapping = {
+        'lundi': 'monday',
+        'mardi': 'tuesday',
+        'mercredi': 'wednesday',
+        'jeudi': 'thursday',
+        'vendredi': 'friday',
+        'samedi': 'saturday'
+      }
+      const dayKey = dayMapping[dayName]
+      
+      // Matin
+      const matinActive = schedule[dayKey]?.morning === true
+      if (matinActive) {
+        const success = assignSlotToPractice(week, day, 'matin', practice, 2, internsList, unavailabilities, globalStats)
+        if (success) affectationsCount += 2
+        else {
+          console.error(`  ❌ Impossible d'affecter 2 internes à ${practice.name} - ${dayName} matin`)
+          return false
+        }
+      }
+      
+      // Après-midi (sauf samedi)
+      if (dayIndex < 5) { // Lun-Ven seulement
+        const apresMidiActive = schedule[dayKey]?.afternoon === true
+        if (apresMidiActive) {
+          const success = assignSlotToPractice(week, day, 'apres_midi', practice, 2, internsList, unavailabilities, globalStats)
+          if (success) affectationsCount += 2
+          else {
+            console.error(`  ❌ Impossible d'affecter 2 internes à ${practice.name} - ${dayName} après-midi`)
+            return false
+          }
+        }
+      }
+    }
+  }
+  
+  console.log(`  ✅ ${affectationsCount} affectations créées pour practices à 2 internes`)
+  week.stats.affectationsCreees = (week.stats.affectationsCreees || 0) + affectationsCount
+  
+  return true
+}
+
+/**
+ * Assigner un slot spécifique à une practice
+ */
+function assignSlotToPractice(week, day, periode, practice, nbRequired, internsList, unavailabilities, globalStats) {
+  // Trouver les internes disponibles pour ce slot
+  const available = getAvailableInternsForSlot(week, day, periode, internsList, unavailabilities)
+  
+  if (available.length < nbRequired) {
+    console.error(`    ❌ Seulement ${available.length} internes disponibles (besoin: ${nbRequired})`)
+    return false
+  }
+  
+  // Sélectionner les meilleurs internes (équilibrage)
+  const selected = selectBestInternsForPractice(available, practice, globalStats, nbRequired)
+  
+  if (selected.length !== nbRequired) {
+    console.error(`    ❌ Impossible de sélectionner ${nbRequired} internes`)
+    return false
+  }
+  
+  // Créer les affectations
+  for (const intern of selected) {
+    const affectation = {
+      id: `affectation-${week.weekNumber}-${day.date}-${periode}-${intern.id}`,
+      interneId: intern.id,
+      interneName: `${intern.firstName} ${intern.lastName}`,
+      practiceId: practice.id,
+      practiceName: practice.name,
+      date: day.date,
+      periode,
+      type: 'travail',
+      weekNumber: week.weekNumber
+    }
+    
+    week.affectations.push(affectation)
+    
+    // Mettre à jour les stats globales
+    if (!globalStats.practicesParInterne) {
+      globalStats.practicesParInterne = {}
+    }
+    if (!globalStats.practicesParInterne[intern.id]) {
+      globalStats.practicesParInterne[intern.id] = {}
+    }
+    if (!globalStats.practicesParInterne[intern.id][practice.id]) {
+      globalStats.practicesParInterne[intern.id][practice.id] = 0
+    }
+    globalStats.practicesParInterne[intern.id][practice.id]++
+  }
+  
+  console.log(`    ✅ ${day.dayName} ${periode} : ${selected.map(i => `${i.firstName} ${i.lastName}`).join(', ')}`)
+  
+  return true
+}
+
+/**
+ * Obtenir la liste des internes disponibles pour un slot
+ */
+function getAvailableInternsForSlot(week, day, periode, internsList, unavailabilities) {
+  return internsList.filter(intern => {
+    // Vérifier repos post-garde
+    if (periode === 'matin' && day.matin.repos && day.matin.repos.interneId === intern.id) {
+      return false
+    }
+    if (periode === 'apres_midi' && day.apresMidi.repos && day.apresMidi.repos.interneId === intern.id) {
+      return false
+    }
+    
+    // Vérifier empêchements
+    const isUnavailable = checkUnavailability(intern.id, day.date, unavailabilities, periode)
+    if (isUnavailable) {
+      return false
+    }
+    
+    // Vérifier si l'interne a une garde ce jour (éviter de surcharger)
+    // Pour l'instant on permet, mais on pourrait pénaliser dans le scoring
+    
+    return true
+  })
+}
+
+/**
+ * Sélectionner les meilleurs internes pour une practice (équilibrage)
+ */
+function selectBestInternsForPractice(availableInterns, practice, globalStats, nbRequired) {
+  // Calculer un score pour chaque interne
+  const internsWithScore = availableInterns.map(intern => {
+    let score = 100
+    
+    // Facteur 1 : Équilibrage global des practices
+    const practicesStats = globalStats.practicesParInterne?.[intern.id] || {}
+    const totalPractices = Object.values(practicesStats).reduce((sum, count) => sum + count, 0)
+    score -= totalPractices * 5 // Pénalité pour ceux qui ont déjà beaucoup de practices
+    
+    // Facteur 2 : Équilibrage par practice spécifique
+    const countThisPractice = practicesStats[practice.id] || 0
+    score -= countThisPractice * 10 // Pénalité plus forte pour cette practice spécifique
+    
+    // Facteur 3 : Équilibrage par nombre de gardes (éviter de surcharger)
+    const gardesStats = globalStats.gardesParInterne?.[intern.id] || { total: 0 }
+    score -= gardesStats.total * 3
+    
+    return { intern, score }
+  })
+  
+  // Trier par score décroissant et prendre les N meilleurs
+  internsWithScore.sort((a, b) => b.score - a.score)
+  
+  return internsWithScore.slice(0, nbRequired).map(item => item.intern)
+}
+
+/**
+ * Vérifier si un interne est empêché à une date/période
+ */
+function checkUnavailability(interneId, date, unavailabilities, periode = null) {
+  if (!unavailabilities || unavailabilities.length === 0) return false
+  
+  return unavailabilities.some(unavail => {
+    if (unavail.internId !== interneId) return false
+    if (unavail.date !== date) return false
+    
+    // Si période spécifiée, vérifier la correspondance
+    if (periode) {
+      if (unavail.period === 'fullday') return true
+      if (unavail.period === 'matin' && periode === 'matin') return true
+      if (unavail.period === 'apres_midi' && periode === 'apres_midi') return true
+      return false
+    }
+    
+    return true
+  })
+}
+
+/**
  * Sélectionner le meilleur interne pour une garde
  * 
  * Critères de scoring :
@@ -480,17 +687,6 @@ function selectInterneForGarde(interns, date, gardeType, unavailabilities, globa
   })
   
   return candidates[0].intern
-}
-
-/**
- * Vérifier si un interne est indisponible à une date donnée
- */
-function checkUnavailability(interneId, date, unavailabilities) {
-  if (!unavailabilities || unavailabilities.length === 0) return false
-  
-  return unavailabilities.some(unavail => {
-    return unavail.interneId === interneId && unavail.date === date
-  })
 }
 
 /**
@@ -614,15 +810,29 @@ export function generatePlanning(planning, weekNumbers = null) {
   
   console.log('\n✅ Phase 2 terminée : Repos post-garde calculés')
   
+  // PHASE 4a : Attribuer practices à 2 internes (priorité absolue)
+  for (const week of weeksStructure) {
+    const success = assignPractices2Internes(week, planning.practicesList, planning.internsList, planning.unavailabilities, globalStats)
+    if (!success) {
+      return {
+        success: false,
+        error: `Impossible d'attribuer toutes les practices à 2 internes pour la semaine ${week.weekNumber}`,
+        weeks: weeksStructure
+      }
+    }
+  }
+  
+  console.log('\n✅ Phase 4a terminée : Practices à 2 internes attribuées')
+  
   // TODO: Les phases suivantes seront implémentées dans les prochaines tâches
-  // - Phase 4 : Attribution practices
+  // - Phase 4b : Attribution practices à 1 interne
   // - Phase 3 : Attribution OFFs
   
   return {
     success: true,
     weeks: weeksStructure,
     globalStats,
-    message: `✅ Phase 1-2 complètes : Gardes attribuées (7/7) + Repos calculés pour ${weeksStructure.length} semaine(s)`
+    message: `✅ Phase 1-2-4a complètes : Gardes + Repos + Practices (2 internes) pour ${weeksStructure.length} semaine(s)`
   }
 }
 
