@@ -113,6 +113,150 @@ function createDaySlots(date, dayIndex) {
 }
 
 /**
+ * PHASE 1b : Attribuer la garde Dimanche (priorité absolue)
+ * 
+ * La garde Dimanche est la plus difficile (24h : Dimanche 8h → Lundi 8h)
+ * On l'attribue en premier pour maximiser les chances d'équilibre
+ */
+function assignGardeDimanche(week, interns, unavailabilities, globalStats) {
+  console.log(`\n🌙 Phase 1b : Attribution garde Dimanche semaine ${week.weekNumber}`)
+  
+  // Date du dimanche
+  const dimancheDate = week.days[6].date
+  
+  // Trouver le meilleur interne pour cette garde
+  const selectedIntern = selectInterneForGarde(
+    interns,
+    dimancheDate,
+    'dimanche',
+    unavailabilities,
+    globalStats,
+    week
+  )
+  
+  if (!selectedIntern) {
+    console.error('❌ Impossible de trouver un interne pour la garde Dimanche')
+    return false
+  }
+  
+  // Créer l'objet garde
+  const garde = {
+    id: `garde-dim-${week.weekNumber}`,
+    interneId: selectedIntern.id,
+    interneName: `${selectedIntern.firstName} ${selectedIntern.lastName}`,
+    date: dimancheDate,
+    type: 'dimanche',
+    horaire: 'Dimanche 8h → Lundi 8h (24h)',
+    weekNumber: week.weekNumber
+  }
+  
+  // Assigner la garde
+  week.gardes.dimanche = garde
+  week.stats.gardesAttribuees++
+  
+  // Mettre à jour les stats globales
+  if (!globalStats.gardesParInterne[selectedIntern.id]) {
+    globalStats.gardesParInterne[selectedIntern.id] = { total: 0, semaine: 0, samedi: 0, dimanche: 0 }
+  }
+  globalStats.gardesParInterne[selectedIntern.id].total++
+  globalStats.gardesParInterne[selectedIntern.id].dimanche++
+  
+  console.log(`✅ Garde Dimanche attribuée à ${garde.interneName}`)
+  
+  return true
+}
+
+/**
+ * Sélectionner le meilleur interne pour une garde
+ * 
+ * Critères de scoring :
+ * 1. Disponibilité (pas d'empêchement)
+ * 2. Équilibre (qui a eu le moins de gardes ?)
+ * 3. Type de garde (équilibrer les types : semaine, samedi, dimanche)
+ */
+function selectInterneForGarde(interns, date, gardeType, unavailabilities, globalStats, week) {
+  const candidates = []
+  
+  for (const intern of interns) {
+    // Vérifier la disponibilité (empêchements)
+    const isUnavailable = checkUnavailability(intern.id, date, unavailabilities)
+    if (isUnavailable) {
+      console.log(`  ⏭️ ${intern.firstName} ${intern.lastName} : indisponible`)
+      continue
+    }
+    
+    // Calculer le score
+    const score = calculateInterneScore(intern, gardeType, globalStats, week)
+    
+    candidates.push({
+      intern,
+      score
+    })
+  }
+  
+  if (candidates.length === 0) {
+    return null
+  }
+  
+  // Trier par score décroissant (meilleur score en premier)
+  candidates.sort((a, b) => b.score - a.score)
+  
+  console.log(`  📊 ${candidates.length} candidats disponibles`)
+  candidates.slice(0, 3).forEach((c, i) => {
+    console.log(`    ${i + 1}. ${c.intern.firstName} ${c.intern.lastName} (score: ${c.score.toFixed(2)})`)
+  })
+  
+  return candidates[0].intern
+}
+
+/**
+ * Vérifier si un interne est indisponible à une date donnée
+ */
+function checkUnavailability(interneId, date, unavailabilities) {
+  if (!unavailabilities || unavailabilities.length === 0) return false
+  
+  return unavailabilities.some(unavail => {
+    return unavail.interneId === interneId && unavail.date === date
+  })
+}
+
+/**
+ * Calculer le score d'un interne pour une garde
+ * 
+ * Score plus élevé = meilleur candidat
+ */
+function calculateInterneScore(intern, gardeType, globalStats, week) {
+  let score = 100 // Score de base
+  
+  // Facteur 1 : Équilibre du nombre total de gardes
+  const interneStats = globalStats.gardesParInterne[intern.id] || { total: 0, semaine: 0, samedi: 0, dimanche: 0 }
+  const totalGardes = interneStats.total
+  
+  // Favoriser ceux qui ont eu moins de gardes
+  score -= totalGardes * 10
+  
+  // Facteur 2 : Équilibre par type de garde
+  if (gardeType === 'dimanche') {
+    score -= interneStats.dimanche * 15 // Pénalité si déjà eu garde dimanche
+  } else if (gardeType === 'samedi') {
+    score -= interneStats.samedi * 15
+  } else {
+    score -= interneStats.semaine * 5
+  }
+  
+  // Facteur 3 : Éviter les gardes dans la même semaine
+  const hasGardeThisWeek = week.gardes.semaine.some(g => g.interneId === intern.id) ||
+    (week.gardes.samedi && week.gardes.samedi.interneId === intern.id) ||
+    (week.gardes.dimanche && week.gardes.dimanche.interneId === intern.id)
+  
+  if (hasGardeThisWeek) {
+    score -= 20 // Pénalité si déjà une garde cette semaine
+  }
+  
+  return score
+}
+
+/**
  * Générer un planning complet pour une ou plusieurs semaines
  */
 export function generatePlanning(planning, weekNumbers = null) {
@@ -123,7 +267,12 @@ export function generatePlanning(planning, weekNumbers = null) {
   
   console.log('📅 Semaines à générer:', weeksToGenerate)
   
-  // Initialiser les structures de toutes les semaines
+  // Initialiser les statistiques globales (pour équilibrage entre semaines)
+  const globalStats = {
+    gardesParInterne: {} // { interneId: { total, semaine, samedi, dimanche } }
+  }
+  
+  // PHASE 1a : Initialiser les structures de toutes les semaines
   const weeksStructure = []
   
   for (const weekNum of weeksToGenerate) {
@@ -142,8 +291,21 @@ export function generatePlanning(planning, weekNumbers = null) {
   
   console.log('\n✅ Phase 1a terminée : Structures de base créées')
   
+  // PHASE 1b : Attribuer les gardes Dimanche (priorité absolue)
+  for (const week of weeksStructure) {
+    const success = assignGardeDimanche(week, planning.internsList, planning.unavailabilities, globalStats)
+    if (!success) {
+      return {
+        success: false,
+        error: `Impossible d'attribuer la garde Dimanche pour la semaine ${week.weekNumber}`,
+        weeks: weeksStructure
+      }
+    }
+  }
+  
+  console.log('\n✅ Phase 1b terminée : Gardes Dimanche attribuées')
+  
   // TODO: Les phases suivantes seront implémentées dans les prochaines tâches
-  // - Phase 1b : Attribution garde Dimanche
   // - Phase 1c : Attribution gardes semaine (Lun-Ven)
   // - Phase 1d : Attribution garde Samedi
   // - Phase 2 : Calcul repos post-garde
@@ -153,7 +315,8 @@ export function generatePlanning(planning, weekNumbers = null) {
   return {
     success: true,
     weeks: weeksStructure,
-    message: `✅ Phase 1a : Structures de ${weeksStructure.length} semaine(s) créées`
+    globalStats,
+    message: `✅ Phase 1a-1b : Structures créées + Gardes Dimanche attribuées pour ${weeksStructure.length} semaine(s)`
   }
 }
 

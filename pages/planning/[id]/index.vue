@@ -109,24 +109,25 @@
           <!-- Bouton Générer -->
           <button 
             @click="genererPlanning"
-            :disabled="planning.status === 'generated'"
             :style="{
-              background: planning.status === 'generated' ? '#d1d5db' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              background: planning.status === 'generated' ? '#f97316' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
               color: 'white',
               fontSize: '16px',
               fontWeight: '600',
               padding: '14px 30px',
               border: 'none',
               borderRadius: '8px',
-              cursor: planning.status === 'generated' ? 'not-allowed' : 'pointer',
-              transition: 'all 0.2s',
-              opacity: planning.status === 'generated' ? 0.6 : 1
+              cursor: 'pointer',
+              transition: 'all 0.2s'
             }"
             @mouseover="handleGenerateHover"
             @mouseout="handleGenerateLeave"
           >
-            {{ planning.status === 'generated' ? '✅ Planning déjà généré' : '🚀 Générer' }}
+            {{ planning.status === 'generated' ? '🔄 Régénérer' : '🚀 Générer' }}
           </button>
+          <p v-if="planning.status === 'generated'" style="margin: 10px 0 0 0; color: #f97316; font-size: 13px; font-style: italic;">
+            ⚠️ La régénération écrasera le planning existant
+          </p>
         </div>
 
         <!-- Tableau hebdomadaire -->
@@ -293,6 +294,16 @@ const getStatusBadgeStyle = (status) => {
 const genererPlanning = () => {
   console.log('🚀 Génération demandée')
   
+  // Si planning déjà généré, demander confirmation
+  if (planning.value?.status === 'generated') {
+    const confirmation = confirm('⚠️ Ce planning est déjà généré.\n\nLa régénération écrasera toutes les données existantes (gardes, repos, practices, OFFs).\n\nVoulez-vous continuer ?')
+    if (!confirmation) {
+      console.log('❌ Régénération annulée par l\'utilisateur')
+      return
+    }
+    console.log('✅ Régénération confirmée')
+  }
+  
   // Déterminer quelles semaines générer
   const weekNumbers = optionGeneration.value === 'toutes' 
     ? null // null = toutes les semaines
@@ -314,20 +325,41 @@ const genererPlanning = () => {
     message += `- Empêchements : ${planning.value.unavailabilities?.length || 0}\n`
     message += `- Slots totaux : ${result.weeks.reduce((sum, w) => sum + w.stats.slotsTotal, 0)}\n\n`
     
-    message += '📋 Structure créée pour :\n'
+    message += '📋 Semaines générées :\n'
     result.weeks.forEach(week => {
       message += `  • Semaine ${week.weekNumber} (${formatDate(week.startDate)} - ${formatDate(week.endDate)})\n`
       message += `    - ${week.stats.slotsTotal} slots de travail\n`
-      message += `    - 7 gardes à attribuer\n`
+      message += `    - ${week.stats.gardesAttribuees}/7 gardes attribuées\n`
+      
+      // Afficher les gardes attribuées
+      if (week.gardes.dimanche) {
+        message += `    - 🌙 Garde Dimanche : ${week.gardes.dimanche.interneName}\n`
+      }
     })
     
+    // Stats globales si disponibles
+    if (result.globalStats) {
+      message += `\n📊 Statistiques d'équilibre :\n`
+      const gardesStats = result.globalStats.gardesParInterne
+      Object.keys(gardesStats).forEach(interneId => {
+        const intern = planning.value.internsList.find(i => i.id === interneId)
+        if (intern) {
+          const stats = gardesStats[interneId]
+          message += `  • ${intern.firstName} ${intern.lastName} : ${stats.total} garde(s)`
+          if (stats.dimanche > 0) message += ` (dont ${stats.dimanche} dimanche)`
+          message += `\n`
+        }
+      })
+    }
+    
     message += '\n⏳ Prochaines phases (en développement) :\n'
-    message += '  1. Attribution des gardes (Dimanche, Lun-Ven, Samedi)\n'
-    message += '  2. Calcul des repos post-garde\n'
-    message += '  3. Attribution aux practices (priorité)\n'
-    message += '  4. Attribution des OFF (bonus)\n'
-    message += '  5. Détection des conflits\n'
-    message += '  6. Calcul du score d\'équilibre'
+    message += '  1. Attribution 5 gardes semaine (Lun-Ven)\n'
+    message += '  2. Attribution garde Samedi\n'
+    message += '  3. Calcul des repos post-garde\n'
+    message += '  4. Attribution aux practices (priorité)\n'
+    message += '  5. Attribution des OFF (bonus)\n'
+    message += '  6. Détection des conflits\n'
+    message += '  7. Calcul du score d\'équilibre'
     
     alert(message)
   } catch (error) {
@@ -337,17 +369,17 @@ const genererPlanning = () => {
 }
 
 const handleGenerateHover = (e) => {
-  if (planning.value?.status !== 'generated') {
-    e.target.style.transform = 'translateY(-2px)'
+  e.target.style.transform = 'translateY(-2px)'
+  if (planning.value?.status === 'generated') {
+    e.target.style.boxShadow = '0 8px 20px rgba(249, 115, 22, 0.3)'
+  } else {
     e.target.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.3)'
   }
 }
 
 const handleGenerateLeave = (e) => {
-  if (planning.value?.status !== 'generated') {
-    e.target.style.transform = 'translateY(0)'
-    e.target.style.boxShadow = 'none'
-  }
+  e.target.style.transform = 'translateY(0)'
+  e.target.style.boxShadow = 'none'
 }
 </script>
 
