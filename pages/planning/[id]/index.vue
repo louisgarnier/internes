@@ -130,8 +130,47 @@
           </p>
         </div>
 
-        <!-- Tableau hebdomadaire -->
+        <!-- m4-1.2 : Toggle entre les 2 vues -->
+        <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; justify-content: center; gap: 15px;">
+          <button
+            @click="viewMode = 'byIntern'"
+            :style="{
+              padding: '12px 24px',
+              fontSize: '15px',
+              fontWeight: '600',
+              border: '2px solid',
+              borderColor: viewMode === 'byIntern' ? '#667eea' : '#e5e7eb',
+              borderRadius: '8px',
+              background: viewMode === 'byIntern' ? '#667eea' : 'white',
+              color: viewMode === 'byIntern' ? 'white' : '#374151',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }"
+          >
+            👤 Vue par Interne
+          </button>
+          <button
+            @click="viewMode = 'byPeriod'"
+            :style="{
+              padding: '12px 24px',
+              fontSize: '15px',
+              fontWeight: '600',
+              border: '2px solid',
+              borderColor: viewMode === 'byPeriod' ? '#667eea' : '#e5e7eb',
+              borderRadius: '8px',
+              background: viewMode === 'byPeriod' ? '#667eea' : 'white',
+              color: viewMode === 'byPeriod' ? 'white' : '#374151',
+              cursor: 'pointer',
+              transition: 'all 0.2s'
+            }"
+          >
+            📅 Vue par Jour/Période
+          </button>
+        </div>
+
+        <!-- m4-1.4 : Vue par Interne (tableau actuel) -->
         <div 
+          v-if="viewMode === 'byIntern'"
           v-for="semaine in semaines" 
           :key="semaine.numero"
           style="background: white; border-radius: 12px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);"
@@ -230,6 +269,17 @@
           </div>
         </div>
 
+        <!-- m4-1.4 : Vue par Jour/Période (placeholder temporaire) -->
+        <div v-else style="background: white; border-radius: 12px; padding: 40px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 20px;">📅</div>
+          <h3 style="font-size: 20px; font-weight: 600; color: #333; margin: 0 0 10px 0;">
+            Vue par Jour/Période
+          </h3>
+          <p style="font-size: 15px; color: #666; margin: 0;">
+            En cours de développement... (Phase 2)
+          </p>
+        </div>
+
       </div>
     </main>
 
@@ -257,7 +307,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePlanningsStore } from '~/stores/plannings'
 import { generatePlanning } from '~/utils/generation'
@@ -278,6 +328,15 @@ const semaineSelectionnee = ref(1)
 // Modal résultats
 const showResultModal = ref(false)
 const generationResult = ref('')
+
+// m4-1.1 : Mode de vue (Par Interne / Par Jour-Période)
+// m4-1.5 : Initialisation depuis localStorage
+const viewMode = ref(localStorage.getItem('planning_viewMode') || 'byIntern')
+
+// m4-1.5 : Persistance dans localStorage
+watch(viewMode, (newValue) => {
+  localStorage.setItem('planning_viewMode', newValue)
+})
 
 // Générer les semaines
 const semaines = computed(() => {

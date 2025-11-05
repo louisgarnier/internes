@@ -6,9 +6,68 @@
 
 **Priorité :** 🔴 CRITIQUE
 
-**Statut :** 📝 À développer
+**Statut :** 🔄 EN COURS (0% → implémentation toggle + Vue 2)
 
-**Dépendances :** MODULE 3 (Planning généré)
+**Dépendances :** MODULE 3 (Planning généré) ✅
+
+---
+
+## 📋 PLAN D'IMPLÉMENTATION - Module 4
+
+### Phase 1 : Toggle & Structure (m4-1)
+- ✅ **m4-1.1** : Ajouter `ref` pour `viewMode` ('byIntern' / 'byPeriod')
+- ✅ **m4-1.2** : Créer composant toggle (2 boutons avec état actif)
+- ✅ **m4-1.3** : Styling toggle (boutons, hover, état actif)
+- ✅ **m4-1.4** : Affichage conditionnel (v-if sur viewMode)
+- ✅ **m4-1.5** : Persistance LocalStorage (sauvegarder préférence)
+- ✅ **m4-1.6** : Test : Toggle fonctionne visuellement
+
+### Phase 2 : Vue "Par Jour/Période" - Structure (m4-2)
+- ⏳ **m4-2.1** : Créer structure HTML tableau (3 lignes: Matin, AM, Garde)
+- ⏳ **m4-2.2** : Header colonnes jours (Lun-Dim avec dates)
+- ⏳ **m4-2.3** : Labels lignes (🌅 MATIN, 🌆 APRÈS-MIDI, 🌙 GARDE)
+- ⏳ **m4-2.4** : Cellules vides avec bordures
+- ⏳ **m4-2.5** : Navigation semaines (réutiliser existant)
+- ⏳ **m4-2.6** : Test : Structure tableau visible
+
+### Phase 3 : Vue "Par Jour/Période" - Logique Matin (m4-3)
+- ⏳ **m4-3.1** : Fonction `getPracticesByDayPeriod(weekIndex, dayIndex, 'matin')`
+- ⏳ **m4-3.2** : Grouper affectations par practice
+- ⏳ **m4-3.3** : Pour chaque practice : afficher nom + liste internes
+- ⏳ **m4-3.4** : Styling : nom practice en gras, internes en liste à puces
+- ⏳ **m4-3.5** : Test : Affichage practices matin fonctionne
+
+### Phase 4 : Vue "Par Jour/Période" - Logique Après-midi (m4-4)
+- ⏳ **m4-4.1** : Réutiliser `getPracticesByDayPeriod` pour 'apres_midi'
+- ⏳ **m4-4.2** : Affichage similaire à matin
+- ⏳ **m4-4.3** : Gérer samedi AM (vide, pas de travail)
+- ⏳ **m4-4.4** : Test : Affichage practices après-midi fonctionne
+
+### Phase 5 : Vue "Par Jour/Période" - Gardes (m4-5)
+- ⏳ **m4-5.1** : Fonction `getGardeByDay(weekIndex, dayIndex)`
+- ⏳ **m4-5.2** : Afficher nom interne de garde (simple texte)
+- ⏳ **m4-5.3** : Styling : fond orange, texte blanc
+- ⏳ **m4-5.4** : Test : Affichage gardes fonctionne
+
+### Phase 6 : Samedi matin Astreinte (m4-6)
+- ⏳ **m4-6.1** : Détecter samedi matin (dayIndex === 5, periode === 'matin')
+- ⏳ **m4-6.2** : Afficher "Astreinte:" au lieu du nom practice
+- ⏳ **m4-6.3** : Liste internes assignés à l'astreinte
+- ⏳ **m4-6.4** : Test : Astreinte samedi affichée correctement
+
+### Phase 7 : Styling & Finitions (m4-7)
+- ⏳ **m4-7.1** : Cellules adaptatives en hauteur (min-height, auto)
+- ⏳ **m4-7.2** : Alignement texte (practices centré/gauche)
+- ⏳ **m4-7.3** : Espacement liste internes (padding, margin)
+- ⏳ **m4-7.4** : Responsive (largeur colonnes adaptative)
+- ⏳ **m4-7.5** : Test : Tableau lisible et esthétique
+
+### Phase 8 : Tests & Validation (m4-8)
+- ⏳ **m4-8.1** : Test toggle : switch entre les 2 vues
+- ⏳ **m4-8.2** : Test navigation semaines : fonctionne pour les 2 vues
+- ⏳ **m4-8.3** : Test données : toutes practices + gardes affichées
+- ⏳ **m4-8.4** : Test edge cases : semaine vide, 1 seul interne, etc.
+- ⏳ **m4-8.5** : Validation utilisateur : lisibilité OK
 
 ---
 
