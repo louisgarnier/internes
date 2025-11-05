@@ -182,27 +182,41 @@
                   <td style="padding: 16px; font-weight: 600; color: #333; border-right: 1px solid #e5e7eb;">
                     {{ interne.firstName }} {{ interne.lastName }}
                   </td>
-                  <td style="padding: 16px; text-align: center; border-right: 1px solid #e5e7eb; color: #999; font-size: 13px;">
-                    -
-                  </td>
-                  <td style="padding: 16px; text-align: center; border-right: 1px solid #e5e7eb; color: #999; font-size: 13px;">
-                    -
-                  </td>
-                  <td style="padding: 16px; text-align: center; border-right: 1px solid #e5e7eb; color: #999; font-size: 13px;">
-                    -
-                  </td>
-                  <td style="padding: 16px; text-align: center; border-right: 1px solid #e5e7eb; color: #999; font-size: 13px;">
-                    -
-                  </td>
-                  <td style="padding: 16px; text-align: center; border-right: 1px solid #e5e7eb; color: #999; font-size: 13px;">
-                    -
-                  </td>
-                  <td style="padding: 16px; text-align: center; border-right: 1px solid #e5e7eb; color: #999; font-size: 13px;">
-                    -
-                  </td>
-                  <td style="padding: 16px; text-align: center; color: #999; font-size: 13px;">
-                    -
-                  </td>
+                  <!-- Lundi -->
+                  <td 
+                    :style="getJourContent(interne.id, 'lundi', semaine.numero - 1).style + ' border-right: 1px solid #e5e7eb;'"
+                    v-html="getJourContent(interne.id, 'lundi', semaine.numero - 1).html"
+                  ></td>
+                  <!-- Mardi -->
+                  <td 
+                    :style="getJourContent(interne.id, 'mardi', semaine.numero - 1).style + ' border-right: 1px solid #e5e7eb;'"
+                    v-html="getJourContent(interne.id, 'mardi', semaine.numero - 1).html"
+                  ></td>
+                  <!-- Mercredi -->
+                  <td 
+                    :style="getJourContent(interne.id, 'mercredi', semaine.numero - 1).style + ' border-right: 1px solid #e5e7eb;'"
+                    v-html="getJourContent(interne.id, 'mercredi', semaine.numero - 1).html"
+                  ></td>
+                  <!-- Jeudi -->
+                  <td 
+                    :style="getJourContent(interne.id, 'jeudi', semaine.numero - 1).style + ' border-right: 1px solid #e5e7eb;'"
+                    v-html="getJourContent(interne.id, 'jeudi', semaine.numero - 1).html"
+                  ></td>
+                  <!-- Vendredi -->
+                  <td 
+                    :style="getJourContent(interne.id, 'vendredi', semaine.numero - 1).style + ' border-right: 1px solid #e5e7eb;'"
+                    v-html="getJourContent(interne.id, 'vendredi', semaine.numero - 1).html"
+                  ></td>
+                  <!-- Samedi -->
+                  <td 
+                    :style="getJourContent(interne.id, 'samedi', semaine.numero - 1).style + ' border-right: 1px solid #e5e7eb;'"
+                    v-html="getJourContent(interne.id, 'samedi', semaine.numero - 1).html"
+                  ></td>
+                  <!-- Dimanche -->
+                  <td 
+                    :style="getJourContent(interne.id, 'dimanche', semaine.numero - 1).style"
+                    v-html="getJourContent(interne.id, 'dimanche', semaine.numero - 1).html"
+                  ></td>
                 </tr>
               </tbody>
             </table>
@@ -312,6 +326,112 @@ const getStatusBadgeStyle = (status) => {
     'error': 'background: #fee2e2; color: #991b1b; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; display: inline-block;'
   }
   return styles[status] || styles.config
+}
+
+// ✅ m3-17 : Affichage du contenu d'une cellule du tableau
+const getJourContent = (interneId, dayKey, weekIndex) => {
+  // Si pas de données générées, retourner vide
+  if (!planning.value?.generatedData?.weeks) {
+    return { html: '-', style: 'color: #999; font-size: 13px;' }
+  }
+  
+  const week = planning.value.generatedData.weeks[weekIndex]
+  if (!week || !week.days) {
+    return { html: '-', style: 'color: #999; font-size: 13px;' }
+  }
+  
+  // ✅ Mapper les clés texte vers les index de l'array
+  const dayMapping = {
+    'lundi': 0,
+    'mardi': 1,
+    'mercredi': 2,
+    'jeudi': 3,
+    'vendredi': 4,
+    'samedi': 5,
+    'dimanche': 6
+  }
+  
+  const dayIndex = dayMapping[dayKey]
+  const day = week.days[dayIndex]
+  
+  if (!day) {
+    return { html: '-', style: 'color: #999; font-size: 13px;' }
+  }
+  
+  const content = []
+  let bgColor = ''
+  
+  // 1️⃣ Vérifier GARDE (depuis week.gardes)
+  const gardes = []
+  if (week.gardes?.dimanche?.interneId === interneId && dayKey === 'dimanche') {
+    gardes.push('🌙 Garde Dim')
+    bgColor = '#1e3a8a'
+  }
+  if (week.gardes?.samedi?.interneId === interneId && dayKey === 'samedi') {
+    gardes.push('🌙 Garde Sam')
+    bgColor = '#1e3a8a'
+  }
+  week.gardes?.semaine?.forEach(garde => {
+    if (garde.interneId === interneId && garde.date === day.date) {
+      gardes.push('🌙 Garde')
+      bgColor = '#1e3a8a'
+    }
+  })
+  
+  // 2️⃣ Vérifier REPOS (depuis day.matin.repos et day.apresMidi.repos)
+  const reposMatin = day.matin?.repos?.interneId === interneId
+  const reposApresMidi = day.apresMidi?.repos?.interneId === interneId
+  
+  if (reposMatin && reposApresMidi) {
+    content.push('💤 REPOS')
+    bgColor = '#e5e7eb'
+  } else if (reposMatin) {
+    content.push('💤 REPOS (M)')
+  } else if (reposApresMidi) {
+    content.push('💤 REPOS (AM)')
+  }
+  
+  // 3️⃣ Vérifier PRACTICES (depuis week.affectations[])
+  const practicesMatin = week.affectations?.filter(aff => 
+    aff.interneId === interneId && aff.date === day.date && aff.periode === 'matin'
+  ) || []
+  
+  const practicesAM = week.affectations?.filter(aff => 
+    aff.interneId === interneId && aff.date === day.date && aff.periode === 'apres_midi'
+  ) || []
+  
+  practicesMatin.forEach(aff => {
+    content.push(`🏥 ${aff.practiceName} (M)`)
+  })
+  
+  practicesAM.forEach(aff => {
+    content.push(`🏥 ${aff.practiceName} (AM)`)
+  })
+  
+  // 4️⃣ Vérifier OFF (depuis day.matin.off et day.apresMidi.off)
+  if (day.matin?.off?.interneId === interneId) {
+    content.push('🏖️ OFF (M)')
+    if (!bgColor) bgColor = '#dbeafe'
+  }
+  if (day.apresMidi?.off?.interneId === interneId) {
+    content.push('🏖️ OFF (AM)')
+    if (!bgColor) bgColor = '#dbeafe'
+  }
+  
+  // 5️⃣ Ajouter les gardes à la fin
+  content.push(...gardes)
+  
+  // Si aucun contenu, retourner tiret
+  if (content.length === 0) {
+    return { html: '-', style: 'color: #999; font-size: 13px; padding: 12px; text-align: center;' }
+  }
+  
+  // Assembler le HTML avec sauts de ligne
+  const html = content.join('<br>')
+  const textColor = bgColor === '#1e3a8a' ? 'white' : (bgColor === '#e5e7eb' ? '#4b5563' : '#2c3e50')
+  const style = `background: ${bgColor || 'transparent'}; color: ${textColor}; font-size: 11px; padding: 8px; text-align: center; line-height: 1.5;`
+  
+  return { html, style }
 }
 
 // Action Générer
