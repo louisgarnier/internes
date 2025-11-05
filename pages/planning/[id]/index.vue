@@ -219,6 +219,26 @@
       </div>
     </main>
 
+    <!-- Modal Résultats Génération -->
+    <div v-if="showResultModal" @click="showResultModal = false" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 20px;">
+      <div @click.stop style="background: white; border-radius: 12px; padding: 30px; max-width: 800px; max-height: 90vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.3);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h2 style="margin: 0; font-size: 24px; color: #2c3e50;">📊 Résultats de la génération</h2>
+          <button @click="showResultModal = false" style="background: #e74c3c; color: white; border: none; border-radius: 50%; width: 32px; height: 32px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+            ×
+          </button>
+        </div>
+        
+        <pre style="background: #f8f9fa; padding: 20px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.6; white-space: pre-wrap; word-wrap: break-word; color: #2c3e50; margin: 0;">{{ generationResult }}</pre>
+        
+        <div style="margin-top: 20px; text-align: right;">
+          <button @click="showResultModal = false" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 12px 30px; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer;">
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -240,6 +260,10 @@ const planning = computed(() => {
 // Options de génération
 const optionGeneration = ref('toutes')
 const semaineSelectionnee = ref(1)
+
+// Modal résultats
+const showResultModal = ref(false)
+const generationResult = ref('')
 
 // Générer les semaines
 const semaines = computed(() => {
@@ -347,6 +371,22 @@ const genererPlanning = () => {
       if (week.gardes.samedi) {
         message += `    - 🌙 Samedi : ${week.gardes.samedi.interneName}\n`
       }
+      
+      // Repos post-garde calculés
+      if (week.repos && week.repos.length > 0) {
+        const reposParInterne = {}
+        week.repos.forEach(repos => {
+          if (!reposParInterne[repos.interneName]) {
+            reposParInterne[repos.interneName] = 0
+          }
+          reposParInterne[repos.interneName]++
+        })
+        
+        message += `    - 💤 Repos post-garde calculés :\n`
+        Object.keys(reposParInterne).forEach(interneName => {
+          message += `       • ${interneName} : ${reposParInterne[interneName]} demi-journées\n`
+        })
+      }
     })
     
     // Stats globales si disponibles
@@ -380,16 +420,18 @@ const genererPlanning = () => {
     }
     
     message += '\n⏳ Prochaines phases (en développement) :\n'
-    message += '  1. Calcul des repos post-garde\n'
-    message += '  2. Attribution aux practices (priorité)\n'
-    message += '  3. Attribution des OFF (bonus)\n'
-    message += '  4. Détection des conflits\n'
-    message += '  5. Calcul du score d\'équilibre'
+    message += '  1. Attribution aux practices (priorité absolue)\n'
+    message += '  2. Attribution des OFF (bonus, si slots restants)\n'
+    message += '  3. Détection des conflits\n'
+    message += '  4. Calcul du score d\'équilibre'
     
-    alert(message)
+    // Afficher le modal avec les résultats
+    generationResult.value = message
+    showResultModal.value = true
   } catch (error) {
     console.error('❌ Erreur lors de la génération:', error)
-    alert('❌ Erreur lors de la génération du planning.\n\nDétails : ' + error.message)
+    generationResult.value = `❌ Erreur lors de la génération du planning.\n\nDétails : ${error.message}\n\nStack : ${error.stack}`
+    showResultModal.value = true
   }
 }
 

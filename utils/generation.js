@@ -32,7 +32,10 @@ export function initWeekStructure(weekNumber, startDate, interns) {
       date,
       dayName: dayNames[i],
       dayIndex: i, // 0=lundi, 1=mardi, ..., 6=dimanche
-      slots: createDaySlots(date, i)
+      slots: createDaySlots(date, i),
+      // Références directes pour faciliter l'accès
+      matin: {}, // Pour stocker repos/affectations matin
+      apresMidi: {} // Pour stocker repos/affectations après-midi
     })
   }
   
@@ -288,6 +291,155 @@ function assignGardeSamedi(week, interns, unavailabilities, globalStats) {
 }
 
 /**
+ * PHASE 2 : Calculer les repos post-garde obligatoires
+ * 
+ * Règles :
+ * - Garde Lun-Jeu soir → Repos lendemain (matin + après-midi)
+ * - Garde Ven soir → Repos samedi (matin + après-midi)
+ * - Garde Sam 13h-Dim 8h → Repos dimanche (matin + après-midi)
+ * - Garde Dim 8h-Lun 8h → Repos lundi (matin + après-midi) de la SEMAINE SUIVANTE
+ */
+function calculateReposPostGarde(week) {
+  console.log(`\n💤 Phase 2 : Calcul repos post-garde semaine ${week.weekNumber}`)
+  
+  let reposCount = 0
+  
+  // Garde Dimanche → Repos Lundi (matin + après-midi)
+  if (week.gardes.dimanche) {
+    const garde = week.gardes.dimanche
+    const lundiDate = week.days[0].date // Index 0 = Lundi
+    
+    const reposMatin = {
+      id: `repos-${week.weekNumber}-lun-matin`,
+      interneId: garde.interneId,
+      interneName: garde.interneName,
+      date: lundiDate,
+      periode: 'matin',
+      reason: 'Repos post-garde Dimanche'
+    }
+    
+    const reposApresMidi = {
+      id: `repos-${week.weekNumber}-lun-aprem`,
+      interneId: garde.interneId,
+      interneName: garde.interneName,
+      date: lundiDate,
+      periode: 'apres_midi',
+      reason: 'Repos post-garde Dimanche'
+    }
+    
+    week.repos.push(reposMatin, reposApresMidi)
+    week.days[0].matin.repos = reposMatin
+    week.days[0].apresMidi.repos = reposApresMidi
+    reposCount += 2
+    
+    console.log(`  💤 Repos Lundi (matin + AM) pour ${garde.interneName} (garde Dim)`)
+  }
+  
+  // Gardes de semaine (Lun-Jeu) → Repos lendemain
+  if (week.gardes.semaine && week.gardes.semaine.length > 0) {
+    week.gardes.semaine.forEach(garde => {
+      // Trouver l'index du jour de la garde
+      const gardeDayIndex = week.days.findIndex(day => day.date === garde.date)
+      
+      if (gardeDayIndex >= 0 && gardeDayIndex < 4) { // Lun-Jeu (indices 0-3)
+        const reposDayIndex = gardeDayIndex + 1 // Lendemain
+        const reposDate = week.days[reposDayIndex].date
+        const reposDayName = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi'][reposDayIndex]
+        
+        const reposMatin = {
+          id: `repos-${week.weekNumber}-${garde.jour}-matin`,
+          interneId: garde.interneId,
+          interneName: garde.interneName,
+          date: reposDate,
+          periode: 'matin',
+          reason: `Repos post-garde ${garde.jour}`
+        }
+        
+        const reposApresMidi = {
+          id: `repos-${week.weekNumber}-${garde.jour}-aprem`,
+          interneId: garde.interneId,
+          interneName: garde.interneName,
+          date: reposDate,
+          periode: 'apres_midi',
+          reason: `Repos post-garde ${garde.jour}`
+        }
+        
+        week.repos.push(reposMatin, reposApresMidi)
+        week.days[reposDayIndex].matin.repos = reposMatin
+        week.days[reposDayIndex].apresMidi.repos = reposApresMidi
+        reposCount += 2
+        
+        console.log(`  💤 Repos ${reposDayName} (matin + AM) pour ${garde.interneName} (garde ${garde.jour})`)
+      }
+      
+      // Garde Vendredi → Repos Samedi
+      if (gardeDayIndex === 4) { // Vendredi (index 4)
+        const samediDate = week.days[5].date
+        
+        const reposMatin = {
+          id: `repos-${week.weekNumber}-ven-matin`,
+          interneId: garde.interneId,
+          interneName: garde.interneName,
+          date: samediDate,
+          periode: 'matin',
+          reason: 'Repos post-garde Vendredi'
+        }
+        
+        const reposApresMidi = {
+          id: `repos-${week.weekNumber}-ven-aprem`,
+          interneId: garde.interneId,
+          interneName: garde.interneName,
+          date: samediDate,
+          periode: 'apres_midi',
+          reason: 'Repos post-garde Vendredi'
+        }
+        
+        week.repos.push(reposMatin, reposApresMidi)
+        week.days[5].matin.repos = reposMatin
+        week.days[5].apresMidi.repos = reposApresMidi
+        reposCount += 2
+        
+        console.log(`  💤 Repos Samedi (matin + AM) pour ${garde.interneName} (garde vendredi)`)
+      }
+    })
+  }
+  
+  // Garde Samedi → Repos Dimanche
+  if (week.gardes.samedi) {
+    const garde = week.gardes.samedi
+    const dimancheDate = week.days[6].date // Index 6 = Dimanche
+    
+    const reposMatin = {
+      id: `repos-${week.weekNumber}-sam-matin`,
+      interneId: garde.interneId,
+      interneName: garde.interneName,
+      date: dimancheDate,
+      periode: 'matin',
+      reason: 'Repos post-garde Samedi'
+    }
+    
+    const reposApresMidi = {
+      id: `repos-${week.weekNumber}-sam-aprem`,
+      interneId: garde.interneId,
+      interneName: garde.interneName,
+      date: dimancheDate,
+      periode: 'apres_midi',
+      reason: 'Repos post-garde Samedi'
+    }
+    
+    week.repos.push(reposMatin, reposApresMidi)
+    week.days[6].matin.repos = reposMatin
+    week.days[6].apresMidi.repos = reposApresMidi
+    reposCount += 2
+    
+    console.log(`  💤 Repos Dimanche (matin + AM) pour ${garde.interneName} (garde samedi)`)
+  }
+  
+  console.log(`  ✅ ${reposCount} demi-journées de repos calculées`)
+  week.stats.reposCalcules = reposCount
+}
+
+/**
  * Sélectionner le meilleur interne pour une garde
  * 
  * Critères de scoring :
@@ -455,8 +607,14 @@ export function generatePlanning(planning, weekNumbers = null) {
   console.log('\n✅ Phase 1d terminée : Gardes Samedi attribuées')
   console.log('\n🎉 PHASE 1 COMPLÈTE : Toutes les 7 gardes attribuées par semaine !')
   
+  // PHASE 2 : Calculer les repos post-garde obligatoires
+  for (const week of weeksStructure) {
+    calculateReposPostGarde(week)
+  }
+  
+  console.log('\n✅ Phase 2 terminée : Repos post-garde calculés')
+  
   // TODO: Les phases suivantes seront implémentées dans les prochaines tâches
-  // - Phase 2 : Calcul repos post-garde
   // - Phase 4 : Attribution practices
   // - Phase 3 : Attribution OFFs
   
@@ -464,7 +622,7 @@ export function generatePlanning(planning, weekNumbers = null) {
     success: true,
     weeks: weeksStructure,
     globalStats,
-    message: `✅ Phase 1 complète : Toutes les gardes attribuées (7/7) pour ${weeksStructure.length} semaine(s)`
+    message: `✅ Phase 1-2 complètes : Gardes attribuées (7/7) + Repos calculés pour ${weeksStructure.length} semaine(s)`
   }
 }
 
