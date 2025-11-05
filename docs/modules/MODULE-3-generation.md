@@ -294,6 +294,45 @@ FIN SI
 
 ---
 
+### 🚨 CAS SPÉCIAL : Astreinte Samedi Matin
+
+**Nature :** L'astreinte samedi matin (8h-13h) est traitée comme une practice dans le code, mais avec des **règles spécifiques**.
+
+**Caractéristiques :**
+- **Horaires :** Samedi 8h → 13h (5 heures)
+- **Effectif requis :** **1 interne obligatoire** (titulaire)
+- **Backup :** Non implémenté dans v1.0 (voir MODULE 5 pour v1.1+)
+
+**Contraintes spécifiques :**
+
+| Règle | Description |
+|-------|-------------|
+| **AS1** - 1 interne titulaire | Obligatoire, traité comme une practice à 1 interne |
+| **AS2** - Incompatibilité garde samedi | L'interne de garde samedi (13h→Dim 8h) **NE PEUT PAS** être titulaire astreinte |
+| **AS3** - Compatibilité garde vendredi | L'interne de garde vendredi (18h→Sam 8h) **PEUT** enchaîner avec astreinte (Sam 8h-13h) |
+| **AS4** - Scoring intermédiaire | Difficulté > matin normal, mais < garde |
+
+**Scoring de l'astreinte :**
+```
+Difficulté relative :
+  Garde dimanche (24h)        : 100 points
+  Garde samedi (19h)          : 80 points
+  Astreinte samedi (5h)       : 40 points  ← Moins contraignant qu'une garde
+  Garde semaine (14h)         : 30 points
+  Demi-journée normale        : 10 points
+```
+
+**Attribution :**
+- Utilise le même système de scoring que les practices
+- Filtre supplémentaire : exclure l'interne de garde samedi
+- Favorise l'équilibrage entre internes sur plusieurs semaines
+
+**Affichage :**
+- Vue "Par Interne" : `Astreinte (M)` dans la colonne Samedi
+- Vue "Par Jour/Période" : `Astreinte: [Nom Interne]` dans cellule Samedi Matin
+
+---
+
 ### PHASE 3 : Attribution Demi-Journées OFF 🏖️
 
 **⚠️ IMPORTANT :** Cette phase se fait APRÈS l'attribution aux practices.

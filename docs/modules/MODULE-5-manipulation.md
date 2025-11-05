@@ -117,6 +117,57 @@ Repos mardi retiré pour Dr. Martin
 
 ---
 
+### F5.4 - Gestion Backup Astreinte (v1.1+)
+
+**Cas d'usage :** Désigner un interne backup pour l'astreinte samedi matin en cas d'indisponibilité du titulaire.
+
+**Contexte :**
+- **v1.0** : 1 seul interne titulaire assigné à l'astreinte
+- **v1.1+** : Possibilité d'ajouter 1 interne backup
+
+**Interface d'ajout backup :**
+```
+┌────────────────────────────────────────┐
+│  Astreinte Samedi 06/01/2025           │
+├────────────────────────────────────────┤
+│  Titulaire : Dr. Alice Moreau          │
+│                                        │
+│  Backup :                              │
+│  [Ajouter un backup ▼]                │
+│                                        │
+│  Internes disponibles :                │
+│  ⦿ Dr. Baptiste Lefebvre ✅           │
+│  ⭘ Dr. Clara Rousseau    ✅           │
+│  ⭘ Dr. David Simon       ❌ Garde Sam │
+│  ⭘ Dr. Élise Laurent     ❌ Repos     │
+│                                        │
+│      [Annuler]  [Ajouter]             │
+└────────────────────────────────────────┘
+```
+
+**Contraintes backup :**
+- Même disponibilité que titulaire (pas de repos, garde, empêchement)
+- Peut être différent chaque semaine ou fixe (choix utilisateur)
+- Affichage distinct dans les 2 vues :
+  - Vue "Par Interne" : `Astreinte (M) - Backup` en italique/grisé
+  - Vue "Par Jour/Période" : 
+    ```
+    Astreinte:
+    • Titulaire : Alice Moreau
+    • Backup : Baptiste Lefebvre
+    ```
+
+**Gestion échanges :**
+- Possibilité d'échanger titulaire ↔ backup
+- Possibilité de remplacer backup
+- Notification automatique (si MODULE notifications activé)
+
+**Scoring backup :**
+- Le backup compte moins dans l'équilibrage (poids 30% vs 100% titulaire)
+- Car pas de charge de travail réelle (sauf remplacement)
+
+---
+
 ## ✅ Critères d'Acceptation
 
 ```

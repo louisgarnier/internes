@@ -320,10 +320,13 @@
                   <td style="padding: 12px; font-weight: 600; background: #fef3c7; border-right: 1px solid #e5e7eb;">
                     🌅 MATIN
                   </td>
-                  <!-- m4-3.3 : Afficher practices matin pour chaque jour -->
+                  <!-- m4-3.3 + m4-6 : Afficher practices matin (Samedi = Astreinte) -->
                   <td v-for="dayIndex in [0,1,2,3,4,5]" :key="'matin-' + dayIndex" style="padding: 12px; border-right: 1px solid #e5e7eb; min-height: 80px; vertical-align: top;">
                     <div v-for="practice in getPracticesByDayPeriod(semaine.numero - 1, dayIndex, 'matin')" :key="practice.name" style="margin-bottom: 8px;">
-                      <div style="font-weight: 600; color: #2563eb; font-size: 13px;">{{ practice.name }}:</div>
+                      <!-- m4-6.2 : Samedi matin = Astreinte (au lieu du nom de practice) -->
+                      <div style="font-weight: 600; color: #2563eb; font-size: 13px;">
+                        {{ dayIndex === 5 ? 'Astreinte:' : practice.name + ':' }}
+                      </div>
                       <ul style="margin: 4px 0 0 0; padding-left: 20px; list-style: disc; font-size: 12px; color: #374151;">
                         <li v-for="intern in practice.interns" :key="intern">{{ intern }}</li>
                       </ul>

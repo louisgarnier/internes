@@ -50,10 +50,10 @@
 - ⏳ **m4-5.4** : Test : Affichage gardes fonctionne → **PRÊT POUR TEST UTILISATEUR**
 
 ### Phase 6 : Samedi matin Astreinte (m4-6)
-- ⏳ **m4-6.1** : Détecter samedi matin (dayIndex === 5, periode === 'matin')
-- ⏳ **m4-6.2** : Afficher "Astreinte:" au lieu du nom practice
-- ⏳ **m4-6.3** : Liste internes assignés à l'astreinte
-- ⏳ **m4-6.4** : Test : Astreinte samedi affichée correctement
+- ✅ **m4-6.1** : Détecter samedi matin (dayIndex === 5, periode === 'matin')
+- ✅ **m4-6.2** : Afficher "Astreinte:" au lieu du nom practice
+- ✅ **m4-6.3** : Liste internes assignés à l'astreinte
+- ⏳ **m4-6.4** : Test : Astreinte samedi affichée correctement → **PRÊT POUR TEST UTILISATEUR**
 
 ### Phase 7 : Styling & Finitions (m4-7)
 - ⏳ **m4-7.1** : Cellules adaptatives en hauteur (min-height, auto)
