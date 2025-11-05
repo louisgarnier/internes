@@ -16,49 +16,199 @@
 
 ### F4.1 - Vue Hebdomadaire (Tableau)
 
-**Vue par défaut** : Tableau avec toutes les practices et internes.
+**Vue par défaut** : Tableau avec **2 modes de visualisation** complémentaires.
 
-**Structure :**
-- Colonnes : Jours de la semaine (Lun-Sam)
-- Lignes : Practices
-- Cellules : Internes assignés
-
-**Interface :**
+**🔄 Toggle entre 2 vues :**
 ```
 ┌──────────────────────────────────────────────────────────┐
 │  Planning Janvier 2025 - Semaine 1                       │
 │  [← Sem Préc]  06/01 - 12/01/2025  [Sem Suiv →]         │
-├──────────────────────────────────────────────────────────┤
-│                                                          │
-│  Practice     │ Lun  │ Mar  │ Mer  │ Jeu  │ Ven  │ Sam │
-│───────────────┼──────┼──────┼──────┼──────┼──────┼─────┤
-│ Chirurgie     │ M:   │ M:   │ M:   │ M:   │ M:   │ A:  │
-│ (2 internes)  │ MT   │ SP   │ LU   │ EM   │ TH   │ MT  │
-│               │ A:   │ A:   │ A:   │ A:   │ A:   │     │
-│               │ SP   │ LU   │ EM   │ TH   │ MT   │     │
-│───────────────┼──────┼──────┼──────┼──────┼──────┼─────┤
-│ Médecine Int. │ M:   │ M:   │ M:   │ M:   │ M:   │ A:  │
-│ (2 internes)  │ SP   │ LU   │ TH   │ CH   │ HU   │ SP  │
-│               │ A:   │ A:   │ A:   │ A:   │ A:   │     │
-│               │ LU   │ TH   │ CH   │ HU   │ SP   │     │
-│───────────────┼──────┼──────┼──────┼──────┼──────┼─────┤
-│ ... (8 practices au total)                             │
+│                                                           │
+│  [ 👤 Vue par Interne ]  [ 📅 Vue par Jour/Période ]    │ ← Toggle
 └──────────────────────────────────────────────────────────┘
-
-M: Matin | A: Après-midi | A: Astreinte (samedi)
-
-Légende :
-MT = Martin  | SP = Sophie  | LU = Lucas
-EM = Emma    | TH = Thomas  | CH = Chloé  | HU = Hugo
-
-🌙 Gardes : Lun:MT | Mar:SP | Mer:LU | Jeu:EM | Ven:TH | Sam:CH | Dim:HU
 ```
 
-**Code Couleur :**
-- 🟢 Travail normal
-- 🔵 Demi-journée OFF
-- 🟡 Repos post-garde
-- 🔴 Empêchement
+---
+
+#### 📋 **VUE 1 : PAR INTERNE** (pour les internes)
+
+**Objectif :** Chaque interne voit **son planning personnel** complet.
+
+**Structure :**
+- Colonnes : Jours de la semaine (Lun-Dim)
+- Lignes : Internes
+- Cellules : Tâches de l'interne ce jour (practices, garde, repos, OFF)
+
+**Interface :**
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  👤 Vue par Interne                                                          │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                               │
+│  Interne      │ Lun 06/01  │ Mar 07/01  │ Mer 08/01  │ Jeu │ Ven │ Sam │ Dim │
+│───────────────┼────────────┼────────────┼────────────┼─────┼─────┼─────┼─────┤
+│ Alice Martin  │ M: Cardio  │ REPOS      │ M: Urgences│ ... │ ... │ ... │ ... │
+│               │ A: Cardio  │ REPOS      │ A: OFF     │     │     │     │     │
+│               │ 🌙 GARDE   │            │            │     │     │     │     │
+│───────────────┼────────────┼────────────┼────────────┼─────┼─────┼─────┼─────┤
+│ Bob Dupont    │ M: Urgences│ M: Urgences│ M: Cardio  │ ... │ ... │ 🌙  │ REPOS│
+│               │ A: Urgences│ A: OFF     │ A: Cardio  │     │     │GARDE│ REPOS│
+│───────────────┼────────────┼────────────┼────────────┼─────┼─────┼─────┼─────┤
+│ Charlie B.    │ M: Cardio  │ M: Cardio  │ M: OFF     │ ... │ ... │ ... │ ... │
+│               │ A: OFF     │ A: Urgences│ A: Urgences│     │     │     │     │
+│───────────────┼────────────┼────────────┼────────────┼─────┼─────┼─────┼─────┤
+│ ... (7 internes au total)                                                     │
+└───────────────────────────────────────────────────────────────────────────────┘
+
+Légende :
+M: Matin (8h-13h) | A: Après-midi (13h-18h) | A: Astreinte (samedi matin)
+🌙 GARDE : Garde du soir (18h-8h lendemain)
+REPOS : Repos post-garde obligatoire
+OFF : Demi-journée de repos hebdomadaire
+```
+
+**Affichage par cellule :**
+1. **Matin / Après-midi** :
+   - Si **practice** : "M: Cardio" ou "A: Urgences"
+   - Si **REPOS** : "REPOS" (texte jaune, cellule grisée)
+   - Si **OFF** : "OFF" (texte bleu)
+   - Si **Empêchement** : "❌ Indisponible" (texte rouge)
+
+2. **Garde** :
+   - Si **garde** : "🌙 GARDE" (texte orange sur fond sombre)
+   - Sinon : cellule vide
+
+3. **Samedi / Dimanche** :
+   - Samedi matin : "A: Astreinte" (si assigné)
+   - Samedi après-midi : vide (pas de travail)
+   - Dimanche : vide ou "REPOS" si garde samedi/dimanche
+
+**Cas d'affichage complet d'une cellule :**
+```
+┌────────────────┐
+│ Lundi 06/01    │ ← Cellule pour Alice Martin
+├────────────────┤
+│ M: Cardio      │ ← Matin : Assignée à practice Cardio
+│ A: Cardio      │ ← Après-midi : Assignée à practice Cardio
+│ 🌙 GARDE       │ ← Soir : Garde de semaine
+└────────────────┘
+```
+
+---
+
+#### 🏥 **VUE 2 : PAR JOUR/PÉRIODE** (pour les managers)
+
+**Objectif :** Vérifier la **couverture complète des practices** et des gardes.
+
+**Structure :**
+- Colonnes : Jours de la semaine (Lun-Dim)
+- Lignes : **Périodes** (Matin, Après-midi, Garde)
+- Cellules : **Practices** → Liste des internes assignés
+
+**Interface :**
+```
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  📅 Vue par Jour/Période                                                      │
+├──────────────────────────────────────────────────────────────────────────────┤
+│                                                                                │
+│             │ Lun 06/01       │ Mar 07/01       │ Mer 08/01       │ ... │ Dim │
+│─────────────┼─────────────────┼─────────────────┼─────────────────┼─────┼─────┤
+│ 🌅 MATIN    │ Cardio:         │ Cardio:         │ Cardio:         │ ... │  -  │
+│             │  • Alice M.     │  • Alice M.     │  • Bob D.       │     │     │
+│             │  • Charlie B.   │  • Charlie B.   │  • David L.     │     │     │
+│             │                 │                 │                 │     │     │
+│             │ Urgences:       │ Urgences:       │ Urgences:       │     │     │
+│             │  • Bob D.       │  • David L.     │  • Eve R.       │     │     │
+│             │  • David L.     │  • Eve R.       │  • Frank P.     │     │     │
+│─────────────┼─────────────────┼─────────────────┼─────────────────┼─────┼─────┤
+│ 🌆 APRÈS-   │ Cardio:         │ Cardio:         │ Cardio:         │ ... │  -  │
+│    MIDI     │  • Alice M.     │  • George T.    │  • Bob D.       │     │     │
+│             │  • George T.    │  • Hugo S.      │  • David L.     │     │     │
+│             │                 │                 │                 │     │     │
+│             │ Urgences:       │ Urgences:       │ Urgences:       │     │     │
+│             │  • Bob D.       │  • Charlie B.   │  • Frank P.     │     │     │
+│             │  • Eve R.       │  • David L.     │  • Hugo S.      │     │     │
+│─────────────┼─────────────────┼─────────────────┼─────────────────┼─────┼─────┤
+│ 🌙 GARDE    │ Alice M.        │ Bob D.          │ Charlie B.      │ ... │ Eve R.│
+└──────────────────────────────────────────────────────────────────────────────┘
+
+Notes :
+- Samedi matin : "Astreinte:" au lieu de practice normale
+- Samedi après-midi : vide (pas de travail)
+- Dimanche : vide (pas de travail normal)
+- Cellules adaptatives en hauteur selon le nombre de practices actives
+```
+
+**Affichage par cellule Matin/Après-midi :**
+```
+┌─────────────────┐
+│ Cardio:         │ ← Nom de la practice
+│  • Alice M.     │ ← Interne 1 assigné
+│  • Charlie B.   │ ← Interne 2 assigné
+│                 │
+│ Urgences:       │ ← Autre practice active
+│  • Bob D.       │
+│  • David L.     │
+└─────────────────┘
+```
+
+**Affichage cellule Garde :**
+```
+┌─────────────────┐
+│ Alice M.        │ ← Simplement le nom de l'interne de garde
+└─────────────────┘
+```
+
+**Samedi matin (astreinte) :**
+```
+┌─────────────────┐
+│ Astreinte:      │ ← Traité comme une practice spéciale
+│  • Frank P.     │ ← Interne assigné
+└─────────────────┘
+```
+
+---
+
+#### 🎨 **Code Couleur (commun aux 2 vues)**
+
+- 🟢 **Travail normal** : Assignations practices (fond blanc)
+- 🔵 **Demi-journée OFF** : Repos hebdomadaire (fond bleu clair)
+- 🟡 **Repos post-garde** : Repos obligatoire après garde (fond jaune clair)
+- 🔴 **Empêchement** : Indisponibilité déclarée (fond rouge clair)
+- 🟠 **Garde** : Garde du soir (fond orange foncé, texte blanc)
+
+---
+
+#### 🔧 **Implémentation Technique**
+
+**Persistance de la vue sélectionnée :**
+```javascript
+// LocalStorage pour mémoriser la préférence
+localStorage.setItem('viewMode', 'byIntern') // ou 'byPeriod'
+```
+
+**Switch dynamique :**
+```vue
+<template>
+  <div class="view-toggle">
+    <button 
+      :class="{ active: viewMode === 'byIntern' }"
+      @click="viewMode = 'byIntern'"
+    >
+      👤 Vue par Interne
+    </button>
+    <button 
+      :class="{ active: viewMode === 'byPeriod' }"
+      @click="viewMode = 'byPeriod'"
+    >
+      📅 Vue par Jour/Période
+    </button>
+  </div>
+
+  <TableByIntern v-if="viewMode === 'byIntern'" :planning="planning" />
+  <TableByPeriod v-else :planning="planning" />
+</template>
+```
 
 ---
 
@@ -182,5 +332,5 @@ AND les gardes sont affichées clairement
 
 ---
 
-*Dernière mise à jour : 4 novembre 2025*
+*Dernière mise à jour : 5 novembre 2025 - 03h15*
 

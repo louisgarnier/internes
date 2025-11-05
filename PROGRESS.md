@@ -1,6 +1,6 @@
 # 📊 Progression du Développement
 
-**Dernière mise à jour :** 5 novembre 2025 - 01h30
+**Dernière mise à jour :** 5 novembre 2025 - 03h15
 
 ---
 
@@ -217,10 +217,118 @@ Le module de configuration est terminé et fonctionnel :
   - Interface similaire au wizard mais accessible depuis le dashboard
   - Possibilité de régénérer après modification
 
-### À venir - MODULE 3 : GÉNÉRATION AUTOMATIQUE
-- ⏳ Algorithme de génération automatique (contraintes dures + souples)
-- ⏳ Vue hebdomadaire du planning généré
-- ⏳ Changement de statut 'config' → 'generated'
+---
+
+## 🎯 PHASE 4 : MODULE 3 - GÉNÉRATION AUTOMATIQUE (EN COURS ⏳)
+
+### État : 🔄 En cours - PHASE 1 complète (22%)
+
+### Réalisations :
+
+#### ✅ m3-3 : Interface génération (COMPLÉTÉ)
+- Radio buttons : Générer toutes semaines / semaine spécifique
+- Dropdown pour sélection semaine
+- Bouton "🚀 Générer" ou "🔄 Régénérer" (si déjà généré)
+- Confirmation avant régénération
+- Message de warning si planning déjà généré
+
+#### ✅ m3-4 : PHASE 1a - Structure base semaine (COMPLÉTÉ)
+- Fonction `initWeekStructure()` créant structure semaine vide
+- 11 slots de travail (Lun-Ven: 2/jour, Sam: 1)
+- 7 gardes à attribuer (5 GS + 1 GSam + 1 GDim)
+- Tableaux pour repos, OFFs, affectations
+- Fonction `generatePlanning()` orchestrant génération
+
+#### ✅ m3-5 : PHASE 1b - Garde Dimanche (COMPLÉTÉ)
+- Système de scoring pour sélection internes
+- Fonction `selectInterneForGarde()` avec critères multiples
+- Fonction `calculateInterneScore()` : équilibre + évite doublons
+- Fonction `checkUnavailability()` : respect empêchements
+- Attribution garde Dimanche (priorité absolue)
+- Mise à jour stats globales
+
+#### ✅ m3-6 : PHASE 1c - 5 Gardes semaine (COMPLÉTÉ)
+- Fonction `assignGardesSemaine()` pour 5 gardes Lun-Ven
+- Utilise scoring pour équilibrer entre internes
+- Évite naturellement doublons mais accepte si nécessaire (contrainte DURE)
+- Mise à jour stats globales (total + semaine)
+
+#### ✅ m3-7 : PHASE 1d - Garde Samedi (COMPLÉTÉ)
+- Fonction `assignGardeSamedi()` pour garde Sam 13h→Dim 8h
+- CONTRAINTE DURE : doit être attribuée même si doublon
+- Système de scoring pénalise mais n'empêche pas
+- Mise à jour stats globales (total + samedi)
+- **🎉 PHASE 1 COMPLÈTE : Toutes les 7 gardes attribuées par semaine**
+
+#### ✅ Alert améliorée
+- Affichage complet des 7 gardes par semaine
+- Stats triées par nombre de gardes
+- Détail par type : (X sem, Y dim, Z sam)
+- Liste phases restantes mise à jour
+
+### À faire :
+
+#### ⏳ m3-8 : PHASE 2 - Repos post-garde (NEXT)
+- Calculer repos obligatoires après chaque garde
+- Garde Lun-Jeu soir → Repos lendemain (matin + après-midi)
+- Garde Ven soir → Repos samedi (matin + après-midi)
+- Garde Sam → Repos dimanche (matin + après-midi)
+- Garde Dim → Repos lundi (matin + après-midi)
+- Marquer slots comme "repos" dans structure
+
+#### ⏳ m3-9 : PHASE 4a - Practices à 2 internes
+- Attribution practices nécessitant 2 internes
+- Priorité absolue : couvrir toutes les practices AVANT les OFFs
+- Scoring pour sélection internes disponibles
+- Respect empêchements et repos
+
+#### ⏳ m3-10 : PHASE 4b - Practices à 1 interne
+- Attribution practices nécessitant 1 interne
+- Même logique que practices à 2
+- Vérifier couverture complète
+
+#### ⏳ m3-11 : PHASE 3 - Demi-journée OFF
+- Attribuer 1 demi-journée OFF par interne (BONUS)
+- Uniquement si tous les slots practices sont couverts
+- Équilibrer entre internes
+- Note : Si pas assez d'internes pour practices, proposer d'en ajouter
+
+#### ⏳ m3-12 à m3-18 : Finalisation
+- Détection conflits
+- Option ajout internes si sous-staffé
+- Calcul score d'équilibre (0-100)
+- Sauvegarde dans store
+- Changement statut → 'generated'
+- Affichage basique planning généré
+- Tests
+
+### Fichiers créés/modifiés :
+- `utils/generation.js` - Logique génération (PHASE 1a-1d complète)
+- `pages/planning/[id]/index.vue` - Interface génération + alert détaillée
+- `types/planning.ts` - Interfaces Garde et Affectation
+- `utils/planning-helpers.ts` - Fonctions utilitaires dates
+
+---
+
+## 📅 MODULE 4 : VISUALISATION (SPECS MISES À JOUR)
+
+### État : 📝 Spécifications documentées
+
+### Réalisations :
+- ✅ **2 vues complémentaires documentées** :
+  - **Vue 1 : Par Interne** (pour les internes - voir leur planning personnel)
+  - **Vue 2 : Par Jour/Période** (pour les managers - vérifier couverture practices)
+- ✅ Toggle pour switcher entre les 2 vues
+- ✅ Codes couleur définis (travail, OFF, repos, empêchement, garde)
+- ✅ Samedi matin = Astreinte (traitée comme practice)
+- ✅ Affichage REPOS, OFF, empêchements
+
+### À développer (après MODULE 3) :
+- Implémenter Vue 1 (Par Interne)
+- Implémenter Vue 2 (Par Jour/Période)
+- Toggle dynamique avec persistance LocalStorage
+- Code couleur CSS
+- Navigation entre semaines
 
 ### Évolutions futures :
 - 📝 **v1.1** : Page dédiée de gestion des contacts (CRUD complet)
