@@ -405,6 +405,11 @@ const genererPlanning = () => {
           message += `       • ${practiceName} : ${affectationsParPractice[practiceName]} affectations\n`
         })
       }
+      
+      // OFFs attribués
+      if (week.offs && week.offs.length > 0) {
+        message += `    - 💤 OFFs attribués : ${week.offs.length} demi-journées\n`
+      }
     })
     
     // Stats globales si disponibles
@@ -438,10 +443,10 @@ const genererPlanning = () => {
     }
     
     message += '\n⏳ Prochaines phases (en développement) :\n'
-    message += '  1. Attribution des OFF (bonus, si slots restants)\n'
-    message += '  2. Détection des conflits\n'
-    message += '  3. Calcul du score d\'équilibre\n'
-    message += '  4. Sauvegarde et affichage dans le tableau'
+    message += '  1. Détection des conflits\n'
+    message += '  2. Calcul du score d\'équilibre (0-100)\n'
+    message += '  3. Sauvegarde dans le store\n'
+    message += '  4. Affichage dans le tableau'
     
     // Afficher le modal avec les résultats
     generationResult.value = message

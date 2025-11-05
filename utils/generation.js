@@ -588,6 +588,117 @@ function assignPractices1Interne(week, practicesList, internsList, unavailabilit
 }
 
 /**
+ * PHASE 3 : Attribuer 1 demi-journée OFF par interne (BONUS)
+ * 
+ * Si un interne n'a pas de slot disponible, tant pis (pas d'erreur)
+ */
+function assignOFFs(week, internsList, globalStats) {
+  console.log(`\n💤 Phase 3 : Attribution OFFs - Semaine ${week.weekNumber}`)
+  
+  let offsCount = 0
+  
+  // Pour chaque interne
+  for (const intern of internsList) {
+    // Trouver les slots disponibles pour cet interne
+    const availableSlots = []
+    
+    for (let dayIndex = 0; dayIndex < 5; dayIndex++) { // Lun-Ven uniquement
+      const day = week.days[dayIndex]
+      
+      // Vérifier matin
+      const matinDispo = isSlotAvailableForOFF(intern.id, day, 'matin', week)
+      if (matinDispo) {
+        availableSlots.push({ day, periode: 'matin' })
+      }
+      
+      // Vérifier après-midi
+      const apresMidiDispo = isSlotAvailableForOFF(intern.id, day, 'apres_midi', week)
+      if (apresMidiDispo) {
+        availableSlots.push({ day, periode: 'apres_midi' })
+      }
+    }
+    
+    if (availableSlots.length === 0) {
+      console.log(`  ⚠️ ${intern.firstName} ${intern.lastName} : Aucun slot disponible pour OFF`)
+      continue
+    }
+    
+    // Sélectionner un slot aléatoire (ou le premier pour simplifier)
+    const selectedSlot = availableSlots[Math.floor(Math.random() * availableSlots.length)]
+    
+    // Créer l'OFF
+    const off = {
+      id: `off-${week.weekNumber}-${intern.id}`,
+      interneId: intern.id,
+      interneName: `${intern.firstName} ${intern.lastName}`,
+      date: selectedSlot.day.date,
+      periode: selectedSlot.periode,
+      weekNumber: week.weekNumber
+    }
+    
+    week.offs.push(off)
+    
+    // Marquer dans la structure du jour
+    if (selectedSlot.periode === 'matin') {
+      selectedSlot.day.matin.off = off
+    } else {
+      selectedSlot.day.apresMidi.off = off
+    }
+    
+    offsCount++
+    
+    const periodeLabel = selectedSlot.periode === 'matin' ? 'matin' : 'après-midi'
+    console.log(`  ✅ ${intern.firstName} ${intern.lastName} : OFF ${selectedSlot.day.dayName} ${periodeLabel}`)
+  }
+  
+  console.log(`  ✅ ${offsCount} OFFs attribués sur ${internsList.length} internes`)
+  week.stats.offsAttribues = offsCount
+}
+
+/**
+ * Vérifier si un slot est disponible pour un OFF
+ */
+function isSlotAvailableForOFF(interneId, day, periode, week) {
+  // 1. Vérifier si l'interne a un repos ce slot
+  if (periode === 'matin' && day.matin.repos && day.matin.repos.interneId === interneId) {
+    return false
+  }
+  if (periode === 'apres_midi' && day.apresMidi.repos && day.apresMidi.repos.interneId === interneId) {
+    return false
+  }
+  
+  // 2. Vérifier si l'interne a déjà un OFF ce slot
+  if (periode === 'matin' && day.matin.off && day.matin.off.interneId === interneId) {
+    return false
+  }
+  if (periode === 'apres_midi' && day.apresMidi.off && day.apresMidi.off.interneId === interneId) {
+    return false
+  }
+  
+  // 3. Vérifier si l'interne a une affectation practice ce slot
+  const hasAffectation = week.affectations.some(aff => 
+    aff.interneId === interneId && 
+    aff.date === day.date && 
+    aff.periode === periode
+  )
+  if (hasAffectation) {
+    return false
+  }
+  
+  // 4. Vérifier si l'interne a une garde le soir (on évite OFF le même jour)
+  const hasGardeToday = 
+    (week.gardes.dimanche && week.gardes.dimanche.interneId === interneId && week.gardes.dimanche.date === day.date) ||
+    (week.gardes.samedi && week.gardes.samedi.interneId === interneId && week.gardes.samedi.date === day.date) ||
+    (week.gardes.semaine && week.gardes.semaine.some(g => g.interneId === interneId && g.date === day.date))
+  
+  if (hasGardeToday) {
+    return false
+  }
+  
+  return true
+}
+
+/**
  * Assigner un slot spécifique à une practice
  */
 function assignSlotToPractice(week, day, periode, practice, nbRequired, internsList, unavailabilities, globalStats) {
@@ -912,14 +1023,19 @@ export function generatePlanning(planning, weekNumbers = null) {
   console.log('\n✅ Phase 4b terminée : Practices à 1 interne attribuées')
   console.log('\n🎉 PHASE 4 COMPLÈTE : Toutes les practices attribuées !')
   
-  // TODO: Les phases suivantes seront implémentées dans les prochaines tâches
-  // - Phase 3 : Attribution OFFs
+  // PHASE 3 : Attribuer 1 demi-journée OFF par interne (BONUS)
+  for (const week of weeksStructure) {
+    assignOFFs(week, planning.internsList, globalStats)
+  }
+  
+  console.log('\n✅ Phase 3 terminée : OFFs attribués (bonus)')
+  console.log('\n🎉 GÉNÉRATION COMPLÈTE : Gardes + Repos + Practices + OFFs !')
   
   return {
     success: true,
     weeks: weeksStructure,
     globalStats,
-    message: `✅ Phase 1-2-4 complètes : Gardes + Repos + Practices (toutes) pour ${weeksStructure.length} semaine(s)`
+    message: `✅ Génération complète : Gardes + Repos + Practices + OFFs pour ${weeksStructure.length} semaine(s)`
   }
 }
 
