@@ -559,25 +559,121 @@
       </div>
     </div>
 
-    <!-- Modal Ajouter Empêchement (simplifié pour l'instant) -->
+    <!-- Modal Ajouter Empêchement -->
     <div v-if="showUnavailabilityModal" 
       style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000;"
       @click.self="closeUnavailabilityModal">
-      <div style="background: white; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%;">
+      <div style="background: white; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%; max-height: 85vh; overflow-y: auto;">
         <h3 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 600; color: #1e293b;">
           ➕ Ajouter un empêchement
         </h3>
         
-        <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">
-          Formulaire complet à implémenter (tâche f2-2-6)
-        </p>
+        <!-- Sélection interne -->
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 600; color: #334155; margin-bottom: 8px; font-size: 14px;">
+            Interne concerné *
+          </label>
+          <select 
+            v-model="unavailabilityForm.internId"
+            style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; cursor: pointer;"
+          >
+            <option value="" disabled>Sélectionnez un interne</option>
+            <option v-for="intern in formData.internsList" :key="intern.id" :value="intern.id">
+              {{ intern.firstName }} {{ intern.lastName }}
+            </option>
+          </select>
+        </div>
 
-        <button 
-          @click="closeUnavailabilityModal"
-          style="width: 100%; background: #64748b; color: white; font-size: 15px; font-weight: 500; padding: 12px; border: none; border-radius: 8px; cursor: pointer;"
-        >
-          ✕ Fermer
-        </button>
+        <!-- Date -->
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 600; color: #334155; margin-bottom: 8px; font-size: 14px;">
+            Date *
+          </label>
+          <input 
+            v-model="unavailabilityForm.date"
+            type="date"
+            style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px;"
+          >
+        </div>
+
+        <!-- Période -->
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 600; color: #334155; margin-bottom: 12px; font-size: 14px;">
+            Période *
+          </label>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; transition: all 0.2s;"
+              :style="{ background: unavailabilityForm.period === 'morning' ? '#eff6ff' : 'white', borderColor: unavailabilityForm.period === 'morning' ? '#3b82f6' : '#e2e8f0' }">
+              <input 
+                type="radio" 
+                v-model="unavailabilityForm.period" 
+                value="morning"
+                style="width: 18px; height: 18px; cursor: pointer;"
+              />
+              <div>
+                <div style="font-weight: 500; color: #334155;">Matin</div>
+                <div style="font-size: 13px; color: #64748b;">8h - 13h</div>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; transition: all 0.2s;"
+              :style="{ background: unavailabilityForm.period === 'afternoon' ? '#eff6ff' : 'white', borderColor: unavailabilityForm.period === 'afternoon' ? '#3b82f6' : '#e2e8f0' }">
+              <input 
+                type="radio" 
+                v-model="unavailabilityForm.period" 
+                value="afternoon"
+                style="width: 18px; height: 18px; cursor: pointer;"
+              />
+              <div>
+                <div style="font-weight: 500; color: #334155;">Après-midi</div>
+                <div style="font-size: 13px; color: #64748b;">13h - 18h</div>
+              </div>
+            </label>
+
+            <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; transition: all 0.2s;"
+              :style="{ background: unavailabilityForm.period === 'fullday' ? '#eff6ff' : 'white', borderColor: unavailabilityForm.period === 'fullday' ? '#3b82f6' : '#e2e8f0' }">
+              <input 
+                type="radio" 
+                v-model="unavailabilityForm.period" 
+                value="fullday"
+                style="width: 18px; height: 18px; cursor: pointer;"
+              />
+              <div>
+                <div style="font-weight: 500; color: #334155;">Journée complète</div>
+                <div style="font-size: 13px; color: #64748b;">8h - 18h</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Raison (optionnel) -->
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 600; color: #334155; margin-bottom: 8px; font-size: 14px;">
+            Raison (optionnel)
+          </label>
+          <input 
+            v-model="unavailabilityForm.reason"
+            type="text"
+            placeholder="Ex: Formation, Congé, Rendez-vous..."
+            style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px;"
+          >
+        </div>
+
+        <!-- Boutons -->
+        <div style="display: flex; gap: 10px; margin-top: 30px;">
+          <button 
+            @click="saveUnavailability"
+            style="flex: 1; background: #10b981; color: white; font-size: 15px; font-weight: 500; padding: 12px; border: none; border-radius: 8px; cursor: pointer;"
+          >
+            ✓ Ajouter
+          </button>
+          <button 
+            @click="closeUnavailabilityModal"
+            style="flex: 1; background: #64748b; color: white; font-size: 15px; font-weight: 500; padding: 12px; border: none; border-radius: 8px; cursor: pointer;"
+          >
+            ✕ Annuler
+          </button>
+        </div>
       </div>
     </div>
 
@@ -635,6 +731,13 @@ const practiceForm = ref({
     friday: { morning: false, afternoon: false },
     saturday: { morning: false, afternoon: false }
   }
+})
+
+const unavailabilityForm = ref({
+  internId: '',
+  date: '',
+  period: 'fullday',
+  reason: ''
 })
 
 // Charger les données du planning au montage
@@ -775,11 +878,39 @@ const getPracticeScheduleSummary = (practice) => {
 
 // Empêchements
 const openAddUnavailabilityModal = () => {
+  unavailabilityForm.value = {
+    internId: formData.value.internsList.length > 0 ? formData.value.internsList[0].id : '',
+    date: '',
+    period: 'fullday',
+    reason: ''
+  }
   showUnavailabilityModal.value = true
 }
 
 const closeUnavailabilityModal = () => {
   showUnavailabilityModal.value = false
+}
+
+const saveUnavailability = () => {
+  if (!unavailabilityForm.value.internId) {
+    alert('Veuillez sélectionner un interne')
+    return
+  }
+
+  if (!unavailabilityForm.value.date) {
+    alert('Veuillez sélectionner une date')
+    return
+  }
+
+  formData.value.unavailabilities.push({
+    id: Date.now().toString(),
+    internId: unavailabilityForm.value.internId,
+    date: unavailabilityForm.value.date,
+    period: unavailabilityForm.value.period,
+    reason: unavailabilityForm.value.reason
+  })
+
+  closeUnavailabilityModal()
 }
 
 const deleteUnavailability = (id) => {
@@ -808,20 +939,83 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString('fr-FR', options)
 }
 
-// Sauvegarde (à implémenter dans f2-2-7)
+// Sauvegarde
 const saveChanges = () => {
-  alert('✅ Sauvegarde à implémenter dans f2-2-7\n\nDonnées actuelles :\n' + 
-    `- Nom: ${formData.value.name}\n` +
-    `- Date début: ${formData.value.startDate}\n` +
-    `- Semaines: ${formData.value.weeks}\n` +
-    `- Internes: ${formData.value.internsList.length}\n` +
-    `- Practices: ${formData.value.practicesList.length}\n` +
-    `- Empêchements: ${formData.value.unavailabilities.length}`)
+  // Validation des champs obligatoires
+  if (!formData.value.name || !formData.value.startDate || !formData.value.weeks) {
+    alert('⚠️ Veuillez remplir tous les champs obligatoires (nom, date, semaines)')
+    return
+  }
+
+  // Vérifier que la date est un lundi
+  if (!isMonday(formData.value.startDate)) {
+    alert('⚠️ La date de début doit être un lundi')
+    return
+  }
+
+  // Vérifier qu'il y a au moins un interne
+  if (formData.value.internsList.length === 0) {
+    alert('⚠️ Veuillez ajouter au moins un interne')
+    return
+  }
+
+  // Vérifier qu'il y a au moins une practice
+  if (formData.value.practicesList.length === 0) {
+    alert('⚠️ Veuillez ajouter au moins une practice')
+    return
+  }
+
+  // Préparer les données à sauvegarder
+  const updatedData = {
+    name: formData.value.name,
+    startDate: formData.value.startDate,
+    weeks: formData.value.weeks,
+    internsList: formData.value.internsList,
+    practicesList: formData.value.practicesList,
+    unavailabilities: formData.value.unavailabilities,
+    internsCount: formData.value.internsList.length,
+    practicesCount: formData.value.practicesList.length
+  }
+
+  // Sauvegarder dans le store
+  planningsStore.updatePlanning(planningId, updatedData)
+
+  // Message de confirmation
+  alert('✅ Modifications sauvegardées avec succès !\n\n' +
+    `📝 Nom: ${formData.value.name}\n` +
+    `📅 Date: ${formatDate(formData.value.startDate)}\n` +
+    `🗓️ Semaines: ${formData.value.weeks}\n` +
+    `👥 Internes: ${formData.value.internsList.length}\n` +
+    `🏥 Practices: ${formData.value.practicesList.length}\n` +
+    `🚫 Empêchements: ${formData.value.unavailabilities.length}`)
+
+  // Redirection vers la page de visualisation
+  navigateTo(`/planning/${planningId}`)
 }
 
-// Régénération (à implémenter dans f2-2-8)
+// Régénération
 const regeneratePlanning = () => {
-  alert('🔄 Régénération à implémenter dans f2-2-8')
+  if (confirm('🔄 Régénérer le planning ?\n\nCette action va recalculer automatiquement toutes les gardes et assignations en fonction des nouveaux paramètres.\n\nContinuer ?')) {
+    // D'abord sauvegarder les modifications
+    const updatedData = {
+      name: formData.value.name,
+      startDate: formData.value.startDate,
+      weeks: formData.value.weeks,
+      internsList: formData.value.internsList,
+      practicesList: formData.value.practicesList,
+      unavailabilities: formData.value.unavailabilities,
+      internsCount: formData.value.internsList.length,
+      practicesCount: formData.value.practicesList.length,
+      status: 'config' // Remettre en mode config pour régénération
+    }
+
+    planningsStore.updatePlanning(planningId, updatedData)
+
+    alert('✅ Planning sauvegardé et remis en mode "Configuration".\n\nVous pouvez maintenant retourner à la page de visualisation et cliquer sur "Générer" pour régénérer le planning.')
+
+    // Redirection vers la page de visualisation
+    navigateTo(`/planning/${planningId}`)
+  }
 }
 </script>
 
