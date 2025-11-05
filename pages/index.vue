@@ -186,7 +186,7 @@ const createNewPlanning = () => {
 }
 
 const viewPlanning = (id) => {
-  alert(`👁️ Voir le planning ${id}\n\nCette action ouvrira la vue hebdomadaire (MODULE 4)`)
+  navigateTo(`/planning/${id}`)
 }
 
 const duplicatePlanning = (id) => {

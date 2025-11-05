@@ -1,0 +1,283 @@
+<template>
+  <div style="min-height: 100vh; background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%); padding: 40px;">
+    
+    <!-- Header -->
+    <header style="background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-radius: 12px; margin-bottom: 30px;">
+      <div style="max-width: 1200px; margin: 0 auto; padding: 20px 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+          <div>
+            <h1 style="font-size: 28px; font-weight: bold; color: #2d3748; margin: 0 0 8px 0;">
+              📋 {{ planning?.name || 'Planning' }}
+            </h1>
+            <p v-if="planning" style="font-size: 15px; color: #666; margin: 0;">
+              {{ planning.weeks }} semaine{{ planning.weeks > 1 ? 's' : '' }} • 
+              {{ planning.internsCount }} internes • 
+              {{ planning.practicesCount }} practices
+            </p>
+          </div>
+          <button 
+            @click="navigateTo('/')"
+            style="background: #e5e7eb; color: #374151; font-size: 15px; font-weight: 600; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+            @mouseover="$event.target.style.background = '#d1d5db'"
+            @mouseout="$event.target.style.background = '#e5e7eb'"
+          >
+            ← Retour
+          </button>
+        </div>
+        
+        <!-- Badge statut -->
+        <div v-if="planning">
+          <span :style="getStatusBadgeStyle(planning.status)">
+            {{ getStatusLabel(planning.status) }}
+          </span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main style="max-width: 1200px; margin: 0 auto;">
+      
+      <!-- Planning introuvable -->
+      <div v-if="!planning" style="text-align: center; padding: 80px 40px; background: white; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+        <div style="font-size: 60px; margin-bottom: 20px;">❌</div>
+        <h2 style="font-size: 24px; font-weight: bold; color: #2d3748; margin-bottom: 15px;">
+          Planning introuvable
+        </h2>
+        <p style="font-size: 16px; color: #666; margin-bottom: 30px;">
+          Le planning demandé n'existe pas ou a été supprimé.
+        </p>
+        <button 
+          @click="navigateTo('/')"
+          style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 16px; font-weight: 600; padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer;"
+        >
+          Retour au dashboard
+        </button>
+      </div>
+
+      <!-- Planning trouvé -->
+      <div v-else>
+        
+        <!-- Bouton Générer -->
+        <div style="background: white; border-radius: 12px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+          <h2 style="font-size: 20px; font-weight: 600; color: #333; margin: 0 0 15px 0;">
+            🚀 Génération du Planning
+          </h2>
+          <p style="font-size: 14px; color: #666; margin: 0 0 20px 0;">
+            Génère automatiquement les gardes, repos, et assignations aux practices pour toutes les semaines.
+          </p>
+          
+          <button 
+            @click="genererPlanning"
+            :disabled="planning.status === 'generated'"
+            :style="{
+              background: planning.status === 'generated' ? '#d1d5db' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              color: 'white',
+              fontSize: '16px',
+              fontWeight: '600',
+              padding: '14px 30px',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: planning.status === 'generated' ? 'not-allowed' : 'pointer',
+              transition: 'all 0.2s',
+              opacity: planning.status === 'generated' ? 0.6 : 1
+            }"
+            @mouseover="handleGenerateHover"
+            @mouseout="handleGenerateLeave"
+          >
+            {{ planning.status === 'generated' ? '✅ Planning déjà généré' : '🚀 Générer le Planning Complet' }}
+          </button>
+        </div>
+
+        <!-- Tableau hebdomadaire -->
+        <div 
+          v-for="semaine in semaines" 
+          :key="semaine.numero"
+          style="background: white; border-radius: 12px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);"
+        >
+          <h3 style="font-size: 18px; font-weight: 600; color: #333; margin: 0 0 20px 0;">
+            📅 Semaine {{ semaine.numero }} : Du {{ formatDate(semaine.dateDebut) }} au {{ formatDate(semaine.dateFin) }}
+          </h3>
+
+          <!-- Tableau -->
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; border: 2px solid #e5e7eb; border-radius: 8px;">
+              <!-- Header -->
+              <thead>
+                <tr style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                  <th style="padding: 12px; text-align: left; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2);">
+                    Interne
+                  </th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2);">
+                    Lundi
+                  </th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2);">
+                    Mardi
+                  </th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2);">
+                    Mercredi
+                  </th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2);">
+                    Jeudi
+                  </th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2);">
+                    Vendredi
+                  </th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600; border-right: 1px solid rgba(255,255,255,0.2);">
+                    Samedi
+                  </th>
+                  <th style="padding: 12px; text-align: center; font-weight: 600;">
+                    Dimanche
+                  </th>
+                </tr>
+              </thead>
+              <!-- Body -->
+              <tbody>
+                <tr 
+                  v-for="(interne, index) in planning.internsList" 
+                  :key="interne.id"
+                  :style="{ background: index % 2 === 0 ? '#f9fafb' : 'white' }"
+                >
+                  <td style="padding: 16px; font-weight: 600; color: #333; border-right: 1px solid #e5e7eb;">
+                    {{ interne.firstName }} {{ interne.lastName }}
+                  </td>
+                  <td style="padding: 16px; text-align: center; border-right: 1px solid #e5e7eb; color: #999; font-size: 13px;">
+                    -
+                  </td>
+                  <td style="padding: 16px; text-align: center; border-right: 1px solid #e5e7eb; color: #999; font-size: 13px;">
+                    -
+                  </td>
+                  <td style="padding: 16px; text-align: center; border-right: 1px solid #e5e7eb; color: #999; font-size: 13px;">
+                    -
+                  </td>
+                  <td style="padding: 16px; text-align: center; border-right: 1px solid #e5e7eb; color: #999; font-size: 13px;">
+                    -
+                  </td>
+                  <td style="padding: 16px; text-align: center; border-right: 1px solid #e5e7eb; color: #999; font-size: 13px;">
+                    -
+                  </td>
+                  <td style="padding: 16px; text-align: center; border-right: 1px solid #e5e7eb; color: #999; font-size: 13px;">
+                    -
+                  </td>
+                  <td style="padding: 16px; text-align: center; color: #999; font-size: 13px;">
+                    -
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Message si planning non généré -->
+          <div v-if="planning.status !== 'generated'" style="text-align: center; margin-top: 20px; padding: 20px; background: #eff6ff; border: 2px solid #3b82f6; border-radius: 10px;">
+            <p style="margin: 0; color: #1e40af; font-size: 14px; font-weight: 500;">
+              ℹ️ Cliquez sur "Générer le Planning" ci-dessus pour remplir automatiquement ce tableau
+            </p>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+</template>
+
+<script setup>
+import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
+import { usePlanningsStore } from '~/stores/plannings'
+
+const route = useRoute()
+const planningsStore = usePlanningsStore()
+
+// Récupérer le planning depuis le store
+const planningId = route.params.id
+const planning = computed(() => {
+  return planningsStore.plannings.find(p => p.id === planningId)
+})
+
+// Générer les semaines
+const semaines = computed(() => {
+  if (!planning.value) return []
+  
+  const result = []
+  const startDate = new Date(planning.value.startDate)
+  
+  for (let i = 0; i < planning.value.weeks; i++) {
+    const dateDebut = new Date(startDate)
+    dateDebut.setDate(dateDebut.getDate() + (i * 7))
+    
+    const dateFin = new Date(dateDebut)
+    dateFin.setDate(dateFin.getDate() + 5) // Samedi
+    
+    result.push({
+      numero: i + 1,
+      dateDebut: dateDebut.toISOString().split('T')[0],
+      dateFin: dateFin.toISOString().split('T')[0]
+    })
+  }
+  
+  return result
+})
+
+// Helpers
+const formatDate = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'numeric', year: 'numeric' })
+}
+
+const getStatusLabel = (status) => {
+  const labels = {
+    'config': '⏳ Configuration',
+    'generated': '✅ Généré',
+    'error': '❌ Erreur'
+  }
+  return labels[status] || status
+}
+
+const getStatusBadgeStyle = (status) => {
+  const styles = {
+    'config': 'background: #fef3c7; color: #92400e; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; display: inline-block;',
+    'generated': 'background: #d1fae5; color: #065f46; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; display: inline-block;',
+    'error': 'background: #fee2e2; color: #991b1b; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; display: inline-block;'
+  }
+  return styles[status] || styles.config
+}
+
+// Action Générer (placeholder pour l'instant)
+const genererPlanning = () => {
+  alert('🚀 Génération du planning\n\nCette fonctionnalité sera implémentée étape par étape.\n\nProchaines étapes :\n- Attribution des gardes\n- Calcul des repos\n- Attribution aux practices\n- Attribution des OFF')
+}
+
+const handleGenerateHover = (e) => {
+  if (planning.value?.status !== 'generated') {
+    e.target.style.transform = 'translateY(-2px)'
+    e.target.style.boxShadow = '0 8px 20px rgba(16, 185, 129, 0.3)'
+  }
+}
+
+const handleGenerateLeave = (e) => {
+  if (planning.value?.status !== 'generated') {
+    e.target.style.transform = 'translateY(0)'
+    e.target.style.boxShadow = 'none'
+  }
+}
+</script>
+
+<style scoped>
+table {
+  overflow: hidden;
+}
+
+table th:first-child,
+table td:first-child {
+  position: sticky;
+  left: 0;
+  background: inherit;
+  z-index: 1;
+}
+
+table thead th:first-child {
+  z-index: 2;
+}
+</style>
+
