@@ -551,25 +551,79 @@ Le wizard guide l'utilisateur à travers 4 étapes séquentielles pour configure
 
 ## 🔄 F2.2 - Modification des Paramètres
 
-**Après la création initiale**, l'utilisateur peut modifier tous les paramètres via une interface similaire.
+**Statut :** ✅ COMPLÉTÉ (100%)
 
-**Accès :** Bouton `⚙️ Config` depuis le dashboard
+**Après la création initiale**, l'utilisateur peut modifier tous les paramètres du planning via une page dédiée d'édition.
 
-**Différences avec le wizard :**
-- Pas de navigation linéaire
-- Interface avec onglets ou accordéons
-- Modifications sauvegardées immédiatement
-- Possibilité de régénérer le planning si modifications impactantes
+### Accès
+- **Depuis le dashboard** : Bouton `✏️ Modifier` sur chaque carte de planning
+- **Route** : `/planning/[id]/edit`
 
-**Interface :**
-```
-┌────────────────────────────────────────────────┐
-│  Configuration : Planning Janvier 2025         │
-│  [ Paramètres ] [ Internes ] [ Practices ] [...│
-├────────────────────────────────────────────────┤
-│  (Même contenu que les étapes du wizard)      │
-└────────────────────────────────────────────────┘
-```
+### Architecture
+- ✅ Restructuration routing : `pages/planning/[id]/index.vue` (visualisation) + `pages/planning/[id]/edit.vue` (édition)
+- ✅ Interface avec **4 sections accordéon** (repliables/dépliables)
+- ✅ Modifications sauvegardées sur demande (bouton "💾 Sauvegarder")
+- ✅ Option de régénération si planning déjà généré
+
+### Section 1 : Paramètres Généraux ✅
+- ✅ Modification du **nom** du planning
+- ✅ Modification de la **date de début** (validation lundi)
+- ✅ Modification du **nombre de semaines** (1-10)
+- ✅ Validation en temps réel
+
+### Section 2 : Gestion des Internes ✅
+- ✅ Liste des internes avec compteur en temps réel
+- ✅ Affichage de chaque interne (prénom, nom)
+- ✅ **Bouton ➕ Ajouter** : Modal avec 4 champs (prénom*, nom*, email, téléphone)
+- ✅ **Bouton 🗑️ Supprimer** : Suppression avec confirmation
+- ✅ Cohérence avec le store global des internes (email + téléphone)
+
+### Section 3 : Gestion des Practices ✅
+- ✅ Liste des practices avec compteur en temps réel
+- ✅ Affichage détaillé : nom, nb internes requis, horaires
+- ✅ **Bouton ➕ Ajouter** : Modal complet avec :
+  - Nom de la practice*
+  - Nombre d'internes requis (1 ou 2) - radio buttons stylisés
+  - Grille horaires Lundi-Samedi (checkboxes matin/après-midi)
+  - Samedi après-midi désactivé
+- ✅ **Bouton 🗑️ Supprimer** : Suppression avec confirmation
+- ✅ Validation : nom obligatoire + au moins un horaire
+
+### Section 4 : Gestion des Empêchements ✅
+- ✅ Liste des empêchements avec compteur en temps réel
+- ✅ Affichage : interne, date, période, raison
+- ✅ **Bouton ➕ Ajouter** : Modal complet avec :
+  - Dropdown sélection interne*
+  - Date picker*
+  - Période (radio buttons : Matin 8h-13h / Après-midi 13h-18h / Journée 8h-18h)
+  - Champ raison (optionnel)
+- ✅ **Bouton 🗑️ Supprimer** : Suppression avec confirmation
+- ✅ Validation : interne et date obligatoires
+
+### Sauvegarde et Actions ✅
+- ✅ **Bouton 💾 Sauvegarder** :
+  - Validation complète (nom, date lundi, min 1 interne, min 1 practice)
+  - Appel `planningsStore.updatePlanning()`
+  - Recalcul automatique `internsCount` et `practicesCount`
+  - Message de confirmation avec résumé
+  - Redirection vers page de visualisation
+
+- ✅ **Bouton 🔄 Régénérer** (si `status === 'generated'`) :
+  - Confirmation utilisateur
+  - Sauvegarde des modifications
+  - Reset du status en `'config'`
+  - Message explicatif
+  - Redirection vers page de visualisation
+
+### Alert si Planning Généré
+- ✅ Bandeau orange en haut de page si `status === 'generated'`
+- ✅ Message : "Les modifications seront prises en compte, mais vous devrez régénérer le planning"
+
+### Fichiers Créés/Modifiés (F2.2)
+- ✅ `pages/planning/[id]/edit.vue` - Page d'édition complète (1022 lignes)
+- ✅ `pages/planning/[id]/index.vue` - Page de visualisation (déplacée)
+- ✅ `pages/index.vue` - Ajout bouton "✏️ Modifier" (grille 2x2)
+- ✅ `stores/plannings.js` - Ajout getter `getPlanningById()`
 
 ---
 

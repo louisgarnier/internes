@@ -1,6 +1,6 @@
 # 📊 Progression du Développement
 
-**Dernière mise à jour :** 4 novembre 2025 - 21h55
+**Dernière mise à jour :** 5 novembre 2025 - 01h30
 
 ---
 
@@ -62,9 +62,9 @@
 
 ---
 
-## 🎯 PHASE 3 : MODULE 2 - CONFIGURATION (EN COURS)
+## 🎯 PHASE 3 : MODULE 2 - CONFIGURATION (COMPLÉTÉ ✅)
 
-### État : ✅ COMPLÉTÉ - Wizard 4 étapes terminé (100%)
+### État : ✅ COMPLÉTÉ - F2.1 Wizard + F2.2 Modification (100%)
 
 ### Réalisations :
 
@@ -136,15 +136,63 @@
   - Retour au dashboard
   - Planning visible immédiatement avec badge "Config"
 
-### 🎉 MODULE 2 COMPLÉTÉ !
-Le wizard de configuration est terminé et fonctionnel :
-- ✅ 4 étapes complètes avec navigation
+### ✅ F2.2 : Modification des Paramètres (COMPLÉTÉE)
+**Page d'édition complète** pour modifier un planning existant :
+
+#### Architecture
+- ✅ Restructuration routing : `/planning/[id]/index.vue` (visualisation) + `/planning/[id]/edit.vue` (édition)
+- ✅ Bouton "✏️ Modifier" ajouté sur le dashboard (grille 2x2)
+- ✅ Interface accordéon avec 4 sections repliables/dépliables
+- ✅ Getter `getPlanningById()` ajouté au store
+
+#### Section 1 : Paramètres Généraux ✅
+- Modification nom, date (validation lundi), nombre de semaines
+- Validation en temps réel
+
+#### Section 2 : Gestion des Internes ✅
+- Liste avec compteur dynamique
+- Modal ajout avec 4 champs (prénom*, nom*, email, téléphone)
+- Suppression avec confirmation
+- Cohérence avec store global (email + phone)
+
+#### Section 3 : Gestion des Practices ✅
+- Liste avec compteur dynamique
+- Modal complet : nom, nb internes (1 ou 2), grille horaires Lun-Sam
+- Radio buttons stylisés pour nb internes
+- Checkboxes matin/après-midi
+- Samedi après-midi désactivé
+- Validation : nom + au moins un horaire
+
+#### Section 4 : Gestion des Empêchements ✅
+- Liste avec compteur dynamique
+- Modal complet : dropdown interne, date, période (3 options), raison
+- Radio buttons stylisés (Matin 8h-13h / Après-midi 13h-18h / Journée 8h-18h)
+- Validation : interne + date obligatoires
+
+#### Sauvegarde et Régénération ✅
+- **💾 Sauvegarder** :
+  - Validation complète (nom, date lundi, min 1 interne, min 1 practice)
+  - Appel `planningsStore.updatePlanning()`
+  - Recalcul `internsCount` et `practicesCount`
+  - Message confirmation avec résumé
+  - Redirection vers visualisation
+- **🔄 Régénérer** (si planning généré) :
+  - Confirmation utilisateur
+  - Sauvegarde + reset status en 'config'
+  - Message explicatif
+  - Redirection vers visualisation
+- ⚠️ Alert orange si planning déjà généré
+
+### 🎉 MODULE 2 COMPLÉTÉ À 100% !
+Le module de configuration est terminé et fonctionnel :
+- ✅ **F2.1 Wizard** : 4 étapes complètes avec navigation
+- ✅ **F2.2 Modification** : Page d'édition complète avec 4 sections
 - ✅ Progress bar dynamique
 - ✅ Validations à chaque étape
 - ✅ Modals pour toutes les sous-entités
 - ✅ Messages d'aide et d'erreur
 - ✅ Interface moderne et responsive
-- ✅ Résumé final avant création
+- ✅ Sauvegarde et régénération fonctionnelles
 
 ### 🔧 Intégration Dashboard (COMPLÉTÉE)
 - ✅ **Sauvegarde du planning dans le store** :
