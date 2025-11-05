@@ -438,10 +438,10 @@ const genererPlanning = () => {
     }
     
     message += '\n⏳ Prochaines phases (en développement) :\n'
-    message += '  1. Attribution practices à 1 interne\n'
-    message += '  2. Attribution des OFF (bonus, si slots restants)\n'
-    message += '  3. Détection des conflits\n'
-    message += '  4. Calcul du score d\'équilibre'
+    message += '  1. Attribution des OFF (bonus, si slots restants)\n'
+    message += '  2. Détection des conflits\n'
+    message += '  3. Calcul du score d\'équilibre\n'
+    message += '  4. Sauvegarde et affichage dans le tableau'
     
     // Afficher le modal avec les résultats
     generationResult.value = message

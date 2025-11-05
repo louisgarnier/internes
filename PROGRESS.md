@@ -1,6 +1,6 @@
 # 📊 Progression du Développement
 
-**Dernière mise à jour :** 5 novembre 2025 - 03h15
+**Dernière mise à jour :** 5 novembre 2025 - 05h30
 
 ---
 
@@ -221,7 +221,7 @@ Le module de configuration est terminé et fonctionnel :
 
 ## 🎯 PHASE 4 : MODULE 3 - GÉNÉRATION AUTOMATIQUE (EN COURS ⏳)
 
-### État : 🔄 En cours - PHASE 1 complète (22%)
+### État : 🔄 En cours - PHASE 1, 2, 4 complètes (44%)
 
 ### Réalisations :
 
@@ -260,32 +260,47 @@ Le module de configuration est terminé et fonctionnel :
 - Mise à jour stats globales (total + samedi)
 - **🎉 PHASE 1 COMPLÈTE : Toutes les 7 gardes attribuées par semaine**
 
-#### ✅ Alert améliorée
+#### ✅ m3-8 : PHASE 2 - Repos post-garde (COMPLÉTÉ)
+- Fonction `calculateReposPostGarde()` pour tous repos obligatoires
+- Garde Dimanche → Repos Lundi (matin + après-midi)
+- Garde Lun-Jeu soir → Repos lendemain (matin + après-midi)
+- Garde Vendredi soir → Repos Samedi (matin + après-midi)
+- Garde Samedi → Repos Dimanche (matin + après-midi)
+- Repos ajoutés à `week.repos[]` et marqués dans `week.days[X].matin/apresMidi.repos`
+- Comptabilisés dans `week.stats.reposCalcules`
+- Ajout propriétés `matin: {}` et `apresMidi: {}` dans structure jours
+- **🎉 PHASE 2 COMPLÈTE : Tous les repos post-garde calculés**
+
+#### ✅ m3-9 : PHASE 4a - Practices à 2 internes (COMPLÉTÉ)
+- Fonction `assignPractices2Internes()` pour practices nécessitant 2 internes
+- Fonction `assignSlotToPractice()` : attribution slot spécifique
+- Fonction `getAvailableInternsForSlot()` : filtre internes disponibles
+- Fonction `selectBestInternsForPractice()` : scoring équilibrage
+- Fonction `checkUnavailability()` améliorée : vérifie empêchements par période
+- Respect repos post-garde et empêchements
+- Scoring : équilibrage global + par practice + charge gardes
+- Mapping jours français → anglais pour format schedule
+- Support format schedule objet (monday.morning/afternoon)
+- Affectations créées avec détails complets et stats globales
+- **Priorité absolue : couvrir practices AVANT OFFs**
+
+#### ✅ m3-10 : PHASE 4b - Practices à 1 interne (COMPLÉTÉ)
+- Fonction `assignPractices1Interne()` pour practices nécessitant 1 interne
+- Réutilise toutes les fonctions existantes (scoring, disponibilité)
+- Même logique que m3-9 mais avec `nbRequired = 1`
+- **🎉 PHASE 4 COMPLÈTE : Toutes les practices attribuées**
+
+#### ✅ Modal résultats amélioré
+- Remplacement `alert()` par modal custom scrollable
 - Affichage complet des 7 gardes par semaine
-- Stats triées par nombre de gardes
+- Section repos post-garde calculés (par interne)
+- Section affectations practices (total + détail par practice)
+- Stats d'équilibre triées par nombre de gardes
 - Détail par type : (X sem, Y dim, Z sam)
+- Modal avec scroll (max 90vh), boutons fermer
 - Liste phases restantes mise à jour
 
 ### À faire :
-
-#### ⏳ m3-8 : PHASE 2 - Repos post-garde (NEXT)
-- Calculer repos obligatoires après chaque garde
-- Garde Lun-Jeu soir → Repos lendemain (matin + après-midi)
-- Garde Ven soir → Repos samedi (matin + après-midi)
-- Garde Sam → Repos dimanche (matin + après-midi)
-- Garde Dim → Repos lundi (matin + après-midi)
-- Marquer slots comme "repos" dans structure
-
-#### ⏳ m3-9 : PHASE 4a - Practices à 2 internes
-- Attribution practices nécessitant 2 internes
-- Priorité absolue : couvrir toutes les practices AVANT les OFFs
-- Scoring pour sélection internes disponibles
-- Respect empêchements et repos
-
-#### ⏳ m3-10 : PHASE 4b - Practices à 1 interne
-- Attribution practices nécessitant 1 interne
-- Même logique que practices à 2
-- Vérifier couverture complète
 
 #### ⏳ m3-11 : PHASE 3 - Demi-journée OFF
 - Attribuer 1 demi-journée OFF par interne (BONUS)
@@ -303,8 +318,13 @@ Le module de configuration est terminé et fonctionnel :
 - Tests
 
 ### Fichiers créés/modifiés :
-- `utils/generation.js` - Logique génération (PHASE 1a-1d complète)
-- `pages/planning/[id]/index.vue` - Interface génération + alert détaillée
+- `utils/generation.js` - Logique génération (PHASE 1, 2, 4 complètes)
+  - Gardes (7/7), Repos post-garde, Practices (2 internes + 1 interne)
+  - Système de scoring intelligent pour équilibrage
+  - Gestion empêchements et disponibilités
+- `pages/planning/[id]/index.vue` - Interface génération + modal résultats détaillé
+  - Modal scrollable avec affichage complet
+  - Sections : gardes, repos, affectations, stats
 - `types/planning.ts` - Interfaces Garde et Affectation
 - `utils/planning-helpers.ts` - Fonctions utilitaires dates
 

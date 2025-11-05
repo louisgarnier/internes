@@ -515,6 +515,79 @@ function assignPractices2Internes(week, practicesList, internsList, unavailabili
 }
 
 /**
+ * PHASE 4b : Attribuer practices nécessitant 1 interne
+ */
+function assignPractices1Interne(week, practicesList, internsList, unavailabilities, globalStats) {
+  console.log(`\n🏥 Phase 4b : Attribution practices à 1 interne - Semaine ${week.weekNumber}`)
+  
+  // Filtrer les practices nécessitant 1 interne
+  const practices1 = practicesList.filter(p => p.requiredInterns === 1)
+  
+  if (practices1.length === 0) {
+    console.log('  ℹ️ Aucune practice à 1 interne configurée')
+    return true
+  }
+  
+  console.log(`  📋 ${practices1.length} practice(s) à 1 interne trouvée(s)`)
+  
+  let affectationsCount = 0
+  
+  // Pour chaque practice
+  for (const practice of practices1) {
+    console.log(`\n  🔹 Practice: ${practice.name}`)
+    
+    // Pour chaque jour de la semaine (Lun-Sam)
+    for (let dayIndex = 0; dayIndex < 6; dayIndex++) {
+      const day = week.days[dayIndex]
+      const dayName = day.dayName
+      
+      // Vérifier si la practice est active ce jour
+      const schedule = practice.schedule || {}
+      
+      // Mapper le nom du jour français vers anglais
+      const dayMapping = {
+        'lundi': 'monday',
+        'mardi': 'tuesday',
+        'mercredi': 'wednesday',
+        'jeudi': 'thursday',
+        'vendredi': 'friday',
+        'samedi': 'saturday'
+      }
+      const dayKey = dayMapping[dayName]
+      
+      // Matin
+      const matinActive = schedule[dayKey]?.morning === true
+      if (matinActive) {
+        const success = assignSlotToPractice(week, day, 'matin', practice, 1, internsList, unavailabilities, globalStats)
+        if (success) affectationsCount += 1
+        else {
+          console.error(`  ❌ Impossible d'affecter 1 interne à ${practice.name} - ${dayName} matin`)
+          return false
+        }
+      }
+      
+      // Après-midi (sauf samedi)
+      if (dayIndex < 5) { // Lun-Ven seulement
+        const apresMidiActive = schedule[dayKey]?.afternoon === true
+        if (apresMidiActive) {
+          const success = assignSlotToPractice(week, day, 'apres_midi', practice, 1, internsList, unavailabilities, globalStats)
+          if (success) affectationsCount += 1
+          else {
+            console.error(`  ❌ Impossible d'affecter 1 interne à ${practice.name} - ${dayName} après-midi`)
+            return false
+          }
+        }
+      }
+    }
+  }
+  
+  console.log(`  ✅ ${affectationsCount} affectations créées pour practices à 1 interne`)
+  week.stats.affectationsCreees = (week.stats.affectationsCreees || 0) + affectationsCount
+  
+  return true
+}
+
+/**
  * Assigner un slot spécifique à une practice
  */
 function assignSlotToPractice(week, day, periode, practice, nbRequired, internsList, unavailabilities, globalStats) {
@@ -824,15 +897,29 @@ export function generatePlanning(planning, weekNumbers = null) {
   
   console.log('\n✅ Phase 4a terminée : Practices à 2 internes attribuées')
   
+  // PHASE 4b : Attribuer practices à 1 interne
+  for (const week of weeksStructure) {
+    const success = assignPractices1Interne(week, planning.practicesList, planning.internsList, planning.unavailabilities, globalStats)
+    if (!success) {
+      return {
+        success: false,
+        error: `Impossible d'attribuer toutes les practices à 1 interne pour la semaine ${week.weekNumber}`,
+        weeks: weeksStructure
+      }
+    }
+  }
+  
+  console.log('\n✅ Phase 4b terminée : Practices à 1 interne attribuées')
+  console.log('\n🎉 PHASE 4 COMPLÈTE : Toutes les practices attribuées !')
+  
   // TODO: Les phases suivantes seront implémentées dans les prochaines tâches
-  // - Phase 4b : Attribution practices à 1 interne
   // - Phase 3 : Attribution OFFs
   
   return {
     success: true,
     weeks: weeksStructure,
     globalStats,
-    message: `✅ Phase 1-2-4a complètes : Gardes + Repos + Practices (2 internes) pour ${weeksStructure.length} semaine(s)`
+    message: `✅ Phase 1-2-4 complètes : Gardes + Repos + Practices (toutes) pour ${weeksStructure.length} semaine(s)`
   }
 }
 
