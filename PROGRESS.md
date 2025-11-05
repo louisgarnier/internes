@@ -163,7 +163,13 @@ Le wizard de configuration est terminé et fonctionnel :
   - Badge "⏳ Config" jaune pour plannings non générés
   - Planning visible immédiatement après création
 
-### À venir - MODULE 3 :
+### À venir :
+- 📝 **F2.2 - Modification des paramètres** (v1.1) :
+  - Éditer un planning existant (nom, dates, internes, practices, empêchements)
+  - Interface similaire au wizard mais accessible depuis le dashboard
+  - Possibilité de régénérer après modification
+
+### À venir - MODULE 3 : GÉNÉRATION AUTOMATIQUE
 - ⏳ Algorithme de génération automatique (contraintes dures + souples)
 - ⏳ Vue hebdomadaire du planning généré
 - ⏳ Changement de statut 'config' → 'generated'

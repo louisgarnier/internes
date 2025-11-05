@@ -184,45 +184,14 @@ Pour chaque garde assignée :
 
 ---
 
-### PHASE 3 : Attribution Demi-Journées OFF 🏖️
-
-**Règle :** Chaque interne DOIT avoir 1 demi-journée OFF par semaine.
-
-**Priorité des slots OFF :**
-1. **Vendredi après-midi** (préféré)
-2. Vendredi matin
-3. Jeudi après-midi
-4. Mercredi après-midi
-5. ... autres jours
-
-**Algorithme :**
-```
-Pour chaque interne :
-  1. Parcourir les slots par ordre de priorité
-  2. Vérifier disponibilité :
-     - Pas de repos post-garde
-     - Pas de garde le soir même
-     - Pas d'empêchement
-  3. Assigner le premier slot disponible
-  4. Si aucun slot disponible → ALERTE (conflit)
-```
-
-**Cas particulier Garde Samedi :**
-```
-Si interne a garde samedi :
-  → Afficher le montant de la garde (€)
-  → Pas de compensation automatique en demi-journées OFF
-  → Équilibrage sur la durée totale du planning
-```
-
-**Affichage des Prix de Garde :**
-- Garde Semaine : XX € (à configurer)
-- Garde Samedi : XX € (montant plus élevé)
-- Garde Dimanche : XX € (montant le plus élevé)
-
----
-
 ### PHASE 4 : Attribution aux Practices 🏥
+
+**⚠️ IMPORTANT :** Cette phase se fait AVANT l'attribution des OFF.
+
+**Logique :** 
+- ✅ **Priorité absolue = Couvrir tous les postes de travail**
+- ✅ Les OFF sont un bonus attribué APRÈS si des slots sont disponibles
+- ✅ Si pas assez d'internes pour couvrir → Proposer d'ajouter des internes
 
 **Objectif :** Remplir tous les slots de travail avec les internes disponibles.
 
@@ -243,7 +212,6 @@ Si interne a garde samedi :
 ```
 1. Filtrer les internes DISPONIBLES
    - Pas en repos
-   - Pas en OFF
    - Pas d'empêchement
    - Pas déjà assigné à une autre practice ce slot
    - Practice active ce jour/période
@@ -272,6 +240,63 @@ score += random(-0.05, 0.05)
 
 // L'interne avec le score le PLUS ÉLEVÉ est choisi
 ```
+
+**Gestion des practices sous-staffées :**
+```
+SI practice manque d'internes (ex: 1/2 assigné)
+ALORS
+  - Enregistrer comme "alerte"
+  - Proposer à l'utilisateur d'ajouter des internes
+  - Ou ajuster le nombre requis pour cette practice
+FIN SI
+```
+
+---
+
+### PHASE 3 : Attribution Demi-Journées OFF 🏖️
+
+**⚠️ IMPORTANT :** Cette phase se fait APRÈS l'attribution aux practices.
+
+**Règle :** Chaque interne DEVRAIT avoir 1 demi-journée OFF par semaine (si possible).
+
+**Priorité des slots OFF :**
+1. **Vendredi après-midi** (préféré)
+2. Vendredi matin
+3. Jeudi après-midi
+4. Mercredi après-midi
+5. ... autres jours
+
+**Algorithme :**
+```
+Pour chaque interne :
+  1. Parcourir les slots par ordre de priorité
+  2. Vérifier disponibilité :
+     - Pas de repos post-garde
+     - Pas de garde le soir même
+     - Pas d'empêchement
+     - Pas déjà assigné à une practice (slots restants uniquement)
+  3. Assigner le premier slot disponible
+  4. Si aucun slot disponible → OK, interne travaille toute la semaine
+     (Les OFF sont un bonus, pas une obligation stricte si pas de slots)
+```
+
+**Note importante :**
+- Les OFF sont souhaitables mais pas obligatoires si aucun slot disponible
+- Priorité = Couverture des practices
+- Dans les statistiques, montrer le nombre de semaines sans OFF par interne
+
+**Cas particulier Garde Samedi :**
+```
+Si interne a garde samedi :
+  → Afficher le montant de la garde (€)
+  → Pas de compensation automatique en demi-journées OFF
+  → Équilibrage sur la durée totale du planning
+```
+
+**Affichage des Prix de Garde :**
+- Garde Semaine : XX € (à configurer)
+- Garde Samedi : XX € (montant plus élevé)
+- Garde Dimanche : XX € (montant le plus élevé)
 
 ---
 
