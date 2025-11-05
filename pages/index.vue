@@ -155,6 +155,7 @@
 </template>
 
 <script setup>
+import { navigateTo } from '#app'
 import { usePlanningsStore } from '~/stores/plannings'
 
 const store = usePlanningsStore()

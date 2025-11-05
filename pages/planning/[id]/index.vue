@@ -225,6 +225,7 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { usePlanningsStore } from '~/stores/plannings'
+import { generatePlanning } from '~/utils/generation'
 
 const route = useRoute()
 const planningsStore = usePlanningsStore()
@@ -290,27 +291,49 @@ const getStatusBadgeStyle = (status) => {
 
 // Action Générer
 const genererPlanning = () => {
-  let message = '🚀 Génération du planning\n\n'
+  console.log('🚀 Génération demandée')
   
-  if (optionGeneration.value === 'toutes') {
-    message += `📊 Mode : Génération COMPLÈTE\n`
-    message += `📅 Semaines à générer : 1 à ${planning.value.weeks}\n`
-  } else {
-    message += `📊 Mode : Génération PARTIELLE\n`
-    message += `📅 Semaine à générer : ${semaineSelectionnee.value}\n`
+  // Déterminer quelles semaines générer
+  const weekNumbers = optionGeneration.value === 'toutes' 
+    ? null // null = toutes les semaines
+    : [semaineSelectionnee.value] // Array avec une seule semaine
+  
+  try {
+    // Appeler la fonction de génération
+    const result = generatePlanning(planning.value, weekNumbers)
+    
+    console.log('✅ Génération terminée:', result)
+    
+    // Afficher le résultat
+    let message = '✅ ' + result.message + '\n\n'
+    message += `📊 Détails du planning :\n`
+    message += `- Planning : ${planning.value.name}\n`
+    message += `- Période : ${formatDate(planning.value.startDate)} → ${result.weeks.length} semaine(s)\n`
+    message += `- Internes : ${planning.value.internsList.length}\n`
+    message += `- Practices : ${planning.value.practicesList.length}\n`
+    message += `- Empêchements : ${planning.value.unavailabilities?.length || 0}\n`
+    message += `- Slots totaux : ${result.weeks.reduce((sum, w) => sum + w.stats.slotsTotal, 0)}\n\n`
+    
+    message += '📋 Structure créée pour :\n'
+    result.weeks.forEach(week => {
+      message += `  • Semaine ${week.weekNumber} (${formatDate(week.startDate)} - ${formatDate(week.endDate)})\n`
+      message += `    - ${week.stats.slotsTotal} slots de travail\n`
+      message += `    - 7 gardes à attribuer\n`
+    })
+    
+    message += '\n⏳ Prochaines phases (en développement) :\n'
+    message += '  1. Attribution des gardes (Dimanche, Lun-Ven, Samedi)\n'
+    message += '  2. Calcul des repos post-garde\n'
+    message += '  3. Attribution aux practices (priorité)\n'
+    message += '  4. Attribution des OFF (bonus)\n'
+    message += '  5. Détection des conflits\n'
+    message += '  6. Calcul du score d\'équilibre'
+    
+    alert(message)
+  } catch (error) {
+    console.error('❌ Erreur lors de la génération:', error)
+    alert('❌ Erreur lors de la génération du planning.\n\nDétails : ' + error.message)
   }
-  
-  message += '\n⏳ Prochaines étapes :\n'
-  message += '1. Attribution des gardes (Dimanche, Lun-Ven, Samedi)\n'
-  message += '2. Calcul des repos post-garde\n'
-  message += '3. Attribution aux practices (priorité)\n'
-  message += '4. Attribution des OFF (bonus)\n'
-  message += '5. Détection des conflits\n'
-  message += '6. Calcul du score d\'équilibre'
-  
-  alert(message)
-  
-  // TODO: Implémenter la génération réelle (tâches m3-4 à m3-17)
 }
 
 const handleGenerateHover = (e) => {
