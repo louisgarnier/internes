@@ -1,6 +1,6 @@
 # 📊 Progression du Développement
 
-**Dernière mise à jour :** 5 novembre 2025 - 05h30
+**Dernière mise à jour :** 5 novembre 2025 - 06h00
 
 ---
 
@@ -221,7 +221,7 @@ Le module de configuration est terminé et fonctionnel :
 
 ## 🎯 PHASE 4 : MODULE 3 - GÉNÉRATION AUTOMATIQUE (EN COURS ⏳)
 
-### État : 🔄 En cours - PHASE 1, 2, 4 complètes (44%)
+### État : 🔄 En cours - PHASE 1, 2, 3, 4 complètes (55%)
 
 ### Réalisations :
 
@@ -290,41 +290,73 @@ Le module de configuration est terminé et fonctionnel :
 - Même logique que m3-9 mais avec `nbRequired = 1`
 - **🎉 PHASE 4 COMPLÈTE : Toutes les practices attribuées**
 
+#### ✅ m3-11 : PHASE 3 - Demi-journée OFF (COMPLÉTÉ)
+- Fonction `assignOFFs()` : attribuer 1 OFF par interne (bonus)
+- Fonction `isSlotAvailableForOFF()` : vérifier disponibilité slot
+  - Pas de repos, pas d'affectation practice, pas de garde le même jour
+- Pour chaque interne, chercher slots disponibles (Lun-Ven, matin ou AM)
+- Sélection aléatoire parmi slots disponibles
+- Si aucun slot disponible → warning mais pas d'erreur (BONUS)
+- OFF marqué dans `week.offs[]` et `day.matin/apresMidi.off`
+- **🎉 PHASE 3 COMPLÈTE : OFFs attribués (bonus)**
+
 #### ✅ Modal résultats amélioré
 - Remplacement `alert()` par modal custom scrollable
 - Affichage complet des 7 gardes par semaine
 - Section repos post-garde calculés (par interne)
 - Section affectations practices (total + détail par practice)
+- Section OFFs attribués (nouvelle !)
 - Stats d'équilibre triées par nombre de gardes
 - Détail par type : (X sem, Y dim, Z sam)
 - Modal avec scroll (max 90vh), boutons fermer
-- Liste phases restantes mise à jour
+- Message succès : "Génération complète : Gardes + Repos + Practices + OFFs"
+
+### 🎉 GÉNÉRATION COMPLÈTE !
+
+**Les 4 phases principales sont terminées :**
+- ✅ PHASE 1 : Attribution des 7 gardes par semaine
+- ✅ PHASE 2 : Calcul des repos post-garde obligatoires
+- ✅ PHASE 4 : Attribution de toutes les practices (1 et 2 internes)
+- ✅ PHASE 3 : Attribution des OFFs (1 demi-journée par interne)
+
+**Total : ~50-60 affectations par semaine générées automatiquement !**
 
 ### À faire :
 
-#### ⏳ m3-11 : PHASE 3 - Demi-journée OFF
-- Attribuer 1 demi-journée OFF par interne (BONUS)
-- Uniquement si tous les slots practices sont couverts
-- Équilibrer entre internes
-- Note : Si pas assez d'internes pour practices, proposer d'en ajouter
-
-#### ⏳ m3-12 à m3-18 : Finalisation
-- Détection conflits
+#### ⏳ m3-12 à m3-14 : Améliorations (optionnel)
+- Détection conflits avancée
 - Option ajout internes si sous-staffé
-- Calcul score d'équilibre (0-100)
-- Sauvegarde dans store
-- Changement statut → 'generated'
-- Affichage basique planning généré
-- Tests
+- Calcul score d'équilibre (0-100) avec détails
+
+#### ⏳ m3-15 : Sauvegarder dans le store (NEXT - PRIORITÉ)
+- Sauvegarder toutes les données générées dans le planning
+- Structure : gardes, repos, affectations, offs
+- Persister dans le store Pinia
+
+#### ⏳ m3-16 : Changer statut planning (NEXT - PRIORITÉ)
+- Changer status de 'config' → 'generated'
+- Mettre à jour lastModified
+
+#### ⏳ m3-17 : Affichage basique planning (NEXT - PRIORITÉ)
+- Remplir le tableau hebdomadaire avec les données générées
+- Afficher gardes, practices, repos, OFFs
+- Navigation entre semaines fonctionnelle
+
+#### ⏳ m3-18 : Tests
+- Test avec 0 empêchement
+- Test avec empêchements
+- Test avec conflits
+- Test avec différents nombres d'internes/practices
 
 ### Fichiers créés/modifiés :
-- `utils/generation.js` - Logique génération (PHASE 1, 2, 4 complètes)
-  - Gardes (7/7), Repos post-garde, Practices (2 internes + 1 interne)
+- `utils/generation.js` - Logique génération (PHASE 1, 2, 3, 4 complètes)
+  - Gardes (7/7), Repos post-garde, Practices (2 + 1 internes), OFFs
   - Système de scoring intelligent pour équilibrage
   - Gestion empêchements et disponibilités
+  - ~50-60 affectations par semaine générées automatiquement
 - `pages/planning/[id]/index.vue` - Interface génération + modal résultats détaillé
   - Modal scrollable avec affichage complet
-  - Sections : gardes, repos, affectations, stats
+  - Sections : gardes, repos, affectations practices, OFFs, stats
 - `types/planning.ts` - Interfaces Garde et Affectation
 - `utils/planning-helpers.ts` - Fonctions utilitaires dates
 
