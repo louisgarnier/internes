@@ -57,15 +57,56 @@
       <!-- Planning trouvé -->
       <div v-else>
         
-        <!-- Bouton Générer -->
+        <!-- Interface Génération -->
         <div style="background: white; border-radius: 12px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
           <h2 style="font-size: 20px; font-weight: 600; color: #333; margin: 0 0 15px 0;">
             🚀 Génération du Planning
           </h2>
-          <p style="font-size: 14px; color: #666; margin: 0 0 20px 0;">
-            Génère automatiquement les gardes, repos, et assignations aux practices pour toutes les semaines.
+          <p style="font-size: 14px; color: #666; margin: 0 0 25px 0;">
+            Génère automatiquement les gardes, repos, et assignations aux practices.
           </p>
           
+          <!-- Options de génération -->
+          <div style="background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 10px; padding: 20px; margin-bottom: 25px;">
+            <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px; cursor: pointer;">
+              <input 
+                type="radio" 
+                v-model="optionGeneration" 
+                value="toutes"
+                style="width: 20px; height: 20px; cursor: pointer;"
+              />
+              <span style="font-size: 15px; color: #333; font-weight: 500;">
+                Générer toutes les semaines (1 à {{ planning.weeks }})
+              </span>
+            </label>
+            
+            <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+              <input 
+                type="radio" 
+                v-model="optionGeneration" 
+                value="specifique"
+                style="width: 20px; height: 20px; cursor: pointer;"
+              />
+              <span style="font-size: 15px; color: #333; font-weight: 500;">
+                Générer une semaine spécifique :
+              </span>
+            </label>
+            
+            <div v-if="optionGeneration === 'specifique'" style="margin-left: 32px; margin-top: 10px;">
+              <select 
+                v-model="semaineSelectionnee"
+                style="padding: 8px 12px; font-size: 14px; border: 2px solid #e5e7eb; border-radius: 6px; outline: none; cursor: pointer; background: white;"
+                @focus="$event.target.style.borderColor = '#667eea'"
+                @blur="$event.target.style.borderColor = '#e5e7eb'"
+              >
+                <option v-for="semaine in semaines" :key="semaine.numero" :value="semaine.numero">
+                  Semaine {{ semaine.numero }} ({{ formatDate(semaine.dateDebut) }} - {{ formatDate(semaine.dateFin) }})
+                </option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Bouton Générer -->
           <button 
             @click="genererPlanning"
             :disabled="planning.status === 'generated'"
@@ -84,7 +125,7 @@
             @mouseover="handleGenerateHover"
             @mouseout="handleGenerateLeave"
           >
-            {{ planning.status === 'generated' ? '✅ Planning déjà généré' : '🚀 Générer le Planning Complet' }}
+            {{ planning.status === 'generated' ? '✅ Planning déjà généré' : '🚀 Générer' }}
           </button>
         </div>
 
@@ -194,6 +235,10 @@ const planning = computed(() => {
   return planningsStore.plannings.find(p => p.id === planningId)
 })
 
+// Options de génération
+const optionGeneration = ref('toutes')
+const semaineSelectionnee = ref(1)
+
 // Générer les semaines
 const semaines = computed(() => {
   if (!planning.value) return []
@@ -243,9 +288,29 @@ const getStatusBadgeStyle = (status) => {
   return styles[status] || styles.config
 }
 
-// Action Générer (placeholder pour l'instant)
+// Action Générer
 const genererPlanning = () => {
-  alert('🚀 Génération du planning\n\nCette fonctionnalité sera implémentée étape par étape.\n\nProchaines étapes :\n- Attribution des gardes\n- Calcul des repos\n- Attribution aux practices\n- Attribution des OFF')
+  let message = '🚀 Génération du planning\n\n'
+  
+  if (optionGeneration.value === 'toutes') {
+    message += `📊 Mode : Génération COMPLÈTE\n`
+    message += `📅 Semaines à générer : 1 à ${planning.value.weeks}\n`
+  } else {
+    message += `📊 Mode : Génération PARTIELLE\n`
+    message += `📅 Semaine à générer : ${semaineSelectionnee.value}\n`
+  }
+  
+  message += '\n⏳ Prochaines étapes :\n'
+  message += '1. Attribution des gardes (Dimanche, Lun-Ven, Samedi)\n'
+  message += '2. Calcul des repos post-garde\n'
+  message += '3. Attribution aux practices (priorité)\n'
+  message += '4. Attribution des OFF (bonus)\n'
+  message += '5. Détection des conflits\n'
+  message += '6. Calcul du score d\'équilibre'
+  
+  alert(message)
+  
+  // TODO: Implémenter la génération réelle (tâches m3-4 à m3-17)
 }
 
 const handleGenerateHover = (e) => {

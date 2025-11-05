@@ -101,10 +101,10 @@
           </div>
           
           <!-- Boutons d'action -->
-          <div style="display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e5e7eb;">
             <button 
               @click="viewPlanning(planning.id)"
-              style="flex: 1; background: #3b82f6; color: white; font-size: 14px; font-weight: 500; padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+              style="background: #3b82f6; color: white; font-size: 14px; font-weight: 500; padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
               @mouseover="$event.target.style.background = '#2563eb'"
               @mouseout="$event.target.style.background = '#3b82f6'"
             >
@@ -112,8 +112,17 @@
             </button>
             
             <button 
+              @click="editPlanning(planning.id)"
+              style="background: #f97316; color: white; font-size: 14px; font-weight: 500; padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+              @mouseover="$event.target.style.background = '#ea580c'"
+              @mouseout="$event.target.style.background = '#f97316'"
+            >
+              ✏️ Modifier
+            </button>
+            
+            <button 
               @click="duplicatePlanning(planning.id)"
-              style="flex: 1; background: #10b981; color: white; font-size: 14px; font-weight: 500; padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+              style="background: #10b981; color: white; font-size: 14px; font-weight: 500; padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
               @mouseover="$event.target.style.background = '#059669'"
               @mouseout="$event.target.style.background = '#10b981'"
             >
@@ -122,7 +131,7 @@
             
             <button 
               @click="deletePlanning(planning.id)"
-              style="flex: 1; background: #ef4444; color: white; font-size: 14px; font-weight: 500; padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
+              style="background: #ef4444; color: white; font-size: 14px; font-weight: 500; padding: 10px 16px; border: none; border-radius: 8px; cursor: pointer; transition: all 0.2s;"
               @mouseover="$event.target.style.background = '#dc2626'"
               @mouseout="$event.target.style.background = '#ef4444'"
             >
@@ -187,6 +196,10 @@ const createNewPlanning = () => {
 
 const viewPlanning = (id) => {
   navigateTo(`/planning/${id}`)
+}
+
+const editPlanning = (id) => {
+  navigateTo(`/planning/${id}/edit`)
 }
 
 const duplicatePlanning = (id) => {
