@@ -442,11 +442,26 @@ const genererPlanning = () => {
       })
     }
     
-    message += '\n⏳ Prochaines phases (en développement) :\n'
-    message += '  1. Détection des conflits\n'
-    message += '  2. Calcul du score d\'équilibre (0-100)\n'
-    message += '  3. Sauvegarde dans le store\n'
-    message += '  4. Affichage dans le tableau'
+    message += '\n✅ Planning sauvegardé avec succès !\n'
+    message += 'Statut : 📊 Généré\n\n'
+    message += '⏳ Fonctionnalités avancées (v1.1+) :\n'
+    message += '  • Détection des conflits\n'
+    message += '  • Calcul du score d\'équilibre (0-100)\n'
+    message += '  • 2 vues de visualisation (Par Interne / Par Jour)'
+    
+    // ✅ PHASE FINALE : Sauvegarder les données générées dans le store (m3-15 + m3-16)
+    console.log('💾 Sauvegarde des données générées dans le store...')
+    
+    planningsStore.updatePlanning(planning.value.id, {
+      generatedData: {
+        weeks: result.weeks,
+        globalStats: result.globalStats
+      },
+      status: 'generated',
+      lastModified: new Date()
+    })
+    
+    console.log('✅ Planning sauvegardé avec statut "generated"')
     
     // Afficher le modal avec les résultats
     generationResult.value = message

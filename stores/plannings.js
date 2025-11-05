@@ -139,7 +139,8 @@ export const usePlanningsStore = defineStore('plannings', {
     updatePlanning(id, updates) {
       const planning = this.plannings.find(p => p.id === id)
       if (planning) {
-        Object.assign(planning, updates, { lastModified: new Date() })
+        Object.assign(planning, updates, { lastModified: updates.lastModified || new Date() })
+        console.log('✅ Planning mis à jour dans le store:', planning.id, 'Status:', planning.status)
       }
     }
   }
