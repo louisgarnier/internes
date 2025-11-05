@@ -387,25 +387,175 @@
       </div>
     </div>
 
-    <!-- Modal Ajouter Practice (simplifié pour l'instant) -->
+    <!-- Modal Ajouter Practice -->
     <div v-if="showPracticeModal" 
       style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000;"
       @click.self="closePracticeModal">
-      <div style="background: white; border-radius: 12px; padding: 30px; max-width: 500px; width: 90%;">
+      <div style="background: white; border-radius: 12px; padding: 30px; max-width: 600px; width: 90%; max-height: 85vh; overflow-y: auto;">
         <h3 style="margin: 0 0 20px 0; font-size: 20px; font-weight: 600; color: #1e293b;">
           ➕ Ajouter une practice
         </h3>
         
-        <p style="color: #64748b; font-size: 14px; margin-bottom: 20px;">
-          Formulaire complet à implémenter (tâche f2-2-5)
-        </p>
+        <!-- Nom de la practice -->
+        <div style="margin-bottom: 20px;">
+          <label style="display: block; font-weight: 600; color: #334155; margin-bottom: 8px; font-size: 14px;">
+            Nom de la practice *
+          </label>
+          <input 
+            v-model="practiceForm.name"
+            type="text"
+            placeholder="Ex: Cardiologie"
+            style="width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px;"
+          >
+        </div>
 
-        <button 
-          @click="closePracticeModal"
-          style="width: 100%; background: #64748b; color: white; font-size: 15px; font-weight: 500; padding: 12px; border: none; border-radius: 8px; cursor: pointer;"
-        >
-          ✕ Fermer
-        </button>
+        <!-- Nombre d'internes requis -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; font-weight: 600; color: #334155; margin-bottom: 12px; font-size: 14px;">
+            Nombre d'internes requis *
+          </label>
+          <div style="display: flex; gap: 15px;">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 12px 20px; border: 2px solid #e2e8f0; border-radius: 8px; flex: 1; transition: all 0.2s;"
+              :style="{ background: practiceForm.requiredInterns === 1 ? '#eff6ff' : 'white', borderColor: practiceForm.requiredInterns === 1 ? '#3b82f6' : '#e2e8f0' }">
+              <input 
+                type="radio" 
+                v-model="practiceForm.requiredInterns" 
+                :value="1"
+                style="width: 18px; height: 18px; cursor: pointer;"
+              />
+              <span style="font-weight: 500; color: #334155;">1 interne</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 12px 20px; border: 2px solid #e2e8f0; border-radius: 8px; flex: 1; transition: all 0.2s;"
+              :style="{ background: practiceForm.requiredInterns === 2 ? '#eff6ff' : 'white', borderColor: practiceForm.requiredInterns === 2 ? '#3b82f6' : '#e2e8f0' }">
+              <input 
+                type="radio" 
+                v-model="practiceForm.requiredInterns" 
+                :value="2"
+                style="width: 18px; height: 18px; cursor: pointer;"
+              />
+              <span style="font-weight: 500; color: #334155;">2 internes</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Horaires -->
+        <div style="margin-bottom: 25px;">
+          <label style="display: block; font-weight: 600; color: #334155; margin-bottom: 12px; font-size: 14px;">
+            Jours et périodes *
+          </label>
+          
+          <div style="background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 10px; padding: 15px;">
+            <!-- Lundi -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">
+              <span style="font-weight: 500; color: #334155; min-width: 100px;">Lundi</span>
+              <div style="display: flex; gap: 20px;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" v-model="practiceForm.schedule.monday.morning" style="width: 18px; height: 18px; cursor: pointer;" />
+                  <span style="color: #64748b; font-size: 14px;">Matin</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" v-model="practiceForm.schedule.monday.afternoon" style="width: 18px; height: 18px; cursor: pointer;" />
+                  <span style="color: #64748b; font-size: 14px;">Après-midi</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Mardi -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">
+              <span style="font-weight: 500; color: #334155; min-width: 100px;">Mardi</span>
+              <div style="display: flex; gap: 20px;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" v-model="practiceForm.schedule.tuesday.morning" style="width: 18px; height: 18px; cursor: pointer;" />
+                  <span style="color: #64748b; font-size: 14px;">Matin</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" v-model="practiceForm.schedule.tuesday.afternoon" style="width: 18px; height: 18px; cursor: pointer;" />
+                  <span style="color: #64748b; font-size: 14px;">Après-midi</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Mercredi -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">
+              <span style="font-weight: 500; color: #334155; min-width: 100px;">Mercredi</span>
+              <div style="display: flex; gap: 20px;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" v-model="practiceForm.schedule.wednesday.morning" style="width: 18px; height: 18px; cursor: pointer;" />
+                  <span style="color: #64748b; font-size: 14px;">Matin</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" v-model="practiceForm.schedule.wednesday.afternoon" style="width: 18px; height: 18px; cursor: pointer;" />
+                  <span style="color: #64748b; font-size: 14px;">Après-midi</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Jeudi -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">
+              <span style="font-weight: 500; color: #334155; min-width: 100px;">Jeudi</span>
+              <div style="display: flex; gap: 20px;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" v-model="practiceForm.schedule.thursday.morning" style="width: 18px; height: 18px; cursor: pointer;" />
+                  <span style="color: #64748b; font-size: 14px;">Matin</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" v-model="practiceForm.schedule.thursday.afternoon" style="width: 18px; height: 18px; cursor: pointer;" />
+                  <span style="color: #64748b; font-size: 14px;">Après-midi</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Vendredi -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #e2e8f0;">
+              <span style="font-weight: 500; color: #334155; min-width: 100px;">Vendredi</span>
+              <div style="display: flex; gap: 20px;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" v-model="practiceForm.schedule.friday.morning" style="width: 18px; height: 18px; cursor: pointer;" />
+                  <span style="color: #64748b; font-size: 14px;">Matin</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" v-model="practiceForm.schedule.friday.afternoon" style="width: 18px; height: 18px; cursor: pointer;" />
+                  <span style="color: #64748b; font-size: 14px;">Après-midi</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Samedi -->
+            <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0;">
+              <span style="font-weight: 500; color: #334155; min-width: 100px;">Samedi</span>
+              <div style="display: flex; gap: 20px;">
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                  <input type="checkbox" v-model="practiceForm.schedule.saturday.morning" style="width: 18px; height: 18px; cursor: pointer;" />
+                  <span style="color: #64748b; font-size: 14px;">Matin</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; opacity: 0.4;">
+                  <input type="checkbox" disabled style="width: 18px; height: 18px;" />
+                  <span style="color: #94a3b8; font-size: 14px;">Après-midi</span>
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <p style="margin: 8px 0 0 0; color: #64748b; font-size: 13px; font-style: italic;">
+            Note : Le samedi après-midi n'est pas disponible
+          </p>
+        </div>
+
+        <!-- Boutons -->
+        <div style="display: flex; gap: 10px; margin-top: 30px;">
+          <button 
+            @click="savePractice"
+            style="flex: 1; background: #10b981; color: white; font-size: 15px; font-weight: 500; padding: 12px; border: none; border-radius: 8px; cursor: pointer;"
+          >
+            ✓ Ajouter
+          </button>
+          <button 
+            @click="closePracticeModal"
+            style="flex: 1; background: #64748b; color: white; font-size: 15px; font-weight: 500; padding: 12px; border: none; border-radius: 8px; cursor: pointer;"
+          >
+            ✕ Annuler
+          </button>
+        </div>
       </div>
     </div>
 
@@ -473,6 +623,19 @@ const showUnavailabilityModal = ref(false)
 
 // Formulaires modales
 const internForm = ref({ firstName: '', lastName: '', email: '', phone: '' })
+
+const practiceForm = ref({
+  name: '',
+  requiredInterns: 1,
+  schedule: {
+    monday: { morning: false, afternoon: false },
+    tuesday: { morning: false, afternoon: false },
+    wednesday: { morning: false, afternoon: false },
+    thursday: { morning: false, afternoon: false },
+    friday: { morning: false, afternoon: false },
+    saturday: { morning: false, afternoon: false }
+  }
+})
 
 // Charger les données du planning au montage
 onMounted(() => {
@@ -543,11 +706,46 @@ const deleteIntern = (id) => {
 
 // Practices
 const openAddPracticeModal = () => {
+  practiceForm.value = {
+    name: '',
+    requiredInterns: 1,
+    schedule: {
+      monday: { morning: false, afternoon: false },
+      tuesday: { morning: false, afternoon: false },
+      wednesday: { morning: false, afternoon: false },
+      thursday: { morning: false, afternoon: false },
+      friday: { morning: false, afternoon: false },
+      saturday: { morning: false, afternoon: false }
+    }
+  }
   showPracticeModal.value = true
 }
 
 const closePracticeModal = () => {
   showPracticeModal.value = false
+}
+
+const savePractice = () => {
+  if (!practiceForm.value.name) {
+    alert('Veuillez donner un nom à la practice')
+    return
+  }
+
+  // Vérifier qu'au moins un slot est sélectionné
+  const hasSchedule = Object.values(practiceForm.value.schedule).some(day => day.morning || day.afternoon)
+  if (!hasSchedule) {
+    alert('Veuillez sélectionner au moins un horaire')
+    return
+  }
+
+  formData.value.practicesList.push({
+    id: Date.now().toString(),
+    name: practiceForm.value.name,
+    requiredInterns: practiceForm.value.requiredInterns,
+    schedule: JSON.parse(JSON.stringify(practiceForm.value.schedule))
+  })
+
+  closePracticeModal()
 }
 
 const deletePractice = (id) => {
