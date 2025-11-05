@@ -32,7 +32,7 @@ export const usePlanningsStore = defineStore('plannings', {
               wednesday: { morning: true, afternoon: true },
               thursday: { morning: true, afternoon: true },
               friday: { morning: true, afternoon: true },
-              saturday: { morning: true, afternoon: false }
+              saturday: { morning: false, afternoon: false }
             }
           },
           { 
@@ -94,13 +94,13 @@ export const usePlanningsStore = defineStore('plannings', {
             name: 'Médecine Générale', 
             requiredInterns: 2,
             schedule: {
-              // Tous les jours (Lun-Sam)
+              // Lun-Ven uniquement (Samedi matin = Astreinte automatique)
               monday: { morning: true, afternoon: true },
               tuesday: { morning: true, afternoon: true },
               wednesday: { morning: true, afternoon: true },
               thursday: { morning: true, afternoon: true },
               friday: { morning: true, afternoon: true },
-              saturday: { morning: true, afternoon: false }
+              saturday: { morning: false, afternoon: false }
             }
           },
           { 
@@ -150,13 +150,13 @@ export const usePlanningsStore = defineStore('plannings', {
             name: 'Laboratoire', 
             requiredInterns: 1,
             schedule: {
-              // Mar, Jeu, Sam matin uniquement
+              // Mar, Jeu uniquement (Samedi matin = Astreinte automatique)
               monday: { morning: false, afternoon: false },
               tuesday: { morning: true, afternoon: false },
               wednesday: { morning: false, afternoon: false },
               thursday: { morning: true, afternoon: false },
               friday: { morning: false, afternoon: false },
-              saturday: { morning: true, afternoon: false }
+              saturday: { morning: false, afternoon: false }
             }
           },
           { 
@@ -164,13 +164,13 @@ export const usePlanningsStore = defineStore('plannings', {
             name: 'Urgences', 
             requiredInterns: 2,
             schedule: {
-              // Tous les jours sauf mercredi
+              // Lun-Ven sauf mercredi (Samedi matin = Astreinte automatique)
               monday: { morning: true, afternoon: true },
               tuesday: { morning: true, afternoon: true },
               wednesday: { morning: false, afternoon: false },
               thursday: { morning: true, afternoon: true },
               friday: { morning: true, afternoon: true },
-              saturday: { morning: true, afternoon: false }
+              saturday: { morning: false, afternoon: false }
             }
           },
           { 

@@ -293,6 +293,81 @@ function assignGardeSamedi(week, interns, unavailabilities, globalStats) {
 }
 
 /**
+ * PHASE 1e : Attribuer l'Astreinte Samedi Matin
+ * 
+ * Astreinte samedi : 8h → 13h (5 heures)
+ * 1 seul interne obligatoire
+ * NE PEUT PAS être l'interne de garde samedi (qui commence à 13h)
+ */
+function assignAstreinteSamedi(week, interns, unavailabilities, globalStats) {
+  console.log(`\n🚨 Phase 1e : Attribution Astreinte Samedi ${week.weekNumber}`)
+  
+  const samediDate = week.days[5].date // Index 5 = Samedi
+  
+  console.log(`  📅 Attribution astreinte Samedi matin (${samediDate} 8h-13h)`)
+  
+  // Filtrer les candidats disponibles
+  const candidates = []
+  
+  for (const intern of interns) {
+    // Vérifier la disponibilité (empêchements)
+    const isUnavailable = checkUnavailability(intern.id, samediDate, unavailabilities, 'matin')
+    if (isUnavailable) {
+      console.log(`  ⏭️ ${intern.firstName} ${intern.lastName} : indisponible`)
+      continue
+    }
+    
+    // ✅ AS2 : L'interne de garde samedi NE PEUT PAS être titulaire astreinte
+    if (week.gardes.samedi && week.gardes.samedi.interneId === intern.id) {
+      console.log(`  ⛔ ${intern.firstName} ${intern.lastName} : a la garde Samedi 13h → Impossible astreinte 8h-13h`)
+      continue
+    }
+    
+    // Calculer le score (équilibrage entre internes)
+    const score = calculateInterneScore(intern, 'astreinte', globalStats, week)
+    
+    candidates.push({
+      intern,
+      score
+    })
+  }
+  
+  if (candidates.length === 0) {
+    console.error(`❌ Impossible de trouver un interne pour l'astreinte Samedi`)
+    return false
+  }
+  
+  // Trier par score décroissant (meilleur score en premier)
+  candidates.sort((a, b) => b.score - a.score)
+  
+  console.log(`  📊 ${candidates.length} candidats disponibles`)
+  candidates.slice(0, 3).forEach((c, i) => {
+    console.log(`    ${i + 1}. ${c.intern.firstName} ${c.intern.lastName} (score: ${c.score.toFixed(2)})`)
+  })
+  
+  const selectedIntern = candidates[0].intern
+  
+  // Créer l'objet astreinte
+  const astreinte = {
+    id: `astreinte-sam-${week.weekNumber}`,
+    interneId: selectedIntern.id,
+    interneName: `${selectedIntern.firstName} ${selectedIntern.lastName}`,
+    date: samediDate,
+    type: 'astreinte',
+    jour: 'samedi',
+    horaire: 'Samedi 8h → 13h',
+    weekNumber: week.weekNumber
+  }
+  
+  // Assigner l'astreinte
+  week.gardes.astreinteSamedi = astreinte
+  
+  console.log(`  ✅ Astreinte Samedi attribuée à ${astreinte.interneName}`)
+  
+  return true
+}
+
+/**
  * PHASE 2 : Calculer les repos post-garde obligatoires
  * 
  * Règles :
@@ -1127,7 +1202,21 @@ export function generatePlanning(planning, weekNumbers = null) {
   }
   
   console.log('\n✅ Phase 1d terminée : Gardes Samedi attribuées')
-  console.log('\n🎉 PHASE 1 COMPLÈTE : Toutes les 7 gardes attribuées par semaine !')
+  
+  // PHASE 1e : Attribuer l'astreinte samedi matin (8h-13h)
+  for (const week of weeksStructure) {
+    const success = assignAstreinteSamedi(week, planning.internsList, planning.unavailabilities, globalStats)
+    if (!success) {
+      return {
+        success: false,
+        error: `Impossible d'attribuer l'astreinte Samedi pour la semaine ${week.weekNumber}`,
+        weeks: weeksStructure
+      }
+    }
+  }
+  
+  console.log('\n✅ Phase 1e terminée : Astreintes Samedi attribuées')
+  console.log('\n🎉 PHASE 1 COMPLÈTE : Toutes les 7 gardes + astreintes attribuées par semaine !')
   
   // PHASE 2 : Calculer les repos post-garde obligatoires
   for (const week of weeksStructure) {

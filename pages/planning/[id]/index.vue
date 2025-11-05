@@ -320,18 +320,23 @@
                   <td style="padding: 12px; font-weight: 600; background: #fef3c7; border-right: 1px solid #e5e7eb;">
                     🌅 MATIN
                   </td>
-                  <!-- m4-3.3 + m4-6 : Afficher practices matin (Samedi = Astreinte) -->
+                  <!-- m4-3.3 + m4-6 : Afficher practices matin (Samedi = Astreinte automatique) -->
                   <td v-for="dayIndex in [0,1,2,3,4,5]" :key="'matin-' + dayIndex" style="padding: 12px; border-right: 1px solid #e5e7eb; min-height: 80px; vertical-align: top;">
-                    <div v-for="practice in getPracticesByDayPeriod(semaine.numero - 1, dayIndex, 'matin')" :key="practice.name" style="margin-bottom: 8px;">
-                      <!-- m4-6.2 : Samedi matin = Astreinte (au lieu du nom de practice) -->
-                      <div style="font-weight: 600; color: #2563eb; font-size: 13px;">
-                        {{ dayIndex === 5 ? 'Astreinte:' : practice.name + ':' }}
-                      </div>
+                    <!-- Samedi = Astreinte (détectée depuis week.gardes.astreinteSamedi) -->
+                    <div v-if="dayIndex === 5 && planning.generatedData?.weeks[semaine.numero - 1]?.gardes?.astreinteSamedi">
+                      <div style="font-weight: 600; color: #f59e0b; font-size: 13px;">🚨 Astreinte:</div>
+                      <ul style="margin: 4px 0 0 0; padding-left: 20px; list-style: disc; font-size: 12px; color: #374151;">
+                        <li>{{ planning.generatedData.weeks[semaine.numero - 1].gardes.astreinteSamedi.interneName }}</li>
+                      </ul>
+                    </div>
+                    <!-- Lun-Ven = Practices normales -->
+                    <div v-else v-for="practice in getPracticesByDayPeriod(semaine.numero - 1, dayIndex, 'matin')" :key="practice.name" style="margin-bottom: 8px;">
+                      <div style="font-weight: 600; color: #2563eb; font-size: 13px;">{{ practice.name }}:</div>
                       <ul style="margin: 4px 0 0 0; padding-left: 20px; list-style: disc; font-size: 12px; color: #374151;">
                         <li v-for="intern in practice.interns" :key="intern">{{ intern }}</li>
                       </ul>
                     </div>
-                    <span v-if="getPracticesByDayPeriod(semaine.numero - 1, dayIndex, 'matin').length === 0" style="color: #9ca3af; font-size: 12px;">-</span>
+                    <span v-if="dayIndex !== 5 && getPracticesByDayPeriod(semaine.numero - 1, dayIndex, 'matin').length === 0" style="color: #9ca3af; font-size: 12px;">-</span>
                   </td>
                   <td style="padding: 12px; min-height: 80px; vertical-align: top;">
                     -
@@ -577,6 +582,12 @@ const getJourContent = (interneId, dayKey, weekIndex) => {
     }
   })
   
+  // 1️⃣bis : Vérifier ASTREINTE SAMEDI (depuis week.gardes.astreinteSamedi)
+  if (week.gardes?.astreinteSamedi?.interneId === interneId && dayKey === 'samedi') {
+    content.push('🚨 Astreinte (M)')
+    if (!bgColor) bgColor = '#f59e0b' // Orange pour astreinte
+  }
+  
   // 2️⃣ Vérifier REPOS (depuis day.matin.repos et day.apresMidi.repos)
   const reposMatin = day.matin?.repos?.interneId === interneId
   const reposApresMidi = day.apresMidi?.repos?.interneId === interneId
@@ -810,6 +821,11 @@ const genererPlanning = () => {
       // Garde Samedi
       if (week.gardes.samedi) {
         message += `    - 🌙 Samedi : ${week.gardes.samedi.interneName}\n`
+      }
+      
+      // Astreinte Samedi
+      if (week.gardes.astreinteSamedi) {
+        message += `    - 🚨 Astreinte Samedi : ${week.gardes.astreinteSamedi.interneName}\n`
       }
       
       // Repos post-garde calculés
