@@ -12,9 +12,47 @@ export const usePlanningsStore = defineStore('plannings', {
         internsCount: 7,
         practicesCount: 8,
         startDate: '2025-01-06',
-        internsList: [],
-        practicesList: [],
-        unavailabilities: [],
+        internsList: [
+          { id: '1', firstName: 'Marie', lastName: 'Dupont', email: 'marie.dupont@email.com', phone: '+33 6 12 34 56 78' },
+          { id: '2', firstName: 'Thomas', lastName: 'Martin', email: 'thomas.martin@email.com', phone: '+33 6 23 45 67 89' },
+          { id: '3', firstName: 'Sophie', lastName: 'Bernard', email: 'sophie.bernard@email.com', phone: '+33 6 34 56 78 90' },
+          { id: '4', firstName: 'Lucas', lastName: 'Petit', email: 'lucas.petit@email.com', phone: '+33 6 45 67 89 01' },
+          { id: '5', firstName: 'Emma', lastName: 'Robert', email: 'emma.robert@email.com', phone: '+33 6 56 78 90 12' },
+          { id: '6', firstName: 'Hugo', lastName: 'Richard', email: 'hugo.richard@email.com', phone: '+33 6 67 89 01 23' },
+          { id: '7', firstName: 'Léa', lastName: 'Durand', email: 'lea.durand@email.com', phone: '+33 6 78 90 12 34' }
+        ],
+        practicesList: [
+          { 
+            id: '1', 
+            name: 'Cardiologie', 
+            requiredInterns: 2,
+            schedule: {
+              monday: { morning: true, afternoon: true },
+              tuesday: { morning: true, afternoon: true },
+              wednesday: { morning: true, afternoon: true },
+              thursday: { morning: true, afternoon: true },
+              friday: { morning: true, afternoon: true },
+              saturday: { morning: true, afternoon: false }
+            }
+          },
+          { 
+            id: '2', 
+            name: 'Urgences', 
+            requiredInterns: 1,
+            schedule: {
+              monday: { morning: true, afternoon: true },
+              tuesday: { morning: true, afternoon: true },
+              wednesday: { morning: true, afternoon: true },
+              thursday: { morning: true, afternoon: true },
+              friday: { morning: true, afternoon: true },
+              saturday: { morning: false, afternoon: false }
+            }
+          }
+        ],
+        unavailabilities: [
+          { id: '1', internId: '1', date: '2025-01-15', period: 'morning', reason: 'Formation' },
+          { id: '2', internId: '3', date: '2025-01-20', period: 'fullday', reason: 'Congé' }
+        ],
         lastModified: new Date('2025-01-15'),
         createdAt: new Date('2025-01-10')
       },
@@ -58,7 +96,12 @@ export const usePlanningsStore = defineStore('plannings', {
     },
 
     // Nombre total de plannings
-    totalPlannings: (state) => state.plannings.length
+    totalPlannings: (state) => state.plannings.length,
+
+    // Récupérer un planning par son ID
+    getPlanningById: (state) => (id) => {
+      return state.plannings.find(p => p.id === id)
+    }
   },
 
   actions: {
