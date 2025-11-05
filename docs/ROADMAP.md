@@ -1,16 +1,16 @@
 # 🗺️ ROADMAP - Gestionnaire de Planning Internes
 
-**Dernière mise à jour :** 5 novembre 2025 - 06h30
+**Dernière mise à jour :** 5 novembre 2025 - 15h00
 
 ---
 
 ## 📊 Vue d'Ensemble
 
-**Version actuelle :** 0.8.0 (Module 3 génération à 55%)  
+**Version actuelle :** 0.9.0 (Module 3 génération à 80%)  
 **Version cible v1.0 (MVP) :** Application fonctionnelle complète  
 **Date de début :** 4 novembre 2025  
 **Date de fin prévue v1.0 :** Mi-novembre 2025  
-**Progression globale :** 🟢 75% complété
+**Progression globale :** 🟢 80% complété
 
 ---
 
@@ -218,26 +218,35 @@
 
 **Total : ~50-60 affectations par semaine générées automatiquement !**
 
-### ⏳ Reste à faire (m3-15 à m3-18)
+### ✅ Finalisation & Tests (m3-15 à m3-18) - COMPLÉTÉ
 
-#### m3-15 : Sauvegarder dans le Store (PRIORITÉ)
-- Sauvegarder données générées dans planning
-- Structure : gardes, repos, affectations, offs
-- Persister dans store Pinia
+#### m3-15 : Sauvegarder dans le Store ✅
+- ✅ Sauvegarder données générées dans planning
+- ✅ Structure : gardes, repos, affectations, offs
+- ✅ Persister dans store Pinia avec `updatePlanning()`
 
-#### m3-16 : Changer Statut (PRIORITÉ)
-- Changer status 'config' → 'generated'
-- Mettre à jour lastModified
+#### m3-16 : Changer Statut ✅
+- ✅ Changer status 'config' → 'generated'
+- ✅ Mettre à jour lastModified
 
-#### m3-17 : Affichage Basique (PRIORITÉ)
-- Remplir tableau hebdomadaire avec données
-- Afficher gardes, practices, repos, OFFs
-- Navigation entre semaines
+#### m3-17 : Affichage Basique ✅
+- ✅ Fonction `getJourContent()` pour affichage dynamique
+- ✅ Afficher gardes (🌙), practices (🏥), repos (💤), OFFs (🏖️)
+- ✅ Afficher empêchements (🚫 Indisponible)
+- ✅ Détection et affichage "⚠️ Manque M/AM" pour slots vides
+- ✅ Affichage doublons "(doublon manque effectif)"
+- ✅ Navigation entre semaines (dropdown)
+- ✅ Modal scrollable pour résultats génération
 
-#### m3-18 : Tests
-- Test avec 0 empêchement
-- Test avec empêchements
-- Test avec différents configs
+#### m3-18 : Tests & Corrections ✅
+- ✅ Tests avec empêchements (respectés pour gardes + practices + OFFs)
+- ✅ Tests doublons (distribution équitable)
+- ✅ **FIX CRITIQUE** : Repos post-garde dimanche cross-semaine
+- ✅ **FIX MAJEUR** : Équilibrage doublons par période (pas journée)
+- ✅ **FIX MAJEUR** : OFFs priorisés pour internes avec doublons (compensation)
+- ✅ **FIX MAJEUR** : Tri 3 niveaux doublons (nb semaine > nb période > pas garde)
+- ✅ **FIX** : Affichage "Manque" même avec garde (garde = soir uniquement)
+- ✅ Tests avec différentes configurations internes/practices
 
 ### Fonctionnalités Reportées à v1.1+
 

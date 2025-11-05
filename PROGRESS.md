@@ -1,6 +1,6 @@
 # 📊 Progression du Développement
 
-**Dernière mise à jour :** 5 novembre 2025 - 06h00
+**Dernière mise à jour :** 5 novembre 2025 - 15h00
 
 ---
 
@@ -219,9 +219,9 @@ Le module de configuration est terminé et fonctionnel :
 
 ---
 
-## 🎯 PHASE 4 : MODULE 3 - GÉNÉRATION AUTOMATIQUE (EN COURS ⏳)
+## 🎯 PHASE 4 : MODULE 3 - GÉNÉRATION AUTOMATIQUE (COMPLÉTÉ ✅)
 
-### État : 🔄 En cours - PHASE 1, 2, 3, 4 complètes (55%)
+### État : ✅ Complété - Toutes phases + tests finalisés (80%)
 
 ### Réalisations :
 
@@ -321,32 +321,62 @@ Le module de configuration est terminé et fonctionnel :
 
 **Total : ~50-60 affectations par semaine générées automatiquement !**
 
-### À faire :
+### ✅ Finalisation & Affichage :
 
-#### ⏳ m3-12 à m3-14 : Améliorations (optionnel)
-- Détection conflits avancée
-- Option ajout internes si sous-staffé
-- Calcul score d'équilibre (0-100) avec détails
+#### ✅ m3-15 : Sauvegarder dans le store (COMPLÉTÉ)
+- ✅ Sauvegarder toutes les données générées dans le planning
+- ✅ Structure : gardes, repos, affectations, offs
+- ✅ Persister dans le store Pinia avec `updatePlanning()`
+- ✅ Propriété `generatedData: { weeks, globalStats }` ajoutée
 
-#### ⏳ m3-15 : Sauvegarder dans le store (NEXT - PRIORITÉ)
-- Sauvegarder toutes les données générées dans le planning
-- Structure : gardes, repos, affectations, offs
-- Persister dans le store Pinia
+#### ✅ m3-16 : Changer statut planning (COMPLÉTÉ)
+- ✅ Changer status de 'config' → 'generated'
+- ✅ Mettre à jour lastModified avec `new Date()`
+- ✅ Confirmation visuelle dans dashboard (badge ✅ Généré)
 
-#### ⏳ m3-16 : Changer statut planning (NEXT - PRIORITÉ)
-- Changer status de 'config' → 'generated'
-- Mettre à jour lastModified
+#### ✅ m3-17 : Affichage basique planning (COMPLÉTÉ)
+- ✅ Fonction `getJourContent()` pour affichage dynamique cellules
+- ✅ Afficher gardes (🌙 Garde, fond bleu foncé)
+- ✅ Afficher repos (💤 REPOS, fond gris)
+- ✅ Afficher practices (🏥 Nom (M/AM), pas de fond)
+- ✅ Afficher OFFs (🏖️ OFF, fond bleu clair)
+- ✅ Afficher empêchements (🚫 Indisponible, fond rouge clair)
+- ✅ Détection et affichage "⚠️ Manque M/AM" pour slots vides (fond jaune)
+- ✅ Affichage doublons "(doublon manque effectif)" avec fond jaune
+- ✅ Navigation entre semaines avec dropdown fonctionnel
+- ✅ Mapping jours array → noms (lundi=0, ..., dimanche=6)
 
-#### ⏳ m3-17 : Affichage basique planning (NEXT - PRIORITÉ)
-- Remplir le tableau hebdomadaire avec les données générées
-- Afficher gardes, practices, repos, OFFs
-- Navigation entre semaines fonctionnelle
+#### ✅ m3-18 : Tests & Corrections Majeures (COMPLÉTÉ)
+- ✅ Tests avec 0 empêchement : OK
+- ✅ Tests avec empêchements : Respectés pour gardes + practices + OFFs
+- ✅ Tests avec doublons : Distribution équitable implémentée
+- ✅ **FIX CRITIQUE** : Repos post-garde dimanche cross-semaine
+  - Second passage après génération toutes semaines
+  - Repos placé sur lundi de la semaine SUIVANTE
+  - `calculateReposPostGarde()` skip dimanche, géré dans `generatePlanning()`
+- ✅ **FIX MAJEUR** : Équilibrage doublons par période (pas journée entière)
+  - Compte practices CETTE PÉRIODE uniquement (matin OU après-midi)
+  - Évite qu'un interne avec 1 practice matin + 0 AM soit choisi avant 0 matin + 1 AM
+- ✅ **FIX MAJEUR** : OFFs priorisés pour internes avec doublons (compensation)
+  - Calcul nb doublons par interne
+  - Tri : 1) Plus de doublons = priorité OFF, 2) Plus de slots vides = priorité OFF
+  - Logs : 'X doublon(s), Y slot(s) vide(s)'
+- ✅ **FIX MAJEUR** : Tri 3 niveaux sélection doublons
+  - Priorité 1 : Moins de doublons CETTE SEMAINE (équilibrage global)
+  - Priorité 2 : Moins de practices CETTE PÉRIODE (équilibrage local)
+  - Priorité 3 : Pas de garde CE JOUR (éviter surcharge)
+  - Logs détaillés : 'X doublon(s) semaine, Y practice(s) période, garde/pas garde'
+- ✅ **FIX** : Affichage "Manque" même avec garde
+  - Garde = soir uniquement, donc matin + après-midi doivent être couverts
+  - Suppression condition `hasGardeToday` qui bloquait vérification
 
-#### ⏳ m3-18 : Tests
-- Test avec 0 empêchement
-- Test avec empêchements
-- Test avec conflits
-- Test avec différents nombres d'internes/practices
+### 🎯 Améliorations reportées à v1.1+ :
+
+#### 📋 m3-12 à m3-14 : Fonctionnalités avancées (Voir V2-ROADMAP.md)
+- Détection conflits détaillés (gardes doubles, practices sous-staffées)
+- Option "Ajouter internes" si manque d'effectif
+- Calcul score d'équilibre 0-100 avec détails par catégorie
+- Amélioration scoring équilibrage gardes weekend (CS2)
 
 ### Fichiers créés/modifiés :
 - `utils/generation.js` - Logique génération (PHASE 1, 2, 3, 4 complètes)
