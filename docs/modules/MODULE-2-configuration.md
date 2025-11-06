@@ -2,15 +2,17 @@
 
 ## 📋 Vue d'Ensemble
 
-**Objectif :** Wizard de configuration en 4 étapes pour créer et paramétrer un planning complet.
+**Objectif :** Wizard de configuration en 5 étapes pour créer et paramétrer un planning complet.
 
 **Priorité :** 🔴 CRITIQUE (Fondation de l'application)
 
-**Statut :** ✅ COMPLÉTÉ (Wizard 4 étapes terminé - 100%)
+**Statut :** 🚧 EN COURS (Étapes 1-4 ✅ | Étape 5 ⏳ - 80%)
 
 **Dépendances :** MODULE 1 (Gestion des plannings)
 
-**Dernière mise à jour :** 4 novembre 2025
+**Dernière mise à jour :** 6 novembre 2025
+
+**Changement majeur v1.0 :** Ajout ÉTAPE 5 - Gardes pré-assignées manuellement (source: systèmes hospitaliers)
 
 ---
 
@@ -127,14 +129,53 @@
   - Retour au dashboard
   - Planning visible immédiatement avec badge "⏳ Config"
 
-## 🎉 MODULE 2 COMPLÉTÉ !
+### Étape 5 : Gardes Pré-assignées ⏳ EN COURS
+- ⏳ Interface Étape 5 du wizard :
+  - Tableau de saisie des gardes
+  - Bouton "➕ Ajouter une garde" en haut à droite
+  - État vide avec icône 🌙 et message explicatif
+  - Liste des gardes avec infos détaillées :
+    - Nom complet de l'interne
+    - Date formatée + Type déduit (Semaine/Samedi/Dimanche)
+    - Repos auto le lendemain (indicateur)
+  - Action : Modifier ✏️ et Supprimer 🗑️
+  - **Warnings visuels** (non bloquants) :
+    - ⚠️ 2 gardes même jour
+    - ⚠️ Gardes consécutives
+    - ⚠️ Garde sur indisponibilité
+- ⏳ Modal Ajouter/Modifier Garde :
+  - Dropdown interne* (depuis liste de l'étape 2)
+  - Date* avec date picker
+  - Type de garde déduit automatiquement du jour :
+    - Lundi-Vendredi → Garde Semaine (18h-8h) 🌙
+    - Samedi → Garde Samedi (13h-8h dimanche) 🌙🌙
+    - Dimanche → Garde Dimanche (8h-8h lundi) 🌙🌙🌙
+  - Validation en temps réel (warnings)
+  - Confirmation : "L'interne sera automatiquement en repos le lendemain"
+- ⏳ Validation :
+  - Les gardes sont **optionnelles** (peuvent être incomplètes)
+  - Idéal : (nb_semaines × 7) gardes
+  - Ex: 4 semaines → 28 gardes recommandées (mais non obligatoires)
+  - Compteur en temps réel : "21/28 gardes assignées (75%)"
+  - Bouton "Terminer" toujours activé (même si incomplet)
+- ⏳ Étape **optionnelle pour les modifications** :
+  - Si planning existant modifié, les gardes peuvent être ajoutées/modifiées plus tard
+  - Message : "Vous pourrez ajouter les gardes via l'édition du planning"
+- ⏳ Progress bar à 100% (5/5 étapes)
+- ⏳ Bouton "✓ Terminer et Créer le Planning" (vert)
+- ⏳ Fonction `createPlanning()` mise à jour :
+  - Ajout `preAssignedGardes` dans la structure
+  - Format: `{ interneId, date, type, reposDate }`
 
-### Wizard Complet - 4 Étapes
-Toutes les étapes du wizard de configuration sont terminées et fonctionnelles :
+## 🎉 MODULE 2 - État Global
+
+### Wizard Complet - 5 Étapes
+État d'avancement du wizard de configuration :
 - ✅ **Étape 1** : Paramètres généraux (nom, date, semaines)
 - ✅ **Étape 2** : Gestion des internes (CRUD + contacts globaux)
 - ✅ **Étape 3** : Gestion des practices (CRUD + jours/périodes)
 - ✅ **Étape 4** : Empêchements (optionnel, CRUD simplifié)
+- ⏳ **Étape 5** : Gardes pré-assignées (CRUD, source externe, warnings)
 
 ### Fonctionnalités Globales
 - ✅ Navigation fluide entre les étapes (Retour/Suivant)
@@ -226,13 +267,13 @@ Toutes les étapes du wizard de configuration sont terminées et fonctionnelles 
 
 ## 🎯 Fonctionnalités
 
-### F2.1 - Wizard de Création (4 Étapes)
+### F2.1 - Wizard de Création (5 Étapes)
 
-Le wizard guide l'utilisateur à travers 4 étapes séquentielles pour configurer complètement un planning.
+Le wizard guide l'utilisateur à travers 5 étapes séquentielles pour configurer complètement un planning.
 
 #### Navigation du Wizard
 ```
-[ 1 📝 Paramètres ] → [ 2 👥 Internes ] → [ 3 🏥 Practices ] → [ 4 🚫 Empêchements ]
+[ 1 📝 Paramètres ] → [ 2 👥 Internes ] → [ 3 🏥 Practices ] → [ 4 🚫 Empêchements ] → [ 5 🌙 Gardes ]
 
 État actif: ◉
 État validé: ✓
@@ -549,6 +590,173 @@ Le wizard guide l'utilisateur à travers 4 étapes séquentielles pour configure
 
 ---
 
+### ÉTAPE 5 : Gardes Pré-assignées ⏳
+
+**Objectif :** Saisir manuellement toutes les gardes pour l'ensemble de la période (source: systèmes hospitaliers externes).
+
+**Contexte Important :**
+Les gardes sont générées par des systèmes communs à tous les hôpitaux (externes à cette application). Cette étape permet de les importer manuellement. Une fonctionnalité d'import fichier est prévue pour la v2.0.
+
+**Actions possibles :**
+- ➕ Ajouter une garde
+- ✏️ Modifier une garde
+- 🗑️ Supprimer une garde
+
+**Nombre de gardes :**
+- Total recommandé : **`nb_semaines × 7`** (idéal si toutes les gardes disponibles)
+- Exemple : 4 semaines → 28 gardes recommandées (mais **non obligatoires**)
+- Compteur en temps réel affiché : "21/28 gardes assignées (75%)"
+- ℹ️ Les gardes peuvent être **partielles** (ex: 21/28 si certains jours non couverts)
+
+**Types de garde (déduits automatiquement du jour) :**
+| Jour | Type | Horaires | Difficulté | Icône |
+|------|------|----------|------------|-------|
+| Lundi-Vendredi | Garde Semaine | 18h → 8h (14h) | ⭐ Normale | 🌙 |
+| Samedi | Garde Samedi | 13h → 8h dim (19h) | ⭐⭐⭐ Difficile | 🌙🌙 |
+| Dimanche | Garde Dimanche | 8h → 8h lun (24h) | ⭐⭐ Élevée | 🌙🌙🌙 |
+
+**Repos automatique :**
+- Garde → **Repos obligatoire le lendemain** (matin + après-midi)
+- Le repos est calculé et affiché automatiquement
+- Exemple : Garde Lundi 13/01 → Repos Mardi 14/01 (M + AM)
+
+**Interface :**
+```
+┌────────────────────────────────────────────────┐
+│  Étape 5 sur 5 : Gardes (21/28) [➕ Ajouter]  │
+├────────────────────────────────────────────────┤
+│                                                │
+│  📊 Progression : 21/28 gardes assignées (75%) │
+│  ℹ️ 7 gardes manquantes (non bloquant)         │
+│                                                │
+│  ┌──────────────────────────────────────────┐ │
+│  │ Dr. Martin Dupont                        │ │
+│  │ 🌙 Garde Semaine - Lundi 06/01/2025     │ │
+│  │ → Repos : Mardi 07/01 (M + AM)          │ │
+│  │                          [✏️] [🗑️]     │ │
+│  └──────────────────────────────────────────┘ │
+│  ┌──────────────────────────────────────────┐ │
+│  │ Dr. Sophie Bernard                       │ │
+│  │ 🌙 Garde Semaine - Mardi 07/01/2025     │ │
+│  │ → Repos : Mercredi 08/01 (M + AM)       │ │
+│  │                          [✏️] [🗑️]     │ │
+│  └──────────────────────────────────────────┘ │
+│  ┌──────────────────────────────────────────┐ │
+│  │ Dr. Lucas Petit                          │ │
+│  │ 🌙🌙 Garde Samedi - Samedi 11/01/2025   │ │
+│  │ → Repos : Dimanche 12/01 (M + AM)       │ │
+│  │                          [✏️] [🗑️]     │ │
+│  └──────────────────────────────────────────┘ │
+│  ┌──────────────────────────────────────────┐ │
+│  │ ⚠️ Dr. Emma Leroy                        │ │
+│  │ 🌙🌙🌙 Garde Dimanche - Dim 12/01/2025  │ │
+│  │ → Repos : Lundi 13/01 (M + AM)          │ │
+│  │ ⚠️ Conflit : Garde sur indisponibilité   │ │
+│  │                          [✏️] [🗑️]     │ │
+│  └──────────────────────────────────────────┘ │
+│  ┌──────────────────────────────────────────┐ │
+│  │ ⚠️ Dr. Thomas Robert                     │ │
+│  │ 🌙 Garde Semaine - Lundi 13/01/2025     │ │
+│  │ → Repos : Mardi 14/01 (M + AM)          │ │
+│  │ ⚠️ Gardes consécutives (2 jours de suite)│ │
+│  │                          [✏️] [🗑️]     │ │
+│  └──────────────────────────────────────────┘ │
+│  ...                                           │
+│                                                │
+│  ℹ️ Les gardes sont issues de systèmes externes│
+│     Import automatique prévu en v2.0           │
+│                                                │
+│               [← Retour]  [Terminer ✓]        │
+└────────────────────────────────────────────────┘
+```
+
+**Modal Ajouter/Modifier Garde :**
+```
+┌────────────────────────────────────┐
+│  Ajouter une Garde                 │
+├────────────────────────────────────┤
+│                                    │
+│  Interne *                         │
+│  ┌──────────────────────────────┐ │
+│  │ Dr. Martin Dupont        ▼  │ │
+│  └──────────────────────────────┘ │
+│                                    │
+│  Date *                            │
+│  ┌──────────────────────────────┐ │
+│  │ 📅 13/01/2025 (Lundi)        │ │
+│  └──────────────────────────────┘ │
+│                                    │
+│  ℹ️ Type détecté : Garde Semaine   │
+│     Horaires : 18h → 8h (14h)      │
+│     Difficulté : ⭐ Normale         │
+│                                    │
+│  ✅ Repos automatique :             │
+│     Mardi 14/01/2025 (M + AM)      │
+│                                    │
+│  ⚠️ WARNINGS DÉTECTÉS :             │
+│  • Garde déjà assignée ce jour à   │
+│    Dr. Sophie Bernard              │
+│  • Interne a une garde consécutive │
+│    (Dimanche 12/01)                │
+│                                    │
+│  ℹ️ Ces warnings ne bloquent pas   │
+│     la création (flexibilité)      │
+│                                    │
+│     [Annuler]  [Ajouter quand même]│
+└────────────────────────────────────┘
+```
+
+**Warnings (non bloquants) :**
+1. ⚠️ **2 gardes même jour** : Détection si une autre garde existe déjà ce jour
+2. ⚠️ **Gardes consécutives** : Détection si l'interne a une garde la veille ou le lendemain
+3. ⚠️ **Garde sur indisponibilité** : Détection si l'interne est marqué indisponible (Étape 4)
+
+**Détails d'implémentation :**
+
+**Calcul automatique du type de garde :**
+```javascript
+function getGardeType(date) {
+  const dayOfWeek = new Date(date).getDay()
+  if (dayOfWeek === 0) return { type: 'dimanche', label: 'Garde Dimanche', icon: '🌙🌙🌙', hours: '8h-8h', difficulty: 2 }
+  if (dayOfWeek === 6) return { type: 'samedi', label: 'Garde Samedi', icon: '🌙🌙', hours: '13h-8h', difficulty: 3 }
+  return { type: 'semaine', label: 'Garde Semaine', icon: '🌙', hours: '18h-8h', difficulty: 1 }
+}
+```
+
+**Calcul automatique du repos :**
+```javascript
+function calculateReposDate(gardeDate) {
+  const nextDay = addDays(gardeDate, 1)
+  return {
+    date: nextDay,
+    periode: 'fullday', // Matin + Après-midi
+    label: `${formatDate(nextDay)} (M + AM)`
+  }
+}
+```
+
+**Validation :**
+- Date dans la période du planning (entre date début et date fin)
+- Interne sélectionné existe
+- Les gardes sont **optionnelles** (peuvent être incomplètes)
+- Bouton "Terminer" **toujours actif** même si gardes partielles
+- Message info si gardes manquantes : "ℹ️ X gardes manquantes sur Y (non bloquant)"
+- Warnings affichés mais ne bloquent pas
+
+**Modèle de données :**
+```javascript
+{
+  id: "uuid",
+  interneId: "uuid",
+  date: "2025-01-13",
+  type: "semaine", // "semaine" | "samedi" | "dimanche"
+  reposDate: "2025-01-14", // Calculé automatiquement
+  createdAt: "2025-11-06T10:30:00"
+}
+```
+
+---
+
 ## 🔄 F2.2 - Modification des Paramètres
 
 **Statut :** ✅ COMPLÉTÉ (100%)
@@ -599,6 +807,25 @@ Le wizard guide l'utilisateur à travers 4 étapes séquentielles pour configure
   - Champ raison (optionnel)
 - ✅ **Bouton 🗑️ Supprimer** : Suppression avec confirmation
 - ✅ Validation : interne et date obligatoires
+
+### Section 5 : Gestion des Gardes ⏳ EN COURS
+- ⏳ Liste des gardes avec compteur en temps réel
+- ⏳ Indicateur de progression : "45/63 gardes (71%)"
+- ⏳ Affichage détaillé par garde :
+  - Nom complet interne
+  - Date formatée + Type (icône 🌙/🌙🌙/🌙🌙🌙)
+  - Repos automatique affiché
+  - Warnings visuels si conflits
+- ⏳ **Bouton ➕ Ajouter** : Modal complet (identique Étape 5) avec :
+  - Dropdown sélection interne*
+  - Date picker*
+  - Type auto-détecté + horaires affichés
+  - Repos auto-calculé affiché
+  - Warnings en temps réel (non bloquants)
+- ⏳ **Bouton ✏️ Modifier** : Modal pré-rempli
+- ⏳ **Bouton 🗑️ Supprimer** : Suppression avec confirmation
+- ⏳ Validation : interne et date obligatoires
+- ⏳ **Important** : Modification d'une garde → Régénération requise pour recalculer practices/OFFs
 
 ### Sauvegarde et Actions ✅
 - ✅ **Bouton 💾 Sauvegarder** :
@@ -666,6 +893,18 @@ Le wizard guide l'utilisateur à travers 4 étapes séquentielles pour configure
 }
 ```
 
+### Garde (Pré-assignée)
+```javascript
+{
+  id: "uuid",
+  interneId: "uuid",
+  date: "2025-01-13",
+  type: "semaine", // "semaine" | "samedi" | "dimanche" (auto-détecté)
+  reposDate: "2025-01-14", // Calculé auto (lendemain)
+  createdAt: "2025-11-06T10:30:00"
+}
+```
+
 ---
 
 ## ✅ Critères d'Acceptation
@@ -698,9 +937,37 @@ THEN il passe à l'étape 4
 ### Étape 4
 ```
 GIVEN l'utilisateur est à l'étape 4
-WHEN il clique sur "Terminer" (avec ou sans empêchements)
-THEN le planning est créé
-AND il est redirigé vers la vue du planning ou dashboard
+WHEN il ajoute des empêchements (optionnel)
+AND il clique sur "Suivant"
+THEN il passe à l'étape 5
+```
+
+### Étape 5
+```
+GIVEN l'utilisateur est à l'étape 5
+AND nb_semaines = 4 (donc 28 gardes recommandées)
+WHEN il ajoute toutes les gardes (28/28)
+AND il clique sur "Terminer"
+THEN le planning est créé avec preAssignedGardes
+AND il est redirigé vers le dashboard
+AND le planning apparaît avec statut "⏳ Config"
+
+GIVEN l'utilisateur est à l'étape 5
+WHEN il a ajouté seulement 21/28 gardes
+THEN le bouton "Terminer" est TOUJOURS actif
+AND un message "ℹ️ 7 gardes manquantes (non bloquant)" est affiché
+AND le planning peut être créé avec 21 gardes seulement
+
+GIVEN l'utilisateur est à l'étape 5
+WHEN il n'a ajouté AUCUNE garde (0/28)
+THEN le bouton "Terminer" est TOUJOURS actif
+AND le planning peut être créé sans aucune garde
+AND un message "ℹ️ Aucune garde assignée" est affiché
+
+GIVEN l'utilisateur ajoute une garde
+WHEN la date a déjà une garde assignée
+THEN un warning "⚠️ 2 gardes même jour" s'affiche
+BUT la garde peut quand même être créée (non bloquant)
 ```
 
 ---
@@ -712,5 +979,5 @@ AND il est redirigé vers la vue du planning ou dashboard
 
 ---
 
-*Dernière mise à jour : 4 novembre 2025*
+*Dernière mise à jour : 6 novembre 2025*
 

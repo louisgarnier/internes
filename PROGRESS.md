@@ -1,6 +1,6 @@
 # 📊 Progression du Développement
 
-**Dernière mise à jour :** 5 novembre 2025 - 15h00
+**Dernière mise à jour :** 6 novembre 2025 - 12h00
 
 ---
 
@@ -62,9 +62,9 @@
 
 ---
 
-## 🎯 PHASE 3 : MODULE 2 - CONFIGURATION (COMPLÉTÉ ✅)
+## 🎯 PHASE 3 : MODULE 2 - CONFIGURATION (🚧 EN COURS)
 
-### État : ✅ COMPLÉTÉ - F2.1 Wizard + F2.2 Modification (100%)
+### État : 🚧 EN COURS - F2.1 Wizard 80% (Étape 5 en cours) + F2.2 Modification 100%
 
 ### Réalisations :
 
@@ -136,6 +136,44 @@
   - Retour au dashboard
   - Planning visible immédiatement avec badge "Config"
 
+#### ⏳ Étape 5 : Gardes Pré-assignées (EN COURS - 0%)
+
+**🔄 CHANGEMENT MAJEUR v1.0 :** Les gardes ne sont plus générées automatiquement par l'algorithme. Elles sont **saisies manuellement** dans cette étape (source: systèmes hospitaliers externes).
+
+**Micro-tâches :**
+- ⏳ **m2-5.1** : Ajouter Étape 5 dans le wizard (après Étape 4)
+- ⏳ **m2-5.2** : Créer formulaire `gardeForm` avec champs : interneId, date
+- ⏳ **m2-5.3** : Fonction `getGardeType(date)` : Déduction auto du type (semaine/samedi/dimanche)
+- ⏳ **m2-5.4** : Fonction `calculateReposDate(date)` : Calcul auto date de repos
+- ⏳ **m2-5.5** : Compteur en temps réel : "21/28 gardes assignées (75%)"
+- ⏳ **m2-5.6** : Liste des gardes avec affichage détaillé (interne, date, type, repos)
+- ⏳ **m2-5.7** : Modal Ajouter/Modifier Garde
+- ⏳ **m2-5.8** : Fonction `detectDuplicateGardes()` : Warning 2 gardes même jour
+- ⏳ **m2-5.9** : Fonction `detectConsecutiveGardes()` : Warning gardes consécutives
+- ⏳ **m2-5.10** : Fonction `detectGardeOnUnavailability()` : Warning garde sur indispo
+- ⏳ **m2-5.11** : Affichage warnings dans modal et liste (badges oranges)
+- ⏳ **m2-5.12** : Validation : Gardes optionnelles (peuvent être incomplètes)
+- ⏳ **m2-5.13** : Bouton "Terminer" toujours actif (même si 0 garde)
+- ⏳ **m2-5.14** : Message "ℹ️ X gardes manquantes sur Y (non bloquant)"
+- ⏳ **m2-5.15** : Fonction `createPlanning()` mise à jour avec `preAssignedGardes`
+- ⏳ **m2-5.16** : Progress bar à 100% (5/5 étapes)
+- ⏳ **m2-5.17** : Tests avec planning 4 semaines (28 gardes)
+
+**Structure de données :**
+```javascript
+formData.preAssignedGardes = [
+  {
+    id: 'garde-1',
+    interneId: 'intern-1',
+    date: '2025-01-06',
+    type: 'semaine', // Auto-déduit
+    reposDate: '2025-01-07', // Auto-calculé
+    createdAt: timestamp
+  },
+  // ... 27 autres gardes
+]
+```
+
 ### ✅ F2.2 : Modification des Paramètres (COMPLÉTÉE)
 **Page d'édition complète** pour modifier un planning existant :
 
@@ -168,6 +206,23 @@
 - Modal complet : dropdown interne, date, période (3 options), raison
 - Radio buttons stylisés (Matin 8h-13h / Après-midi 13h-18h / Journée 8h-18h)
 - Validation : interne + date obligatoires
+
+#### Section 5 : Gestion des Gardes ⏳ (EN COURS - 0%)
+**🔄 NOUVEAU :** Section pour gérer les gardes pré-assignées (identique à Étape 5 du wizard)
+
+**Micro-tâches :**
+- ⏳ **m2-6.1** : Ajouter Section 5 dans l'accordéon de `/planning/[id]/edit.vue`
+- ⏳ **m2-6.2** : Liste des gardes avec compteur : "45/63 gardes (71%)"
+- ⏳ **m2-6.3** : Affichage détaillé par garde (interne, date, type, repos, warnings)
+- ⏳ **m2-6.4** : Modal Ajouter/Modifier Garde (réutilisation Étape 5)
+- ⏳ **m2-6.5** : Fonctions warnings (duplicate/consecutive/unavailability)
+- ⏳ **m2-6.6** : Suppression garde avec confirmation
+- ⏳ **m2-6.7** : Message info : "ℹ️ X gardes manquantes sur Y (non bloquant)"
+- ⏳ **m2-6.8** : Bouton "💾 Sauvegarder" met à jour `preAssignedGardes`
+- ⏳ **m2-6.9** : Bandeau orange si modification : "⚠️ Régénération requise pour recalculer practices/OFFs"
+- ⏳ **m2-6.10** : Tests : Ajouter/Modifier/Supprimer gardes + Sauvegarde
+
+**Note :** Modification d'une garde → Régénération nécessaire pour recalculer repos + practices
 
 #### Sauvegarde et Régénération ✅
 - **💾 Sauvegarder** :
@@ -476,13 +531,18 @@ Le module de configuration est terminé et fonctionnel :
 |-------|--------|------|-------------|
 | ✅ Phase 1 | Setup & Documentation | **COMPLÉTÉ** | 100% |
 | ✅ Phase 2 | MODULE 1 - Dashboard | **COMPLÉTÉ** | 100% |
-| ✅ Phase 3 | MODULE 2 - Configuration | **COMPLÉTÉ** (Wizard 4 étapes) | 100% |
-| ✅ Phase 4 | MODULE 3 - Génération | **COMPLÉTÉ** (7 gardes + astreinte) | 85% |
+| 🚧 Phase 3 | MODULE 2 - Configuration | **EN COURS** (Wizard 5 étapes - Étape 5 en cours) | 80% |
+| 🔄 Phase 4 | MODULE 3 - Génération | **REFONTE** (Gardes pré-assignées) | 60% |
 | 🚧 Phase 5 | MODULE 4 - Visualisation | **EN COURS** (2 vues fonctionnelles) | 75% |
 | 📝 Phase 6 | MODULE 5 - Manipulation | À venir | 0% |
 | 📝 Phase 7 | MODULE 6 - Export | À venir | 0% |
 | 📝 Phase 8 | MODULE 7 - Stockage | À venir | 0% |
 | 📝 Phase 9 | Tests & Polish | À venir | 0% |
+
+**🔄 CHANGEMENT MAJEUR v1.0 :**
+- Les **gardes ne sont plus générées automatiquement** par l'algorithme
+- Nouvelle **Étape 5 du wizard** : Saisie manuelle des gardes (source: systèmes hospitaliers)
+- MODULE 3 simplifié : Application gardes pré-définies → Calcul repos → Attribution practices/OFFs
 
 ---
 

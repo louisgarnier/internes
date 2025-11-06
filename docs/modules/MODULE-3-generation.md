@@ -2,15 +2,20 @@
 
 ## 📋 Vue d'Ensemble
 
-**Objectif :** Générer automatiquement un planning complet en respectant toutes les contraintes (gardes, repos, empêchements, équilibre).
+**Objectif :** Générer automatiquement un planning complet à partir des gardes pré-assignées, en respectant toutes les contraintes (repos, empêchements, équilibre practices/OFFs).
 
 **Priorité :** 🔴 CRITIQUE (Cœur de l'application)
 
-**Statut :** 🟡 EN DÉVELOPPEMENT (70% complété)
+**Statut :** 🟡 EN COURS DE REFONTE (60% - Changement majeur : Gardes pré-assignées)
 
-**Dépendances :** MODULE 2 (Configuration complète)
+**Dépendances :** MODULE 2 (Configuration complète + Gardes pré-assignées - Étape 5)
 
-**Complexité :** ⭐⭐⭐⭐⭐ TRÈS ÉLEVÉE
+**Complexité :** ⭐⭐⭐⭐ ÉLEVÉE
+
+**🔄 CHANGEMENT MAJEUR v1.0 :**
+- **Avant** : Les gardes étaient attribuées automatiquement par l'algorithme (scoring)
+- **Maintenant** : Les gardes sont **pré-assignées manuellement** via l'Étape 5 du wizard (source: systèmes hospitaliers externes)
+- **Impact** : PHASE 1 simplifiée = Appliquer les gardes pré-définies + Validations/Warnings
 
 ---
 
@@ -25,11 +30,11 @@
 | **CD2b** - Repos post-garde Vendredi (samedi matin+AM) | ✅ IMPLÉMENTÉ | Fonctionne correctement |
 | **CD2c** - Repos post-garde Samedi (dimanche matin+AM) | ✅ IMPLÉMENTÉ | Fonctionne correctement |
 | **CD2d** - Repos post-garde Dimanche (lundi matin+AM) | ✅ IMPLÉMENTÉ | Repos placé sur lundi de la semaine suivante (cross-semaine) |
-| **CD2e** - Pas de garde Lundi si garde Dimanche | ✅ IMPLÉMENTÉ | Garde Dimanche finit Lundi 8h → Impossible garde Lundi 18h |
-| **CD3** - Unicité des gardes (1 interne = max 1 garde/jour) | ✅ IMPLÉMENTÉ | Vérifié dans le scoring |
-| **CD4** - Respect des empêchements (indisponibilités) | ✅ IMPLÉMENTÉ | Vérifié pour gardes + practices + OFFs |
+| **CD2e** - Pas de garde Lundi si garde Dimanche | ⚠️ WARNING | Vérifié dans Étape 5 wizard (non bloquant) |
+| **CD3** - Unicité des gardes (1 interne = max 1 garde/jour) | ⚠️ WARNING | Vérifié dans Étape 5 wizard (non bloquant) |
+| **CD4** - Respect des empêchements (indisponibilités) | ✅ IMPLÉMENTÉ | Vérifié pour practices + OFFs (warning pour gardes) |
 | **CD5** - Demi-journée OFF (1 par interne/semaine) | ⚠️ PARTIEL | Attribué si slots disponibles (bonus) |
-| **CD6** - Couverture complète (7 gardes/semaine) | ✅ IMPLÉMENTÉ | 7/7 gardes toujours attribuées |
+| **CD6** - Couverture complète (7 gardes/semaine) | ❌ NON REQUIS | Les gardes sont saisies manuellement, peut être incomplet |
 
 ### Contraintes SOUPLES (Objectifs d'équilibre)
 
@@ -117,82 +122,208 @@ VALIDATION: Vérification des contraintes
 
 ---
 
-### PHASE 1 : Attribution des Gardes 🌙 + Astreinte 🚨
+### PHASE 1 : Application des Gardes Pré-assignées 🌙 (REFONTE v1.0)
 
-**Objectif :** Assigner les 7 gardes de la semaine + 1 astreinte samedi matin de manière optimale.
+**🔄 CHANGEMENT MAJEUR :** Les gardes ne sont plus attribuées automatiquement par l'algorithme. Elles sont **pré-saisies manuellement** dans l'Étape 5 du wizard (source: systèmes hospitaliers externes).
 
-**Les 7 gardes à attribuer :**
-1. Garde Lundi soir (GS)
-2. Garde Mardi soir (GS)
-3. Garde Mercredi soir (GS)
-4. Garde Jeudi soir (GS)
-5. Garde Vendredi soir (GS)
-6. Garde Samedi (GSam) → 13h-8h dimanche
-7. Garde Dimanche (GDim) → 24h
+**Objectif :** Appliquer les gardes pré-définies dans la structure de la semaine + Détecter/afficher les warnings + Préparer le calcul des repos.
 
-**+ 1 Astreinte :**
-8. Astreinte Samedi matin → 8h-13h (5h)
+**Les 7 gardes (pré-assignées) :**
+1. Garde Lundi soir (GS) → 18h-8h (14h)
+2. Garde Mardi soir (GS) → 18h-8h (14h)
+3. Garde Mercredi soir (GS) → 18h-8h (14h)
+4. Garde Jeudi soir (GS) → 18h-8h (14h)
+5. Garde Vendredi soir (GS) → 18h-8h (14h)
+6. Garde Samedi (GSam) → 13h-8h dimanche (19h)
+7. Garde Dimanche (GDim) → 8h-8h lundi (24h)
 
-**Ordre de priorité :**
-1. **Garde Dimanche** (la plus difficile, 24h) - Phase 1b
-2. **Gardes Semaine** (Lundi-Vendredi) - Phase 1c
-3. **Garde Samedi** (la moins désirable) - Phase 1d
-4. **Astreinte Samedi** (obligatoire, 1 interne) - Phase 1e
+**Source des gardes :**
+- Saisies manuellement dans l'**Étape 5** du wizard
+- Format : `{ interneId, date, type, reposDate }`
+- Type déduit automatiquement du jour de la semaine
+- Total requis : `nb_semaines × 7` gardes
 
-**Pour chaque garde :**
+**Processus PHASE 1 :**
 ```
-1. Filtrer les internes DISPONIBLES
-   - Pas de garde déjà assignée ce jour
-   - Pas de repos post-garde ce jour
-   - Pas d'empêchement
+1. Récupérer les gardes pré-assignées depuis planning.preAssignedGardes
    
-2. Calculer un SCORE pour chaque interne disponible
+2. Pour chaque semaine à générer :
    
-3. Choisir l'interne avec le MEILLEUR score
+   a) Filtrer les gardes de cette semaine (date dans [startDate, endDate])
    
-4. Assigner la garde
+   b) Pour chaque garde :
+      - Identifier le type (lundi-vendredi/samedi/dimanche)
+      - Récupérer l'interne assigné
+      - Placer la garde dans la structure week.gardes
    
-5. Marquer les repos post-garde automatiques
+   c) (Optionnel) Vérifier le nombre de gardes présentes
+      → Si < 7 : Logger info "Semaine X : X/7 gardes assignées" (NON BLOQUANT)
+   
+   d) (Optionnel) Détecter et logger les warnings :
+      • ⚠️ 2 gardes même jour
+      • ⚠️ Gardes consécutives
+      • ⚠️ Garde sur indisponibilité
+      
+   e) Préparer les dates de repos (calculées à PHASE 2)
 ```
 
-**Système de Score :**
+**Important :**
+- ✅ Les gardes sont **FIXES** (pas de scoring, pas d'optimisation)
+- ✅ Les repos seront calculés automatiquement en PHASE 2 (inchangé)
+- ⚠️ Les warnings sont **informatifs** (non bloquants, affichés dans Étape 5)
+- ❌ Pas de modification des gardes dans la génération
+
+**Validation (informative uniquement) :**
 ```javascript
-score = 0
-
-// Facteur 1 : Déficit de gardes totales (poids 3)
-deficitTotal = moyenneGardes - gardesInterne
-score += deficitTotal × 3
-
-// Facteur 2 : Déficit par type de garde (poids 2)
-if (typeGarde === "dimanche") {
-  deficitDimanche = moyenneDimanche - gardesdimanCheInterne
-  score += deficitDimanche × 2
-  score += 1 // Bonus pour garde dimanche
-}
-
-if (typeGarde === "samedi") {
-  deficitSamedi = moyenneSamedi - gardesSamediInterne
-  score += deficitSamedi × 2
+// Logger le nombre de gardes présentes (NON BLOQUANT)
+function logGardesForWeek(weekStartDate, preAssignedGardes) {
+  const gardesThisWeek = preAssignedGardes.filter(g => 
+    g.date >= weekStartDate && g.date <= addDays(weekStartDate, 6)
+  )
   
-  // Pénalité si garde samedi récente (< 3 semaines)
-  if (aFaitSamediRecemment) {
-    score -= 5
+  console.log(`📊 Semaine ${weekStartDate} : ${gardesThisWeek.length}/7 gardes assignées`)
+  
+  // Logger les types de gardes présentes
+  const types = gardesThisWeek.map(g => g.type)
+  const semaineCount = types.filter(t => t === 'semaine').length
+  const hasSamedi = types.includes('samedi')
+  const hasDimanche = types.includes('dimanche')
+  
+  console.log(`  - Gardes semaine : ${semaineCount}/5`)
+  console.log(`  - Garde samedi : ${hasSamedi ? '✅' : '❌'}`)
+  console.log(`  - Garde dimanche : ${hasDimanche ? '✅' : '❌'}`)
+  
+  if (gardesThisWeek.length < 7) {
+    console.log(`  ⚠️ Semaine incomplète : ${7 - gardesThisWeek.length} garde(s) manquante(s)`)
   }
+  
+  return gardesThisWeek
 }
-
-// Facteur 3 : Aléatoire (pour éviter patterns)
-score += random(-0.1, 0.1)
-
-// L'interne avec le score le PLUS ÉLEVÉ est choisi
 ```
 
-**Exemple :**
+**Exemple de structure après PHASE 1 :**
+```javascript
+week.gardes = {
+  semaine: [
+    { interneId: 'intern-1', date: '2025-01-06', type: 'semaine', jourName: 'lundi' },
+    { interneId: 'intern-2', date: '2025-01-07', type: 'semaine', jourName: 'mardi' },
+    { interneId: 'intern-3', date: '2025-01-08', type: 'semaine', jourName: 'mercredi' },
+    { interneId: 'intern-4', date: '2025-01-09', type: 'semaine', jourName: 'jeudi' },
+    { interneId: 'intern-5', date: '2025-01-10', type: 'semaine', jourName: 'vendredi' }
+  ],
+  samedi: { interneId: 'intern-6', date: '2025-01-11', type: 'samedi' },
+  dimanche: { interneId: 'intern-7', date: '2025-01-05', type: 'dimanche' },
+  astreinteSamedi: null // Calculé séparément (existant)
+}
 ```
-Garde Dimanche :
-- Dr. Martin : -2 gardes → score = (-2 × 3) + (-1 × 2) + 1 = -7
-- Dr. Sophie : -1 garde  → score = (-1 × 3) + (0 × 2) + 1 = -2  ← CHOISI
-- Dr. Lucas  : +1 garde  → score = (1 × 3) + (1 × 2) + 1 = 6
+
+**Différence avec l'ancien système :**
+| Aspect | Ancien (scoring) | Nouveau (pré-assigné) |
+|--------|------------------|----------------------|
+| Source | Algorithme automatique | Saisie manuelle (Étape 5) |
+| Optimisation | Scoring + équilibrage | Aucune (gardes fixes) |
+| Flexibilité | Automatique | Contrôle utilisateur total |
+| Warnings | Bloquants | Informatifs uniquement |
+| Modification | Régénération = nouvelles gardes | Gardes conservées |
+
+---
+
+### ⚠️ Warnings et Validations (PHASE 1 - Gardes)
+
+**3 types de warnings détectés lors de la saisie (Étape 5) et de la génération :**
+
+#### Warning 1 : Deux gardes le même jour
+```javascript
+function detectDuplicateGardes(preAssignedGardes) {
+  const gardesByDate = {}
+  const warnings = []
+  
+  preAssignedGardes.forEach(garde => {
+    if (!gardesByDate[garde.date]) {
+      gardesByDate[garde.date] = []
+    }
+    gardesByDate[garde.date].push(garde)
+  })
+  
+  Object.entries(gardesByDate).forEach(([date, gardes]) => {
+    if (gardes.length > 1) {
+      warnings.push({
+        type: 'duplicate_garde',
+        date,
+        internes: gardes.map(g => g.interneId),
+        message: `⚠️ 2 gardes assignées le ${date}`
+      })
+    }
+  })
+  
+  return warnings
+}
 ```
+
+#### Warning 2 : Gardes consécutives
+```javascript
+function detectConsecutiveGardes(interneId, preAssignedGardes) {
+  const interneGardes = preAssignedGardes
+    .filter(g => g.interneId === interneId)
+    .map(g => g.date)
+    .sort()
+  
+  const warnings = []
+  
+  for (let i = 0; i < interneGardes.length - 1; i++) {
+    const date1 = new Date(interneGardes[i])
+    const date2 = new Date(interneGardes[i + 1])
+    const diffDays = (date2 - date1) / (1000 * 60 * 60 * 24)
+    
+    if (diffDays === 1) {
+      warnings.push({
+        type: 'consecutive_gardes',
+        interneId,
+        dates: [interneGardes[i], interneGardes[i + 1]],
+        message: `⚠️ Gardes consécutives : ${interneGardes[i]} et ${interneGardes[i + 1]}`
+      })
+    }
+  }
+  
+  return warnings
+}
+```
+
+#### Warning 3 : Garde sur indisponibilité
+```javascript
+function detectGardeOnUnavailability(preAssignedGardes, unavailabilities) {
+  const warnings = []
+  
+  preAssignedGardes.forEach(garde => {
+    const conflict = unavailabilities.find(unavail => 
+      unavail.internId === garde.interneId &&
+      unavail.date === garde.date &&
+      (unavail.period === 'fullday' || unavail.period === 'afternoon')
+    )
+    
+    if (conflict) {
+      warnings.push({
+        type: 'garde_on_unavailability',
+        interneId: garde.interneId,
+        date: garde.date,
+        message: `⚠️ Garde assignée sur une indisponibilité (${conflict.reason || 'Non spécifié'})`
+      })
+    }
+  })
+  
+  return warnings
+}
+```
+
+**Affichage des warnings :**
+- **Dans l'Étape 5 du wizard** : Affichés en temps réel lors de l'ajout/modification d'une garde
+- **Dans la génération** : Loggés dans la console (informatifs, non bloquants)
+- **Format** : Badge orange avec icône ⚠️ à côté de la garde concernée
+
+**Important :**
+- ⚠️ Ces warnings sont **NON BLOQUANTS** (flexibilité pour cas exceptionnels)
+- ℹ️ Ils sont affichés pour **informer l'utilisateur** des situations potentiellement problématiques
+- ✅ L'utilisateur peut choisir de les ignorer (ex: urgence, remplacement de dernière minute)
 
 ---
 
@@ -585,5 +716,5 @@ AND des solutions sont proposées
 
 ---
 
-*Dernière mise à jour : 4 novembre 2025*
+*Dernière mise à jour : 6 novembre 2025 - REFONTE PHASE 1 (Gardes pré-assignées)*
 
