@@ -1201,6 +1201,14 @@ const createPlanning = () => {
   // Sauvegarder le planning dans le store
   const planningsStore = usePlanningsStore()
   
+  // ✅ FIX: Mapper internsRequired → requiredInterns + ajouter id unique
+  const practicesListMapped = formData.value.practices.map((practice, index) => ({
+    id: `practice-${Date.now()}-${index}`,
+    name: practice.name,
+    requiredInterns: practice.internsRequired, // ← FIX: Renommer le champ
+    schedule: practice.schedule
+  }))
+  
   planningsStore.addPlanning({
     name: formData.value.name,
     status: 'config', // Pas encore généré
@@ -1209,7 +1217,7 @@ const createPlanning = () => {
     practicesCount: formData.value.practices.length,
     startDate: formData.value.startDate,
     internsList: formData.value.interns,
-    practicesList: formData.value.practices,
+    practicesList: practicesListMapped, // ← Utiliser la version mappée
     unavailabilities: formData.value.unavailabilities
   })
   
